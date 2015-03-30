@@ -27,7 +27,6 @@ server.post('/DirectoryProfile', function(req, res, next)
     {
         logHandler.WriteLog("info", "Start");
 
-
         var data = fsMediaFormatter.convertUrlEncoded(req.body);
 
         var hostname = data["hostname"];
@@ -90,6 +89,27 @@ server.post('/DirectoryProfile', function(req, res, next)
 
                     res.end(xml);
                 }
+            })
+        }
+        else if(purpose && profile && hostname && purpose === 'gateways')
+        {
+            var csId = parseInt(hostname);
+            extBackendHandler.GetGatewayListForCallServerProfile(profile, csId, function(err, result)
+            {
+                if (err)
+                {
+                    logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
+                    var xml = xmlGen.createNotFoundResponse();
+
+                    res.end(xml);
+                }
+                else
+                {
+                    var xml = xmlGen.CreateGatewayProfile(result);
+
+                    res.end(xml);
+                }
+
             })
         }
         else

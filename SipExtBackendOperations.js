@@ -174,135 +174,222 @@ var GetGatewayListForCallServerProfile = function(profile, csId, callback)
     }
 };
 
-var GetGatewayListForCallServerProfilee = function(profile, csId, callback)
+var GetGatewayForOutgoingRequest = function(fromNumber, lbId, callback)
 {
-    try
-    {
-        dbModel.SipNetworkProfile
-            .find({where: [{CallServerId: csId}, {ProfileName: profile}, {ObjType: 'external'}]})
-            .complete(function (err, prof)
-            {
-                try
-                {
-                    if (err)
-                    {
-                        callback(err, undefined);
-                    }
-                    else if (!prof)
-                    {
-                        callback(new Error('Profile Not found'), undefined);
-                    }
-                    else
-                    {
-                        dbModel.Cloud
-                            .find({include: [{model: dbModel.CallServer, where: {id: csId}}]})
-                            .complete(function (err, resultCsCloud)
-                            {
-                                try
-                                {
-                                    if (err)
-                                    {
-                                        callback(err, undefined);
-                                    }
-                                    else if (!resultCsCloud)
-                                    {
-                                        callback(new Error('Unable to find a cluster to call server'), undefined);
-                                    }
-                                    else
-                                    {
+    var outgoingRequest = {
+        LimitId: "",
+        GwIpUrl: ""
+    };
 
-                                        dbModel.Trunk
-                                            .findAll({where: [{ClusterId: resultCsCloud.CSDB_CallServers[0].ClusterId}]})
-                                            .complete(function (err, trunkRecList)
+    dbModel.TrunkPhoneNumber
+        .find({where :[{PhoneNumber: fromNumber}], include : [{model: dbModel.Trunk, as: "Trunk"}]})
+        .complete(function (err, result)
+        {
+            if(err)
+            {
+                callback(err, undefined);
+            }
+            else if(result)
+            {
+                if(result.Trunk)
+                {
+                    if(result.LimitId)
+                    {
+                        outgoingRequest.LimitId = result.LimitId;
+                    }
+
+                    outgoingRequest.GwIpUrl = result.Trunk.IpUrl;
+
+                    callback(undefined, outgoingRequest);
+
+                }
+                else
+                {
+                    callback(new Error('Trunk not added to number'), undefined);
+                }
+            }
+            else
+            {
+                callback(new Error('Number not found'), undefined);
+            }
+
+        });
+}
+
+var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
+{
+    var incomingRequest = {
+        LimitId: "",
+        IpCode: "",
+        LoadBalanceType: ""
+    };
+
+    dbModel.TrunkPhoneNumber
+        .find({where :[{PhoneNumber: toNumber}]})
+        .complete(function (err, phn)
+        {
+            try
+            {
+                if(err)
+                {
+                    callback(err, undefined);
+                }
+                else if(phn && phn.CompanyId && phn.TenantId)
+                {
+                    //record found
+                    var companyId = phn.CompanyId;
+                    var tenantId = phn.TenantId;
+
+                    dbModel.CloudEndUser
+                        .find({where :[{CompanyId: companyId}, {TenantId: tenantId}]})
+                        .complete(function (err, endUser)
+                        {
+                            if(err)
+                            {
+                                callback(err, undefined);
+                            }
+                            else if(endUser && endUser.SIPConnectivityProvision)
+                            {
+                                var provisionMechanism = endUser.SIPConnectivityProvision;
+
+                                switch(provisionMechanism)
+                                {
+                                    case 1:
+                                    {
+                                        //find call server
+                                        dbModel.CallServer
+                                            .find({where :[{CompanyId: companyId}, {TenantId: tenantId}]})
+                                            .complete(function (err, cs)
                                             {
-                                                try
+                                                if(err)
                                                 {
-                                                    if (err)
+                                                    callback(err, undefined);
+                                                }
+                                                else if(cs)
+                                                {
+                                                    //call server found
+                                                    incomingRequest.LimitId = phn.LimitId;
+                                                    incomingRequest.IpCode = cs.InternalMainIP;
+                                                    incomingRequest.LoadBalanceType = "cs";
+
+                                                    callback(undefined, incomingRequest);
+
+                                                }
+                                                else
+                                                {
+                                                    callback(new Error('Cannot find a call server dedicated to company number'), undefined);
+                                                }
+
+                                            });
+                                    }
+                                        break;
+                                    case 2:
+                                    {
+                                        //find call server that matches profile
+                                        dbModel.SipNetworkProfile
+                                            .find({where :[{CompanyId: companyId}, {TenantId: tenantId}, {ObjType: "internal"}], include : [{model: dbModel.CallServer, as: "CallServer"}]})
+                                            .complete(function (err, res)
+                                            {
+                                                if(err)
+                                                {
+                                                    callback(err, undefined);
+                                                }
+                                                else if(res)
+                                                {
+                                                    if(res.CallServer)
                                                     {
-                                                        callback(err, undefined);
-                                                    }
-                                                    else if (!trunkRecList)
-                                                    {
-                                                        callback(new Error('Trunk not found for the cluster'), undefined);
+                                                        incomingRequest.LimitId = phn.LimitId;
+                                                        incomingRequest.IpCode = res.CallServer.InternalMainIP;
+                                                        incomingRequest.LoadBalanceType = "cs";
+
+                                                        callback(undefined, incomingRequest);
                                                     }
                                                     else
                                                     {
-                                                        var res = {
-                                                            TrunkList : trunkRecList,
-                                                            Profile : prof,
-                                                            LoadBalancer : undefined
-                                                        };
+                                                        callback(new Error('call server not connected to sip profile'), undefined);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    callback(new Error('Cannot find a sip network profile'), undefined);
+                                                }
 
-                                                        if (resultCsCloud.LoadBalancerId)
-                                                        {
-                                                            //Get Loadbalancer Info
 
-                                                            dbModel.LoadBalancer
-                                                                .find({where: [{id: resultCsCloud.LoadBalancerId}]})
-                                                                .complete(function (err, lb)
-                                                                {
-                                                                    try
-                                                                    {
+                                            });
+                                        break;
+                                    }
+                                    case 3:
+                                    {
+                                        //find cloud code that belongs to cloud end user
 
-                                                                        if (err)
-                                                                        {
-                                                                            callback(err, undefined);
-                                                                        }
-                                                                        else if (lb)
-                                                                        {
-                                                                            res.LoadBalancer = lb;
+                                        if(endUser.ClusterId)
+                                        {
+                                            var clusId = endUser.ClusterId;
 
-                                                                            callback(undefined, res);
-                                                                        }
-                                                                    }
-                                                                    catch (ex)
-                                                                    {
-                                                                        callback(ex, undefined);
-                                                                    }
+                                            dbModel.Cloud
+                                                .find({where :[{id: clusId}]})
+                                                .complete(function (err, clusterInfo)
+                                                {
+                                                    if(err)
+                                                    {
+                                                        callback(err, undefined);
+                                                    }
+                                                    else if(clusterInfo)
+                                                    {
+                                                        incomingRequest.LimitId = phn.LimitId;
+                                                        incomingRequest.IpCode = clusterInfo.Code;
+                                                        incomingRequest.LoadBalanceType = "cluster";
 
-                                                                })
-
-                                                        }
-                                                        else
-                                                        {
-                                                            callback(undefined, res);
-                                                        }
+                                                        callback(undefined, incomingRequest);
+                                                    }
+                                                    else
+                                                    {
+                                                        callback(new Error('Cannot find a cloud for end user'), undefined);
                                                     }
 
-                                                }
-                                                catch (ex)
-                                                {
-                                                    callback(ex, undefined);
-                                                }
+                                                });
 
-                                            })
-
+                                        }
+                                        else
+                                        {
+                                            callback(new Error('Cluster Id not set'), undefined);
+                                        }
+                                        break;
 
                                     }
+                                    default:
+                                    {
+                                        callback(new Error('Invalid provision mechanism'), undefined);
+                                        break;
+                                    }
                                 }
-                                catch (ex)
-                                {
-                                    callback(ex, undefined);
-                                }
+                            }
+                            else
+                            {
+                                callback(new Error('Cloud Enduser not found'), undefined);
+                            }
 
-                            })
-                    }
+                        });
+
                 }
-                catch (ex)
+                else
                 {
-                    callback(ex, undefined);
+                    callback(new Error('Invalid phone number'), undefined);
                 }
+            }
+            catch(ex)
+            {
+                callback(ex, undefined);
+            }
 
-            })
+        });
 
-    }
-    catch(ex)
-    {
-        console.log(ex.toString());
-    }
+
 };
 
 module.exports.GetUserBy_Name_Domain = GetUserBy_Name_Domain;
 module.exports.GetUserBy_Ext_Domain = GetUserBy_Ext_Domain;
 module.exports.GetGatewayListForCallServerProfile = GetGatewayListForCallServerProfile;
+module.exports.GetCloudForIncomingRequest = GetCloudForIncomingRequest;
+module.exports.GetGatewayForOutgoingRequest = GetGatewayForOutgoingRequest;
 

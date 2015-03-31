@@ -21,6 +21,62 @@ server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
 
+server.get('/LbRequestController/:direction/:number/', function(req,res,next)
+{
+    try
+    {
+        var direction = req.params.direction;
+        var number = req.params.number;
+
+        if(direction === "in")
+        {
+            extBackendHandler.GetCloudForIncomingRequest(number, 0, function(err, cb)
+            {
+                if(err || !cb)
+                {
+                    res.end(",,");
+                }
+                else
+                {
+                    var returnMessage = cb.LimitId + "," + cb.LoadBalanceType + "," + cb.IpCode;
+                    res.end(returnMessage);
+                }
+
+            });
+        }
+        else if(direction === "out")
+        {
+            extBackendHandler.GetGatewayForOutgoingRequest(number, 0, function(err, cb)
+            {
+                if(err || !cb)
+                {
+                    res.end(",");
+                }
+                else
+                {
+                    var returnMessage = cb.LimitId + "," + cb.GwIpUrl;
+                    res.end(returnMessage);
+                }
+
+            });
+        }
+        else
+        {
+            logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error("Invalid direction"), 'EXCEPTION', false, undefined));
+            res.end(",");
+        }
+
+    }
+    catch(ex)
+    {
+        logHandler.WriteLog("error", jsonFormatter.FormatMessage(ex, 'EXCEPTION', false, undefined));
+        res.end(",");
+    }
+
+    return next();
+})
+
+
 server.post('/DirectoryProfile', function(req, res, next)
 {
     try

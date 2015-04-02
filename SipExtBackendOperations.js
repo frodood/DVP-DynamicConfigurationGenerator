@@ -69,6 +69,58 @@ var GetUserBy_Name_Domain = function(extName, domain, callback)
 
 };
 
+var GetContext = function(context, callback)
+{
+    try
+    {
+        dbModel.Context
+            .find({where :[{Context: context}]})
+            .complete(function (err, ctxt)
+            {
+                try
+                {
+                    callback(err, ctxt);
+                }
+                catch(ex)
+                {
+                    callback(ex, undefined);
+                }
+
+            });
+
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+    }
+}
+
+var GetPhoneNumberDetails = function(phnNum, callback)
+{
+    try
+    {
+        dbModel.TrunkPhoneNumber
+            .find({where :[{PhoneNumber: phnNum}]})
+            .complete(function (err, phnInfo)
+            {
+                try
+                {
+                    callback(err, phnInfo);
+                }
+                catch(ex)
+                {
+                    callback(ex, undefined);
+                }
+
+
+            })
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+    }
+};
+
 var GetGatewayListForCallServerProfile = function(profile, csId, callback)
 {
     try
@@ -392,4 +444,6 @@ module.exports.GetUserBy_Ext_Domain = GetUserBy_Ext_Domain;
 module.exports.GetGatewayListForCallServerProfile = GetGatewayListForCallServerProfile;
 module.exports.GetCloudForIncomingRequest = GetCloudForIncomingRequest;
 module.exports.GetGatewayForOutgoingRequest = GetGatewayForOutgoingRequest;
+module.exports.GetContext = GetContext;
+module.exports.GetPhoneNumberDetails = GetPhoneNumberDetails;
 

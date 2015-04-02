@@ -1,6 +1,6 @@
 var restify = require('restify');
 var fsMediaFormatter = require('./FreeSwitchMediaFormatter.js');
-var extBackendHandler = require('./SipExtBackendOperations.js');
+var backendHandler = require('./SipExtBackendOperations.js');
 var xmlGen = require('./XmlResponseGenerator.js');
 var logHandler = require('./LogHandler.js');
 var jsonFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
@@ -21,6 +21,102 @@ server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
 
+
+server.post('/CallApp', function(req,res,next)
+{
+    try
+    {
+        var data = fsMediaFormatter.convertUrlEncoded(req.body);
+
+        var hostname = data["hostname"];
+        var cdnum = data["Caller-Destination-Number"];
+        var callerContext = data["Caller-Context"];
+        var huntDestNum = data["Hunt-Destination-Number"];
+        var huntContext = data["Hunt-Context"];
+        var varDomain = data["variable_domain"];
+        var varUserId = data["variable_user_id"];
+        var profile = data["variable_sofia_profile_name"];
+        var varUuid = data["variable_uuid"];
+        var varSipFromUri = data["variable_sip_from_uri"];
+        var varSipToUri = data["variable_sip_to_uri"];
+        var varUsrContext = data["variable_user_context"];
+        var varFromNumber = data["variable_FromNumber"];
+
+        if (cdnum && callerContext && hostname)
+        {
+            //Dialplan
+
+            var destNum = (huntDestNum) ? huntDestNum:cdnum;
+
+            //Get Context
+
+            backendHandler.GetContext(callerContext, function(err, ctxt)
+            {
+                if(err)
+                {
+                    var xml = xmlGen.createNotFoundResponse();
+
+                    res.end(xml);
+                }
+                else if(!ctxt || ctxt.ContextCat === "PUBLIC")
+                {
+                    var decodedSipFromUri = decodeURIComponent(varSipFromUri);
+                    var decodedSipToUri = decodeURIComponent(varSipToUri);
+
+                    var fromSplitArr = decodedSipFromUri.split("@");
+
+                    var toSplitArr = decodedSipToUri.split("@");
+
+                    var aniNum = "";
+                    var dnisNum = "";
+                    var domain = "";
+
+                    if(fromSplitArr.count == 2)
+                    {
+                        domain = fromSplitArr[1];
+
+                        var domainAndPort = domain.split(":");
+
+                        if(domainAndPort.count == 2)
+                        {
+                            domain = domainAndPort[0];
+                        }
+
+                        aniNum = fromSplitArr[0];
+
+                    }
+
+                    if(toSplitArr.count == 2)
+                    {
+                        dnisNum = toSplitArr[0];
+                    }
+
+                    //pick inbound call rule
+
+
+
+                    res.end("ffff");
+
+                }
+                else
+                {}
+
+            })
+
+
+
+        }
+    }
+    catch(ex)
+    {
+
+    }
+
+    return next();
+
+})
+
+
 server.get('/LbRequestController/:direction/:number/', function(req,res,next)
 {
     try
@@ -30,7 +126,7 @@ server.get('/LbRequestController/:direction/:number/', function(req,res,next)
 
         if(direction === "in")
         {
-            extBackendHandler.GetCloudForIncomingRequest(number, 0, function(err, cb)
+            backendHandler.GetCloudForIncomingRequest(number, 0, function(err, cb)
             {
                 if(err || !cb)
                 {
@@ -46,7 +142,7 @@ server.get('/LbRequestController/:direction/:number/', function(req,res,next)
         }
         else if(direction === "out")
         {
-            extBackendHandler.GetGatewayForOutgoingRequest(number, 0, function(err, cb)
+            backendHandler.GetGatewayForOutgoingRequest(number, 0, function(err, cb)
             {
                 if(err || !cb)
                 {
@@ -102,7 +198,7 @@ server.post('/DirectoryProfile', function(req, res, next)
                 tempAuthRealm = sipAuthRealm;
             }
 
-            extBackendHandler.GetUserBy_Name_Domain(user, tempAuthRealm, function(err, usr){
+            backendHandler.GetUserBy_Name_Domain(user, tempAuthRealm, function(err, usr){
                 if(usr != undefined)
                 {
                     //create xml
@@ -128,7 +224,7 @@ server.post('/DirectoryProfile', function(req, res, next)
                 tempAuthRealm = sipAuthRealm;
             }
 
-            extBackendHandler.GetUserBy_Ext_Domain(user, tempAuthRealm, function(err, usr){
+            backendHandler.GetUserBy_Ext_Domain(user, tempAuthRealm, function(err, usr){
                 if(usr != undefined)
                 {
                     //create xml
@@ -150,7 +246,7 @@ server.post('/DirectoryProfile', function(req, res, next)
         else if(purpose && profile && hostname && purpose === 'gateways')
         {
             var csId = parseInt(hostname);
-            extBackendHandler.GetGatewayListForCallServerProfile(profile, csId, function(err, result)
+            backendHandler.GetGatewayListForCallServerProfile(profile, csId, function(err, result)
             {
                 if (err)
                 {

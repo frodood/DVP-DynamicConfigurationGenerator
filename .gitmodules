@@ -4,3 +4,6 @@
 [submodule "DVP-DBModels"]
 	path = DVP-DBModels
 	url = https://github.com/DuoSoftware/DVP-DBModels.git
+[submodule "DVP-RuleService"]
+	path = DVP-RuleService
+	url = https://github.com/DuoSoftware/DVP-RuleService.git

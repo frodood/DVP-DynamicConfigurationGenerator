@@ -38,7 +38,7 @@ var GetUserBy_Name_Domain = function(extName, domain, callback)
     try
     {
         dbModel.CloudEndUser
-            .find({where: {Domain: domain}, include: [{model: dbModel.SipUACEndpoint, where: {SipUsername: extName}}]})
+            .find({where: {Domain: domain}, include: [{model: dbModel.SipUACEndpoint, as: "SipUACEndpoint", where: {SipUsername: extName}}]})
             .complete(function (err, ext)
             {
                 try
@@ -68,6 +68,24 @@ var GetUserBy_Name_Domain = function(extName, domain, callback)
 
 
 };
+
+var GetGroupBy_Name_Domain = function(grpName, domain, callback)
+{
+    try
+    {
+        dbModel.UserGroup
+            .find({where: [{Domain: domain},{GroupName: grpName}], include: [{model: dbModel.SipUACEndpoint, as: "SipUACEndpoint", include:[{model: dbModel.CloudEndUser, as : "CloudEndUser"}]}, {model: dbModel.Extension, as: "Extension"}]})
+            .complete(function (err, grpData)
+            {
+                callback(err, grpData);
+
+            })
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+    }
+}
 
 var GetContext = function(context, callback)
 {
@@ -100,7 +118,7 @@ var GetPhoneNumberDetails = function(phnNum, callback)
     try
     {
         dbModel.TrunkPhoneNumber
-            .find({where :[{PhoneNumber: phnNum}]})
+            .find({where :[{PhoneNumber: phnNum},{Enable: true}]})
             .complete(function (err, phnInfo)
             {
                 try
@@ -128,7 +146,7 @@ var GetGatewayListForCallServerProfile = function(profile, csId, callback)
         var gatewayList = [];
 
         dbModel.SipNetworkProfile
-            .find({where :[{ProfileName: profile},{ObjType: 'external'}], include: [{model: dbModel.CallServer, as: "CallServer", where:[{Code: csId}]},{model: dbModel.Trunk, as: "Trunk"}]})
+            .find({where :[{ProfileName: profile},{ObjType: 'EXTERNAL'}], include: [{model: dbModel.CallServer, as: "CallServer", where:[{Code: csId}]},{model: dbModel.Trunk, as: "Trunk"}]})
             .complete(function (err, result)
             {
                 try
@@ -446,4 +464,5 @@ module.exports.GetCloudForIncomingRequest = GetCloudForIncomingRequest;
 module.exports.GetGatewayForOutgoingRequest = GetGatewayForOutgoingRequest;
 module.exports.GetContext = GetContext;
 module.exports.GetPhoneNumberDetails = GetPhoneNumberDetails;
+module.exports.GetGroupBy_Name_Domain = GetGroupBy_Name_Domain;
 

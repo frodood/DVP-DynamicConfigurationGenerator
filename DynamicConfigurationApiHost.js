@@ -1,9 +1,12 @@
 var restify = require('restify');
+var stringify = require('stringify');
 var fsMediaFormatter = require('./FreeSwitchMediaFormatter.js');
 var backendHandler = require('./SipExtBackendOperations.js');
 var xmlGen = require('./XmlResponseGenerator.js');
 var logHandler = require('./LogHandler.js');
 var jsonFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var ruleHandler = require('./DVP-RuleService/CallRuleBackendOperations.js');
+var redisHandler = require('./RedisHandler.js');
 
 var server = restify.createServer({
     name: 'localhost',
@@ -58,7 +61,7 @@ server.post('/CallApp', function(req,res,next)
 
                     res.end(xml);
                 }
-                else if(!ctxt || ctxt.ContextCat === "PUBLIC")
+                else if(!ctxt || ctxt.ContextCat.toUpperCase() === "PUBLIC")
                 {
                     var decodedSipFromUri = decodeURIComponent(varSipFromUri);
                     var decodedSipToUri = decodeURIComponent(varSipToUri);
@@ -71,13 +74,13 @@ server.post('/CallApp', function(req,res,next)
                     var dnisNum = "";
                     var domain = "";
 
-                    if(fromSplitArr.count == 2)
+                    if(fromSplitArr.length == 2)
                     {
-                        domain = fromSplitArr[1];
+                        var domainS = fromSplitArr[1];
 
-                        var domainAndPort = domain.split(":");
+                        var domainAndPort = domainS.split(":");
 
-                        if(domainAndPort.count == 2)
+                        if(domainAndPort.lenght == 2)
                         {
                             domain = domainAndPort[0];
                         }
@@ -86,20 +89,95 @@ server.post('/CallApp', function(req,res,next)
 
                     }
 
-                    if(toSplitArr.count == 2)
+                    if(toSplitArr.length == 2)
                     {
                         dnisNum = toSplitArr[0];
                     }
 
                     //pick inbound call rule
 
+                    backendHandler.GetPhoneNumberDetails(dnisNum, function(err, num)
+                    {
+                        if(err)
+                        {
+                            logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
+                            var xml = xmlGen.createNotFoundResponse();
+
+                            res.end(xml);
+
+                        }
+                        else if(num)
+                        {
+                            ruleHandler.PickCallRuleInbound(aniNum, dnisNum, domain, num.CompanyId, num.TenantId, function(err, rule)
+                            {
+                                if(err)
+                                {
+                                    logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
+                                    var xml = xmlGen.createNotFoundResponse();
+
+                                    res.end(xml);
+                                }
+                                else if(rule)
+                                {
+                                    if(rule.Application)
+                                    {
+                                        var sessionData =
+                                        {
+                                            path: rule.Application.Url,
+                                            company: rule.CompanyId,
+                                            tenant: rule.TenantId,
+                                            app: rule.Application.AppName
+                                        };
+
+                                        var jsonString = JSON.stringify(sessionData);
+
+                                        redisHandler.SetObject(varUuid + "_data", jsonString, function(err, result)
+                                        {
+                                            if(err)
+                                            {
+                                                logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
+                                                var xml = xmlGen.createNotFoundResponse();
+
+                                                res.end(xml);
+                                            }
+                                            else
+                                            {
+                                                var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext);
+                                                res.end(xml);
+                                            }
+
+                                        });
+                                    }
 
 
-                    res.end("ffff");
+                                }
+                                else
+                                {
+                                    logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error('Invalid Phone Number'), 'ERROR', false, undefined));
+                                    var xml = xmlGen.createNotFoundResponse();
+
+                                    res.end(xml);
+                                }
+                            })
+                        }
+                        else
+                        {
+                            logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error('Invalid Phone Number'), 'ERROR', false, undefined));
+                            var xml = xmlGen.createNotFoundResponse();
+
+                            res.end(xml);
+                        }
+                    });
+
 
                 }
                 else
-                {}
+                {
+                    logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error('Invalid Phone Number'), 'ERROR', false, undefined));
+                    var xml = xmlGen.createNotFoundResponse();
+
+                    res.end(xml);
+                }
 
             })
 
@@ -109,7 +187,10 @@ server.post('/CallApp', function(req,res,next)
     }
     catch(ex)
     {
+        logHandler.WriteLog(ex, jsonFormatter.FormatMessage(new Error('Invalid Phone Number'), 'ERROR', false, undefined));
+        var xml = xmlGen.createNotFoundResponse();
 
+        res.end(xml);
     }
 
     return next();
@@ -190,7 +271,41 @@ server.post('/DirectoryProfile', function(req, res, next)
         var sipAuthRealm = data["sip_auth_realm"];
         var profile = data["profile"];
 
-        if(action && user && hostname && domain && (action === 'sip_auth' || action === 'message-count'))
+        if(action && group && hostname && domain && action === "group_call")
+        {
+            var tempAuthRealm = domain;
+            if(sipAuthRealm != undefined)
+            {
+                tempAuthRealm = sipAuthRealm;
+            }
+
+            backendHandler.GetGroupBy_Name_Domain(group, tempAuthRealm, function(err, result)
+            {
+                if(err)
+                {
+                    logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
+                    var xml = xmlGen.createNotFoundResponse();
+
+                    res.end(xml);
+                }
+                else if(result)
+                {
+                    var xml = xmlGen.CreateUserGroupDirectoryProfile(result);
+
+                    res.end(xml);
+
+                }
+                else
+                {
+                    logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error('Group Not Found'), 'ERROR', false, undefined));
+                    var xml = xmlGen.createNotFoundResponse();
+
+                    res.end(xml);
+                }
+            })
+
+        }
+        else if(action && user && hostname && domain && (action === 'sip_auth' || action === 'message-count'))
         {
             var tempAuthRealm = domain;
             if(sipAuthRealm != undefined)

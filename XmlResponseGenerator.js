@@ -1,4 +1,5 @@
 var xmlBuilder = require('xmlbuilder');
+var Config = require('config');
 
 var createNotFoundResponse = function()
 {
@@ -18,6 +19,106 @@ var createNotFoundResponse = function()
     {
         return "";
     }
+
+}
+
+var CreateUserGroupDirectoryProfile = function(grp)
+{
+    try
+    {
+        var grpDomain = grp.Domain ? grp.Domain : "";
+        //var element = new xmlBuilder.create('users');
+        var obj = {
+            'users': [
+
+            ]
+        };
+
+        if(grp.SipUACEndpoint)
+        {
+            grp.SipUACEndpoint.forEach(function(sipUsr)
+            {
+
+                var sipUsername = sipUsr.SipUsername ? sipUsr.SipUsername : "";
+                var sipExt = sipUsr.SipExtension ? sipUsr.SipExtension : "";
+                var sipPassword = sipUsr.Password ? sipUsr.Password : "";
+                var sipUsrDomain = "";
+
+                if(sipUsr.CloudEndUser && sipUsr.CloudEndUser.Domain)
+                {
+                    sipUsrDomain = sipUsr.CloudEndUser.Domain;
+                }
+
+                var sipUserContext = sipUsr.CountextId ? sipUsr.CountextId : "";
+
+                var userObj = {
+                    user:
+                    {
+                        '@id': sipUsername, '@cacheable': 'false', '@number-alias': sipExt,
+                        params: {
+                            param: {'@name' : 'dial-string', '@value' : '{sip_invite_domain=${domain_name},presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}'},
+                            param: {'@name' : 'password', '@value' : sipPassword}
+                        },
+                        variables: {
+                            variable: {'@name' : 'domain', '@value' : sipUsrDomain},
+                            variable: {'@name' : 'user_context', '@value' : sipUserContext},
+                            variable: {'@name' : 'user_id', '@value' : sipUsername}
+
+                        }
+                    }
+                };
+
+                obj.users.push(userObj);
+
+
+
+
+            });
+        }
+
+        var grpExt = "";
+        if(grp.Extension && grp.Extension.Extension)
+        {
+            grpExt = grp.Extension.Extension;
+        }
+
+        var obj2 = {
+            'groups': {
+                group : {'@name' : grpExt, 'users' : []}
+            }
+        };
+
+
+        if(grp.SipUACEndpoint)
+        {
+
+            grp.SipUACEndpoint.forEach(function (sipUsr)
+            {
+                var sipExt = sipUsr.SipExtension ? sipUsr.SipExtension : "";
+                var usrPointerObj = {user: {'@id': sipExt, '@type': 'pointer'}};
+                obj2.groups.group.users.push(usrPointerObj);
+
+            });
+        }
+
+        var doc = xmlBuilder.create('document').att('type', 'freeswitch/xml')
+            doc.ele('section').att('name', 'directory')
+                .ele('domain').att('name', grpDomain)
+                    .ele(obj)
+                    .up()
+                    .ele(obj2).up().up();
+
+        doc.end({pretty: true});
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+    }
+    catch(ex)
+    {
+        return "";
+    }
+
+
 
 }
 
@@ -103,7 +204,7 @@ var CreateGatewayProfile = function(gwList)
     }
     catch(ex)
     {
-        return "";
+        return createNotFoundResponse();
     }
 
 
@@ -176,6 +277,54 @@ var createDirectoryProfile = function(extName, ext, domain, email, password, con
 
 };
 
+var CreateHttpApiDialplan = function(destinationPattern, context)
+{
+    try
+    {
+        if (!destinationPattern) {
+            destinationPattern = "";
+        }
+
+        if (!context) {
+            context = "";
+        }
+
+        var httpUrl = Config.HttpApi.Url;
+
+        var httpApiUrl = "{url=" + httpUrl + "}";
+
+        var doc = xmlBuilder.create('document');
+
+        doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+                .ele('context').att('name', context)
+                    .ele('extension').att('name', 'test')
+                        .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+                            .ele('action').att('application', 'answer')
+                            .up()
+                            .ele('action').att('application', 'httapi').att('value', httpApiUrl)
+                            .up()
+                        .up()
+                    .up()
+                .up()
+            .up()
+
+        .end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+
+    }
+    catch(ex)
+    {
+        return "";
+    }
+
+}
+
 module.exports.createDirectoryProfile = createDirectoryProfile;
 module.exports.createNotFoundResponse = createNotFoundResponse;
 module.exports.CreateGatewayProfile = CreateGatewayProfile;
+module.exports.CreateHttpApiDialplan = CreateHttpApiDialplan;
+module.exports.CreateUserGroupDirectoryProfile = CreateUserGroupDirectoryProfile;

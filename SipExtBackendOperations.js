@@ -357,7 +357,7 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
                                     {
                                         //find call server that matches profile
                                         dbModel.SipNetworkProfile
-                                            .find({where :[{CompanyId: companyId}, {TenantId: tenantId}, {ObjType: "internal"}], include : [{model: dbModel.CallServer, as: "CallServer"}]})
+                                            .find({where :[{CompanyId: companyId}, {TenantId: tenantId}, {ObjType: "INTERNAL"}], include : [{model: dbModel.CallServer, as: "CallServer"}]})
                                             .complete(function (err, res)
                                             {
                                                 if(err)

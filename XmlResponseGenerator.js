@@ -130,18 +130,28 @@ var CreateGatewayProfile = function(gwList)
         var retrySec = 3600;
 
 
-        var doc = xmlBuilder.create('document').att('type', 'freeswitch/xml')
-            .ele('section').att('name', 'directory');
+        var doc = xmlBuilder.create('document').att('type', 'freeswitch/xml');
+        var section = doc.ele('section').att('name', 'directory');
+
+        //var obj = {
+        //    'section': []
+        //    }
+
+        //obj.section.push()
+
+
+
 
         gwList.forEach(function(gw)
         {
+
             var proxy = gw.IpUrl;
             if(gw.Proxy)
             {
                 proxy = gw.Proxy;
             }
 
-            doc.ele('domain').att('name', gw.Domain)
+            section.ele('domain').att('name', gw.Domain)
                 .ele('params')
                     .ele('param').att('name', 'dial-string').att('value', '{presence_id=${dialed_user}${dialed_domain}}${sofia_contact(${dialed_user}${dialed_domain})}')
                     .up()
@@ -197,10 +207,9 @@ var CreateGatewayProfile = function(gwList)
 
         });
 
-        doc.up()
-            .end({pretty: true});
+        //var gwStr = section.end({pretty: true});
 
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+        return section.end({pretty: true});
     }
     catch(ex)
     {

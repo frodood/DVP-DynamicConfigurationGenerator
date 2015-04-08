@@ -198,7 +198,7 @@ server.post('/CallApp', function(req,res,next)
 })
 
 
-server.get('/LbRequestController/:direction/:number/', function(req,res,next)
+server.get('/LbRequestController/:direction/:number/:ip', function(req,res,next)
 {
     try
     {
@@ -216,6 +216,8 @@ server.get('/LbRequestController/:direction/:number/', function(req,res,next)
                 else
                 {
                     var returnMessage = cb.LimitId + "," + cb.LoadBalanceType + "," + cb.IpCode;
+
+                    logHandler.WriteLog('debug', returnMessage);
                     res.end(returnMessage);
                 }
 
@@ -258,8 +260,6 @@ server.post('/DirectoryProfile', function(req, res, next)
 {
     try
     {
-        logHandler.WriteLog("info", "Start");
-
         var data = fsMediaFormatter.convertUrlEncoded(req.body);
 
         var hostname = data["hostname"];
@@ -270,6 +270,8 @@ server.post('/DirectoryProfile', function(req, res, next)
         var group = data["group"];
         var sipAuthRealm = data["sip_auth_realm"];
         var profile = data["profile"];
+
+        logHandler.WriteLog('debug', req.body);
 
         if(action && group && hostname && domain && action === "group_call")
         {
@@ -292,6 +294,8 @@ server.post('/DirectoryProfile', function(req, res, next)
                 {
                     var xml = xmlGen.CreateUserGroupDirectoryProfile(result);
 
+                    logHandler.WriteLog("debug", xml);
+
                     res.end(xml);
 
                 }
@@ -313,14 +317,28 @@ server.post('/DirectoryProfile', function(req, res, next)
                 tempAuthRealm = sipAuthRealm;
             }
 
-            backendHandler.GetUserBy_Name_Domain(user, tempAuthRealm, function(err, usr){
-                if(usr != undefined)
+            backendHandler.GetUserBy_Name_Domain(user, tempAuthRealm, function(err, usr)
+            {
+                if(err)
+                {
+                    logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error('Enduser not defined'), 'ERROR', false, undefined));
+                    var xml = xmlGen.createNotFoundResponse();
+                }
+                else if(usr)
                 {
                     //create xml
-                    var xml = xmlGen.createDirectoryProfile(usr.SipUsername, usr.SipExtension, usr.Domain, usr.EmailAddress, usr.Password, usr.Context);
-
-                    res.end(xml);
-
+                    if(usr.CloudEndUser)
+                    {
+                        var xml = xmlGen.createDirectoryProfile(usr.SipUsername, usr.SipExtension, usr.CloudEndUser.Domain, usr.EmailAddress, usr.Password, usr.ContextId);
+                        logHandler.WriteLog("debug", xml);
+                        res.end(xml);
+                    }
+                    else
+                    {
+                        logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error('Enduser not defined'), 'ERROR', false, undefined));
+                        var xml = xmlGen.createNotFoundResponse();
+                        res.end(xml);
+                    }
                 }
                 else
                 {
@@ -343,9 +361,19 @@ server.post('/DirectoryProfile', function(req, res, next)
                 if(usr != undefined)
                 {
                     //create xml
-                    var xml = xmlGen.createDirectoryProfile(usr.SipUsername, usr.SipExtension, usr.Domain, usr.EmailAddress, usr.Password, usr.Context);
+                    if(usr.CloudEndUser)
+                    {
+                        var xml = xmlGen.createDirectoryProfile(usr.SipUsername, usr.SipExtension, usr.CloudEndUser.Domain, usr.EmailAddress, usr.Password, usr.ContextId);
 
-                    res.end(xml);
+                        res.end(xml);
+                    }
+                    else
+                    {
+                        var xml = xmlGen.createNotFoundResponse();
+
+                        res.end(xml);
+                    }
+
 
                 }
                 else
@@ -397,6 +425,6 @@ server.post('/DirectoryProfile', function(req, res, next)
 });
 
 
-server.listen(9093, 'localhost', function () {
+server.listen(9093, '0.0.0.0', function () {
     console.log('%s listening at %s', server.name, server.url);
 });

@@ -1,11 +1,18 @@
 var winston = require('winston');
 
 var filenameTemp = __dirname + "\\DynamicConfigGeneratorLog.log";
-winston.add(winston.transports.File, { filename: filenameTemp });
+
+var logger = new (winston.Logger)({
+    transports: [
+        new (winston.transports.Console)({ level: 'debug' })
+    ]
+});
 
 var WriteLog = function(level, message)
 {
-    winston.log(level, message);
+    logger.log(level, message);
 };
+
+
 
 module.exports.WriteLog = WriteLog;

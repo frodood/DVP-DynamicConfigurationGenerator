@@ -4,8 +4,8 @@ var GetUserBy_Ext_Domain = function(extension, domain, callback)
 {
     try
     {
-        dbModel.CloudEndUser
-            .find({where: {Domain: domain}, include: [{model: dbModel.SipUACEndpoint, where: {SipExtension: extension}}]})
+        dbModel.SipUACEndpoint
+            .find({where: {SipExtension: extension}, include: [{model: dbModel.CloudEndUser, where: {Domain: domain}}]})
             .complete(function (err, ext)
             {
                 try
@@ -37,8 +37,8 @@ var GetUserBy_Name_Domain = function(extName, domain, callback)
 {
     try
     {
-        dbModel.CloudEndUser
-            .find({where: {Domain: domain}, include: [{model: dbModel.SipUACEndpoint, as: "SipUACEndpoint", where: {SipUsername: extName}}]})
+        dbModel.SipUACEndpoint
+            .find({where: {SipUsername: extName}, include: [{model: dbModel.CloudEndUser, as: "CloudEndUser", where: {Domain : domain}}]})
             .complete(function (err, ext)
             {
                 try
@@ -158,8 +158,7 @@ var GetGatewayListForCallServerProfile = function(profile, csId, callback)
                     else if(result)
                     {
                         //check profile contains direct trunk map
-                        if(result)
-                        {
+
                             //direct trunk termination
                             if(result.Trunk != null)
                             {
@@ -206,6 +205,8 @@ var GetGatewayListForCallServerProfile = function(profile, csId, callback)
                                                         gatewayList.push(gw);
                                                     })
 
+                                                    callback(undefined, gatewayList);
+
 
                                                 }
 
@@ -220,10 +221,14 @@ var GetGatewayListForCallServerProfile = function(profile, csId, callback)
                                 }
 
                             }
+                        else
+                            {
+                                callback(undefined, gatewayList);
+                            }
 
-                            callback(undefined, gatewayList);
 
-                        }
+
+
                     }
                     else
                     {

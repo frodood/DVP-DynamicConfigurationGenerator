@@ -42,6 +42,29 @@ var PublishToRedis = function(pattern, message, callback)
     }
 }
 
+var GetFromSet = function(setName, callback)
+{
+    try
+    {
+        if(client.connected)
+        {
+            client.smembers(setName).keys("*", function (err, setValues)
+            {
+                callback(err, setValues);
+            });
+        }
+        else
+        {
+            callback(new Error('Redis Client Disconnected'), undefined);
+        }
+
+
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+    }
+};
 
 client.on('error', function(msg)
 {
@@ -50,3 +73,4 @@ client.on('error', function(msg)
 
 module.exports.SetObject = SetObject;
 module.exports.PublishToRedis = PublishToRedis;
+module.exports.GetFromSet = GetFromSet;

@@ -2,13 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66ecaa1d-b51b-4e7c-97f3-9a168c731a92" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DynamicConfigurationApiHost.js" afterPath="$PROJECT_DIR$/DynamicConfigurationApiHost.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FreeSwitchMediaFormatter.js" afterPath="$PROJECT_DIR$/FreeSwitchMediaFormatter.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LogHandler.js" afterPath="$PROJECT_DIR$/LogHandler.js" />
+      <change type="DELETED" beforePath="D:\DVP\DVP-DynamicConfigurationGenerator\DynamicConfigurationApiHost.js" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/RedisHandler.js" afterPath="$PROJECT_DIR$/RedisHandler.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SipExtBackendOperations.js" afterPath="$PROJECT_DIR$/SipExtBackendOperations.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/XmlResponseGenerator.js" afterPath="$PROJECT_DIR$/XmlResponseGenerator.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MOVED" beforePath="D:\DVP\DVP-DynamicConfigurationGenerator\DynamicConfigurationApiHost.js" afterPath="$PROJECT_DIR$/app.js" />
     </list>
     <ignored path="DVP-DynamicConfigurationGenerator.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -32,14 +29,14 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="DynamicConfigurationApiHost.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/DynamicConfigurationApiHost.js">
+      <file leaf-file-name="app.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="2807" max-vertical-offset="3604">
-              <caret line="402" column="46" selection-start-line="402" selection-start-column="37" selection-end-line="402" selection-end-column="57" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="57" max-vertical-offset="1717">
+              <caret line="20" column="0" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
               <folding>
-                <element signature="e#919#7370#0" expanded="false" />
-                <element signature="e#7455#8906#0" expanded="false" />
+                <element signature="e#919#7409#0" expanded="false" />
+                <element signature="e#9007#14749#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -55,24 +52,26 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="XmlResponseGenerator.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="XmlResponseGenerator.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/XmlResponseGenerator.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.65667576" vertical-offset="286" max-vertical-offset="3893">
-              <caret line="146" column="0" selection-start-line="146" selection-start-column="0" selection-end-line="146" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="221" max-vertical-offset="1207">
+              <caret line="294" column="9" selection-start-line="294" selection-start-column="9" selection-end-line="294" selection-end-column="9" />
               <folding>
                 <element signature="e#113#566#0" expanded="false" />
                 <element signature="e#620#3535#0" expanded="false" />
+                <element signature="e#3581#7085#0" expanded="false" />
+                <element signature="e#7173#9319#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SipExtBackendOperations.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="SipExtBackendOperations.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/SipExtBackendOperations.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="3104" max-vertical-offset="5372">
-              <caret line="364" column="127" selection-start-line="364" selection-start-column="127" selection-end-line="364" selection-end-column="127" />
+            <state vertical-scroll-proportion="0.38434783" vertical-offset="0" max-vertical-offset="2516">
+              <caret line="114" column="0" selection-start-line="114" selection-start-column="0" selection-end-line="114" selection-end-column="0" />
               <folding>
                 <element signature="e#107#891#0" expanded="false" />
                 <element signature="e#957#1766#0" expanded="false" />
@@ -80,6 +79,7 @@
                 <element signature="e#2346#2780#0" expanded="false" />
                 <element signature="e#2837#3303#0" expanded="false" />
                 <element signature="e#7671#8687#0" expanded="false" />
+                <element signature="e#8757#16877#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -88,18 +88,8 @@
       <file leaf-file-name="default.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/config/default.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="391">
-              <caret line="16" column="3" selection-start-line="16" selection-start-column="3" selection-end-line="16" selection-end-column="3" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RedisHandler.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/RedisHandler.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="51" max-vertical-offset="969">
-              <caret line="12" column="14" selection-start-line="12" selection-start-column="14" selection-end-line="12" selection-end-column="14" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="187" max-vertical-offset="391">
+              <caret line="11" column="16" selection-start-line="11" selection-start-column="12" selection-end-line="11" selection-end-column="16" />
               <folding />
             </state>
           </provider>
@@ -128,15 +118,15 @@
         <option value="$PROJECT_DIR$/RuleEngine.js" />
         <option value="$PROJECT_DIR$/DVP-RuleService/CallRuleBackendOperations.js" />
         <option value="$PROJECT_DIR$/DVP-DBModels/index.js" />
-        <option value="$PROJECT_DIR$/config/default.js" />
         <option value="$PROJECT_DIR$/DVP-Common/LogHandler/CommonLogHandler.js" />
         <option value="$PROJECT_DIR$/LogHandler.js" />
         <option value="$PROJECT_DIR$/FreeSwitchMediaFormatter.js" />
         <option value="$PROJECT_DIR$/DVP-DBModels/Trunk.js" />
         <option value="$PROJECT_DIR$/SipExtBackendOperations.js" />
+        <option value="$PROJECT_DIR$/XmlResponseGenerator.js" />
         <option value="$PROJECT_DIR$/DynamicConfigurationApiHost.js" />
         <option value="$PROJECT_DIR$/RedisHandler.js" />
-        <option value="$PROJECT_DIR$/XmlResponseGenerator.js" />
+        <option value="$PROJECT_DIR$/config/default.js" />
       </list>
     </option>
   </component>
@@ -172,6 +162,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -206,7 +197,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -233,10 +223,14 @@
       <ConfigurationWrapper RunnerId="debuggableProgram" />
       <method />
     </configuration>
+    <configuration default="true" type="DartCommandLineRunConfigurationType" factoryName="Dart Command Line Application">
+      <method />
+    </configuration>
     <configuration default="true" type="DartUnitRunConfigurationType" factoryName="DartUnit">
       <method />
     </configuration>
-    <configuration default="true" type="DartCommandLineRunConfigurationType" factoryName="Dart Command Line Application">
+    <configuration default="true" type="JavaScriptTestRunnerKarma" factoryName="Karma" config-file="">
+      <envs />
       <method />
     </configuration>
     <configuration default="true" type="JSTestDriver:ConfigurationType" factoryName="JsTestDriver">
@@ -244,10 +238,6 @@
       <setting name="settingsFile" value="" />
       <setting name="serverType" value="INTERNAL" />
       <setting name="preferredDebugBrowser" value="Chrome" />
-      <method />
-    </configuration>
-    <configuration default="true" type="JavaScriptTestRunnerKarma" factoryName="Karma" config-file="">
-      <envs />
       <method />
     </configuration>
     <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
@@ -315,25 +305,25 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="1" />
-    <editor active="false" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3306189" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32899022" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33876222" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24981412" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19553903" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40228012" sideWeight="0.49962825" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4495114" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19553903" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3257329" sideWeight="0.50037175" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33876222" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40228012" sideWeight="0.49962825" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4495114" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
     </layout>
@@ -353,9 +343,9 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24981412" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32899022" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
     </layout-to-restore>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -418,7 +408,7 @@
           <option name="timeStamp" value="108" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/DynamicConfigurationApiHost.js</url>
+          <url>file://$PROJECT_DIR$/app.js</url>
           <line>250</line>
           <option name="timeStamp" value="109" />
         </line-breakpoint>
@@ -468,7 +458,7 @@
           <option name="timeStamp" value="121" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/DynamicConfigurationApiHost.js</url>
+          <url>file://$PROJECT_DIR$/app.js</url>
           <line>59</line>
           <option name="timeStamp" value="128" />
         </line-breakpoint>
@@ -513,7 +503,7 @@
           <option name="timeStamp" value="156" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/DynamicConfigurationApiHost.js</url>
+          <url>file://$PROJECT_DIR$/app.js</url>
           <line>285</line>
           <option name="timeStamp" value="161" />
         </line-breakpoint>
@@ -523,12 +513,22 @@
           <option name="timeStamp" value="162" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/DynamicConfigurationApiHost.js</url>
+          <url>file://$PROJECT_DIR$/app.js</url>
           <line>344</line>
           <option name="timeStamp" value="171" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/app.js</url>
+          <line>28</line>
+          <option name="timeStamp" value="182" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/app.js</url>
+          <line>16</line>
+          <option name="timeStamp" value="183" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="182" />
+      <option name="time" value="184" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="NodeJSConfigurationType">
@@ -552,13 +552,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DynamicConfigurationApiHost.js">
+    <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="850">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#919#7370#0" expanded="false" />
-            <element signature="e#7455#8906#0" expanded="false" />
+            <element signature="e#919#7409#0" expanded="false" />
+            <element signature="e#9007#14749#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -570,13 +570,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DynamicConfigurationApiHost.js">
+    <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="850">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#919#7370#0" expanded="false" />
-            <element signature="e#7455#8906#0" expanded="false" />
+            <element signature="e#919#7409#0" expanded="false" />
+            <element signature="e#9007#14749#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -588,13 +588,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DynamicConfigurationApiHost.js">
+    <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="850">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#919#7370#0" expanded="false" />
-            <element signature="e#7455#8906#0" expanded="false" />
+            <element signature="e#919#7409#0" expanded="false" />
+            <element signature="e#9007#14749#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -606,13 +606,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DynamicConfigurationApiHost.js">
+    <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="187" max-vertical-offset="663">
           <caret line="11" column="5" selection-start-line="11" selection-start-column="5" selection-end-line="11" selection-end-column="5" />
           <folding>
-            <element signature="e#919#7370#0" expanded="false" />
-            <element signature="e#7455#8906#0" expanded="false" />
+            <element signature="e#919#7409#0" expanded="false" />
+            <element signature="e#9007#14749#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -624,13 +624,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DynamicConfigurationApiHost.js">
+    <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="306" max-vertical-offset="697">
           <caret line="18" column="43" selection-start-line="18" selection-start-column="43" selection-end-line="18" selection-end-column="43" />
           <folding>
-            <element signature="e#919#7370#0" expanded="false" />
-            <element signature="e#7455#8906#0" expanded="false" />
+            <element signature="e#919#7409#0" expanded="false" />
+            <element signature="e#9007#14749#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -642,13 +642,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DynamicConfigurationApiHost.js">
+    <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="306" max-vertical-offset="697">
           <caret line="18" column="43" selection-start-line="18" selection-start-column="43" selection-end-line="18" selection-end-column="43" />
           <folding>
-            <element signature="e#919#7370#0" expanded="false" />
-            <element signature="e#7455#8906#0" expanded="false" />
+            <element signature="e#919#7409#0" expanded="false" />
+            <element signature="e#9007#14749#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -879,17 +879,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SipExtBackendOperations.js">
+    <entry file="file://$PROJECT_DIR$/RedisHandler.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="3104" max-vertical-offset="5372">
-          <caret line="364" column="127" selection-start-line="364" selection-start-column="127" selection-end-line="364" selection-end-column="127" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="364" max-vertical-offset="1105">
+          <caret line="42" column="1" selection-start-line="42" selection-start-column="1" selection-end-line="42" selection-end-column="1" />
           <folding>
-            <element signature="e#107#891#0" expanded="false" />
-            <element signature="e#957#1766#0" expanded="false" />
-            <element signature="e#1834#2299#0" expanded="false" />
-            <element signature="e#2346#2780#0" expanded="false" />
-            <element signature="e#2837#3303#0" expanded="false" />
-            <element signature="e#7671#8687#0" expanded="false" />
+            <element signature="e#238#500#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -897,15 +892,7 @@
     <entry file="file://$PROJECT_DIR$/config/default.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="391">
-          <caret line="16" column="3" selection-start-line="16" selection-start-column="3" selection-end-line="16" selection-end-column="3" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RedisHandler.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="51" max-vertical-offset="969">
-          <caret line="12" column="14" selection-start-line="12" selection-start-column="14" selection-end-line="12" selection-end-column="14" />
+          <caret line="11" column="16" selection-start-line="11" selection-start-column="12" selection-end-line="11" selection-end-column="16" />
           <folding />
         </state>
       </provider>
@@ -918,24 +905,42 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DynamicConfigurationApiHost.js">
+    <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2807" max-vertical-offset="3604">
-          <caret line="402" column="46" selection-start-line="402" selection-start-column="37" selection-end-line="402" selection-end-column="57" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="57" max-vertical-offset="1717">
+          <caret line="20" column="0" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
           <folding>
-            <element signature="e#919#7370#0" expanded="false" />
-            <element signature="e#7455#8906#0" expanded="false" />
+            <element signature="e#919#7409#0" expanded="false" />
+            <element signature="e#9007#14749#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/XmlResponseGenerator.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.65667576" vertical-offset="286" max-vertical-offset="3893">
-          <caret line="146" column="0" selection-start-line="146" selection-start-column="0" selection-end-line="146" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="221" max-vertical-offset="1207">
+          <caret line="294" column="9" selection-start-line="294" selection-start-column="9" selection-end-line="294" selection-end-column="9" />
           <folding>
             <element signature="e#113#566#0" expanded="false" />
             <element signature="e#620#3535#0" expanded="false" />
+            <element signature="e#3581#7085#0" expanded="false" />
+            <element signature="e#7173#9319#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SipExtBackendOperations.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.38434783" vertical-offset="0" max-vertical-offset="2516">
+          <caret line="114" column="0" selection-start-line="114" selection-start-column="0" selection-end-line="114" selection-end-column="0" />
+          <folding>
+            <element signature="e#107#891#0" expanded="false" />
+            <element signature="e#957#1766#0" expanded="false" />
+            <element signature="e#1834#2299#0" expanded="false" />
+            <element signature="e#2346#2780#0" expanded="false" />
+            <element signature="e#2837#3303#0" expanded="false" />
+            <element signature="e#7671#8687#0" expanded="false" />
+            <element signature="e#8757#16877#0" expanded="false" />
           </folding>
         </state>
       </provider>

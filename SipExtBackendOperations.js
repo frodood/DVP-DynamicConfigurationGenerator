@@ -1,4 +1,4 @@
-var dbModel = require('./DVP-DBModels');
+var dbModel = require('DVP-DBModels');
 
 var GetUserBy_Ext_Domain = function(extension, domain, callback)
 {

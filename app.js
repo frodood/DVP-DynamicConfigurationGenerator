@@ -4,8 +4,8 @@ var fsMediaFormatter = require('./FreeSwitchMediaFormatter.js');
 var backendHandler = require('./SipExtBackendOperations.js');
 var xmlGen = require('./XmlResponseGenerator.js');
 var logHandler = require('./LogHandler.js');
-var jsonFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
-var ruleHandler = require('./DVP-RuleService/CallRuleBackendOperations.js');
+var jsonFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var ruleHandler = require('DVP-RuleService/CallRuleBackendOperations.js');
 var redisHandler = require('./RedisHandler.js');
 
 var hostIp = config.Host.Ip;

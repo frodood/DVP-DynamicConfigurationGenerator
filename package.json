@@ -1,0 +1,34 @@
+{
+  "name": "DVP-DynamicConfigurationGenerator",
+  "version": "1.0.0",
+  "description": "DVP-DynamicConfigurationGenerator\r =================================",
+  "main": "app.js",
+  "dependencies": {
+    "DVP-Common": "DuoSoftware/DVP-Common",
+    "DVP-DBModels": "DuoSoftware/DVP-DBModels",
+    "DVP-RuleService": "DuoSoftware/DVP-RuleService",
+    "config": "^1.12.0",
+    "pg-hstore": "^2.3.1",
+    "pg": "^4.2.0",
+    "restify": "^2.8.5",
+    "redis": "^0.12.1",
+    "sequelize": "^2.0.0-rc8",
+    "stringify": "^3.1.0",
+    "winston": "^0.9.0",
+    "xmlbuilder": "^2.4.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DuoSoftware/DVP-DynamicConfigurationGenerator.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DuoSoftware/DVP-DynamicConfigurationGenerator/issues"
+  },
+  "homepage": "https://github.com/DuoSoftware/DVP-DynamicConfigurationGenerator"
+}

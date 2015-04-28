@@ -8,11 +8,17 @@ module.exports = {
     "Database":"dvpdb"
   },
   "Redis": {
-    "IpAddress":"192.168.2.33",
-    "Port":"2345",
-    "Database":0
+    "IpAddress":"localhost",
+    "Port":"6379"
   },
-  "HttpApi": {
-    "Url":"http://192.168.2.33/hhhdsjf"
+
+  "Host":{
+    "Ip":"0.0.0.0",
+    "Port":"9093",
+    "Version":"1.0.0.0"
+  },
+
+  "Services": {
+    "HttApiUrl":"http://192.168.2.33/hhhdsjf"
   }
 };

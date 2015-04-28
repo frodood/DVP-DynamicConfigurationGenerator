@@ -8,9 +8,12 @@ var jsonFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJs
 var ruleHandler = require('./DVP-RuleService/CallRuleBackendOperations.js');
 var redisHandler = require('./RedisHandler.js');
 
+var hostIp = config.Host.Ip;
+var hostPort = config.Host.Port;
+var hostVersion = config.Host.Version;
+
 var server = restify.createServer({
-    name: 'localhost',
-    version: '1.0.0',
+    name: 'DVP-DynamicConfigurationGenerator',
     formatters : {
         'application/x-www-form-urlencoded' : function(req, res, body)
         {
@@ -23,9 +26,18 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
+server.post('/RedisPublisher', function(req, res, next)
+{
+    var message = JSON.stringify(req.body);
+    redisHandler.PublishToRedis('DVPEVENTS', message, function(err, result)
+    {
+        res.end();
+    })
+});
 
 
-server.post('/CallApp', function(req,res,next)
+
+server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', function(req,res,next)
 {
     try
     {
@@ -198,7 +210,7 @@ server.post('/CallApp', function(req,res,next)
 })
 
 
-server.get('/LbRequestController/:direction/:number/:ip', function(req,res,next)
+server.get('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/LbRequestController/:direction/:number/:ip', function(req,res,next)
 {
     try
     {
@@ -256,7 +268,7 @@ server.get('/LbRequestController/:direction/:number/:ip', function(req,res,next)
 })
 
 
-server.post('/DirectoryProfile', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/DirectoryProfile', function(req, res, next)
 {
     try
     {
@@ -425,6 +437,6 @@ server.post('/DirectoryProfile', function(req, res, next)
 });
 
 
-server.listen(9093, '0.0.0.0', function () {
+server.listen(hostPort, hostIp, function () {
     console.log('%s listening at %s', server.name, server.url);
 });

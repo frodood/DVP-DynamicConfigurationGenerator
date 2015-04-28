@@ -298,7 +298,7 @@ var CreateHttpApiDialplan = function(destinationPattern, context)
             context = "";
         }
 
-        var httpUrl = Config.HttpApi.Url;
+        var httpUrl = Config.Services.HttApiUrl;
 
         var httpApiUrl = "{url=" + httpUrl + "}";
 

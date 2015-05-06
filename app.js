@@ -135,6 +135,22 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                 {
                                     if(rule.Application)
                                     {
+                                        var evtData =
+                                        {
+                                            SessionId: varUuid,
+                                            EventClass: "CALL",
+                                            EventType : "CALL_RULE",
+                                            EventCategory: "INBOUND_RULE",
+                                            EventTime : new Date(),
+                                            EventName : "Call Rule Picked",
+                                            EventData : dnisNum,
+                                            EventParams : rule
+                                        };
+
+                                        var jsonStr = JSON.stringify(evtData);
+                                        redisClient.publish('DVPEVENTS', jsonStr);
+
+
                                         var sessionData =
                                         {
                                             path: rule.Application.Url,

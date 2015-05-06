@@ -17,7 +17,7 @@ var createNotFoundResponse = function()
     }
     catch(ex)
     {
-        return "";
+        return createNotFoundResponse();
     }
 
 }
@@ -115,7 +115,7 @@ var CreateUserGroupDirectoryProfile = function(grp)
     }
     catch(ex)
     {
-        return "";
+        return createNotFoundResponse();
     }
 
 
@@ -281,12 +281,12 @@ var createDirectoryProfile = function(extName, ext, domain, email, password, con
     }
     catch(ex)
     {
-        return "";
+        return createNotFoundResponse();
     }
 
 };
 
-var CreateHttpApiDialplan = function(destinationPattern, context)
+var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl)
 {
     try
     {
@@ -298,9 +298,9 @@ var CreateHttpApiDialplan = function(destinationPattern, context)
             context = "";
         }
 
-        var httpUrl = Config.Services.HttApiUrl;
+        //var httpUrl = Config.Services.HttApiUrl;
 
-        var httpApiUrl = "{url=" + httpUrl + "}";
+        var httpApiUrl = "{url=" + httApiUrl + "}";
 
         var doc = xmlBuilder.create('document');
 
@@ -327,13 +327,56 @@ var CreateHttpApiDialplan = function(destinationPattern, context)
     }
     catch(ex)
     {
-        return "";
+        return createNotFoundResponse();
     }
 
-}
+};
+
+var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl)
+{
+    try
+    {
+        if (!destinationPattern) {
+            destinationPattern = "";
+        }
+
+        if (!context) {
+            context = "";
+        }
+
+        var doc = xmlBuilder.create('document');
+
+        doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+            .ele('action').att('application', 'answer')
+            .up()
+            .ele('action').att('application', 'socket').att('data', socketUrl + ' async full')
+            .up()
+            .up()
+            .up()
+            .up()
+            .up()
+
+            .end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+
+    }
+    catch(ex)
+    {
+        return createNotFoundResponse();
+    }
+
+};
 
 module.exports.createDirectoryProfile = createDirectoryProfile;
 module.exports.createNotFoundResponse = createNotFoundResponse;
 module.exports.CreateGatewayProfile = CreateGatewayProfile;
 module.exports.CreateHttpApiDialplan = CreateHttpApiDialplan;
 module.exports.CreateUserGroupDirectoryProfile = CreateUserGroupDirectoryProfile;
+module.exports.CreateSocketApiDialplan = CreateSocketApiDialplan;

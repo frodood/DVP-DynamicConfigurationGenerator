@@ -6,12 +6,27 @@ var redisPort = Config.Redis.Port;
 
 var client = redis.createClient(redisPort, redisIp);
 
+var SetObjectWithExpire = function(key, value, timeout, callback)
+{
+    try
+    {
+        client.setex(key, timeout, value, function(err, response)
+        {
+            callback(err, response);
+        });
+
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+    }
+
+};
+
 var SetObject = function(key, value, callback)
 {
     try
     {
-        //var client = redis.createClient(redisPort, redisIp);
-
         client.set(key, value, function(err, response)
         {
             callback(err, response);
@@ -74,3 +89,4 @@ client.on('error', function(msg)
 module.exports.SetObject = SetObject;
 module.exports.PublishToRedis = PublishToRedis;
 module.exports.GetFromSet = GetFromSet;
+module.exports.SetObjectWithExpire = SetObjectWithExpire;

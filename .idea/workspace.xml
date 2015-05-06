@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66ecaa1d-b51b-4e7c-97f3-9a168c731a92" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/RedisHandler.js" afterPath="$PROJECT_DIR$/RedisHandler.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/XmlResponseGenerator.js" afterPath="$PROJECT_DIR$/XmlResponseGenerator.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app.js" afterPath="$PROJECT_DIR$/app.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/default.js" afterPath="$PROJECT_DIR$/config/default.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="DVP-DynamicConfigurationGenerator.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -28,14 +28,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="app.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.49210528" vertical-offset="510" max-vertical-offset="1955">
-              <caret line="41" column="22" selection-start-line="41" selection-start-column="22" selection-end-line="41" selection-end-column="41" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="5069" max-vertical-offset="7361">
+              <caret line="62" column="0" selection-start-line="62" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
               <folding>
-                <element signature="e#1318#8656#0" expanded="false" />
-                <element signature="e#10356#16098#0" expanded="false" />
+                <element signature="e#18577#24319#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -44,14 +43,9 @@
       <file leaf-file-name="XmlResponseGenerator.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/XmlResponseGenerator.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="435" max-vertical-offset="1207">
-              <caret line="306" column="41" selection-start-line="306" selection-start-column="41" selection-end-line="306" selection-end-column="41" />
-              <folding>
-                <element signature="e#113#566#0" expanded="false" />
-                <element signature="e#620#3535#0" expanded="false" />
-                <element signature="e#3581#7085#0" expanded="false" />
-                <element signature="e#7173#9319#0" expanded="false" />
-              </folding>
+            <state vertical-scroll-proportion="0.0" vertical-offset="5987" max-vertical-offset="6579">
+              <caret line="381" column="65" selection-start-line="381" selection-start-column="65" selection-end-line="381" selection-end-column="65" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -69,18 +63,28 @@
       <file leaf-file-name="CallRuleBackendOperations.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DVP-RuleService/CallRuleBackendOperations.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="918" max-vertical-offset="13498">
-              <caret line="77" column="132" selection-start-line="77" selection-start-column="111" selection-end-line="77" selection-end-column="132" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1122" max-vertical-offset="13498">
+              <caret line="73" column="1" selection-start-line="73" selection-start-column="1" selection-end-line="73" selection-end-column="1" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RedisHandler.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="CallRuleBackendOperations.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node_modules/DVP-RuleService/CallRuleBackendOperations.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="2958" max-vertical-offset="14756">
+              <caret line="145" column="23" selection-start-line="145" selection-start-column="4" selection-end-line="145" selection-end-column="23" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="RedisHandler.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/RedisHandler.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="85" max-vertical-offset="1377">
-              <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.29912025" vertical-offset="51" max-vertical-offset="1649">
+              <caret line="9" column="1" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
               <folding />
             </state>
           </provider>
@@ -99,13 +103,26 @@
       <file leaf-file-name="SipExtBackendOperations.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SipExtBackendOperations.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="102" max-vertical-offset="4114">
-              <caret line="50" column="21" selection-start-line="50" selection-start-column="21" selection-end-line="50" selection-end-column="21" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="5" max-vertical-offset="2907">
+              <caret line="90" column="0" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
               <folding>
                 <element signature="e#105#889#0" expanded="false" />
+                <element signature="e#955#1764#0" expanded="false" />
+                <element signature="e#1832#2297#0" expanded="false" />
+                <element signature="e#2344#2778#0" expanded="false" />
                 <element signature="e#7669#8685#0" expanded="false" />
                 <element signature="e#8755#16875#0" expanded="false" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DynamicConfigGeneratorLog.log" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/DynamicConfigGeneratorLog.log">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="153">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -128,13 +145,13 @@
         <option value="$PROJECT_DIR$/FreeSwitchMediaFormatter.js" />
         <option value="$PROJECT_DIR$/DVP-DBModels/Trunk.js" />
         <option value="$PROJECT_DIR$/DynamicConfigurationApiHost.js" />
-        <option value="$PROJECT_DIR$/RedisHandler.js" />
         <option value="$PROJECT_DIR$/config/custom-environment-variables.js" />
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/SipExtBackendOperations.js" />
-        <option value="$PROJECT_DIR$/XmlResponseGenerator.js" />
         <option value="$PROJECT_DIR$/config/default.js" />
+        <option value="$PROJECT_DIR$/XmlResponseGenerator.js" />
         <option value="$PROJECT_DIR$/app.js" />
+        <option value="$PROJECT_DIR$/RedisHandler.js" />
       </list>
     </option>
   </component>
@@ -209,7 +226,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../DVP-EventService" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
     <property name="recentsLimit" value="5" />
     <property name="FullScreen" value="false" />
@@ -328,21 +345,21 @@
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3306189" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32899022" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33876222" sideWeight="0.49962825" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24981412" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19553903" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.40228012" sideWeight="0.49962825" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4495114" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33876222" sideWeight="0.50037175" order="10" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40228012" sideWeight="0.50037175" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33876222" sideWeight="0.49962825" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40228012" sideWeight="0.49962825" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4495114" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -426,7 +443,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>280</line>
+          <line>413</line>
           <option name="timeStamp" value="109" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -476,7 +493,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>73</line>
+          <line>75</line>
           <option name="timeStamp" value="128" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -515,13 +532,8 @@
           <option name="timeStamp" value="155" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>72</line>
-          <option name="timeStamp" value="156" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>315</line>
+          <line>448</line>
           <option name="timeStamp" value="161" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -531,12 +543,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>374</line>
+          <line>507</line>
           <option name="timeStamp" value="171" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>42</line>
+          <line>44</line>
           <option name="timeStamp" value="182" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -551,11 +563,31 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>231</line>
+          <line>364</line>
           <option name="timeStamp" value="187" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/node_modules/DVP-RuleService/CallRuleBackendOperations.js</url>
+          <line>184</line>
+          <option name="timeStamp" value="188" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/DVP-RuleService/CallRuleBackendOperations.js</url>
+          <line>76</line>
+          <option name="timeStamp" value="190" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/DVP-RuleService/CallRuleBackendOperations.js</url>
+          <line>80</line>
+          <option name="timeStamp" value="191" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/XmlResponseGenerator.js</url>
+          <line>125</line>
+          <option name="timeStamp" value="192" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="188" />
+      <option name="time" value="193" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="NodeJSConfigurationType">
@@ -566,29 +598,10 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="850">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#1318#8656#0" expanded="false" />
-            <element signature="e#10356#16098#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/FreeSwitchMediaFormatter.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="170" max-vertical-offset="306">
-          <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app.js">
-      <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="187" max-vertical-offset="663">
           <caret line="11" column="5" selection-start-line="11" selection-start-column="5" selection-end-line="11" selection-end-column="5" />
           <folding>
-            <element signature="e#1318#8656#0" expanded="false" />
-            <element signature="e#10356#16098#0" expanded="false" />
+            <element signature="e#18577#24319#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -605,8 +618,7 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="306" max-vertical-offset="697">
           <caret line="18" column="43" selection-start-line="18" selection-start-column="43" selection-end-line="18" selection-end-column="43" />
           <folding>
-            <element signature="e#1318#8656#0" expanded="false" />
-            <element signature="e#10356#16098#0" expanded="false" />
+            <element signature="e#18577#24319#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -623,8 +635,7 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="306" max-vertical-offset="697">
           <caret line="18" column="43" selection-start-line="18" selection-start-column="43" selection-end-line="18" selection-end-column="43" />
           <folding>
-            <element signature="e#1318#8656#0" expanded="false" />
-            <element signature="e#10356#16098#0" expanded="false" />
+            <element signature="e#18577#24319#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -847,13 +858,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/DVP-RuleService/CallRuleBackendOperations.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3109756" vertical-offset="0" max-vertical-offset="14756">
-          <caret line="6" column="5" selection-start-line="6" selection-start-column="5" selection-end-line="6" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/FreeSwitchMediaFormatter.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="323">
@@ -892,40 +896,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DVP-RuleService/CallRuleBackendOperations.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="918" max-vertical-offset="13498">
-          <caret line="77" column="132" selection-start-line="77" selection-start-column="111" selection-end-line="77" selection-end-column="132" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RedisHandler.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1377">
-          <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/DVP-RuleService/app.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1071" max-vertical-offset="8228">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/XmlResponseGenerator.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="435" max-vertical-offset="1207">
-          <caret line="306" column="41" selection-start-line="306" selection-start-column="41" selection-end-line="306" selection-end-column="41" />
-          <folding>
-            <element signature="e#113#566#0" expanded="false" />
-            <element signature="e#620#3535#0" expanded="false" />
-            <element signature="e#3581#7085#0" expanded="false" />
-            <element signature="e#7173#9319#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -939,24 +914,74 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/SipExtBackendOperations.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="102" max-vertical-offset="4114">
-          <caret line="50" column="21" selection-start-line="50" selection-start-column="21" selection-end-line="50" selection-end-column="21" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="5" max-vertical-offset="2907">
+          <caret line="90" column="0" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
           <folding>
             <element signature="e#105#889#0" expanded="false" />
+            <element signature="e#955#1764#0" expanded="false" />
+            <element signature="e#1832#2297#0" expanded="false" />
+            <element signature="e#2344#2778#0" expanded="false" />
             <element signature="e#7669#8685#0" expanded="false" />
             <element signature="e#8755#16875#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/DynamicConfigGeneratorLog.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="367">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DVP-RuleService/CallRuleBackendOperations.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1122" max-vertical-offset="13498">
+          <caret line="73" column="1" selection-start-line="73" selection-start-column="1" selection-end-line="73" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/DVP-RuleService/CallRuleBackendOperations.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2244" max-vertical-offset="14756">
+          <caret line="145" column="23" selection-start-line="145" selection-start-column="4" selection-end-line="145" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/redis/lib/commands.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2873">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/XmlResponseGenerator.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="5987" max-vertical-offset="6579">
+          <caret line="381" column="65" selection-start-line="381" selection-start-column="65" selection-end-line="381" selection-end-column="65" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.49210528" vertical-offset="510" max-vertical-offset="1955">
-          <caret line="41" column="22" selection-start-line="41" selection-start-column="22" selection-end-line="41" selection-end-column="41" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="5069" max-vertical-offset="7361">
+          <caret line="62" column="0" selection-start-line="62" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
           <folding>
-            <element signature="e#1318#8656#0" expanded="false" />
-            <element signature="e#10356#16098#0" expanded="false" />
+            <element signature="e#18577#24319#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RedisHandler.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.29912025" vertical-offset="51" max-vertical-offset="1649">
+          <caret line="9" column="1" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+          <folding />
         </state>
       </provider>
     </entry>

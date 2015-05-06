@@ -28,6 +28,8 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
+
+
 server.post('/RedisPublisher', function(req, res, next)
 {
     var message = JSON.stringify(req.body);
@@ -135,6 +137,158 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                 {
                                     if(rule.Application)
                                     {
+                                        if(rule.Application.ObjClass === 'DEVELOPMENT')
+                                        {
+                                            var masterUrl = '';
+                                            if(rule.Application.MasterApplication && rule.Application.MasterApplication.Url)
+                                            {
+                                                var masterApp = rule.Application.MasterApplication;
+                                                if(masterApp.ObjType === "HTTAPI")
+                                                {
+                                                    //add to redis
+                                                    masterUrl = rule.Application.MasterApplication.Url;
+                                                    var sessionData =
+                                                    {
+                                                        path: rule.Application.Url,
+                                                        company: rule.CompanyId,
+                                                        tenant: rule.TenantId,
+                                                        app: rule.Application.AppName
+                                                    };
+
+                                                    var jsonString = JSON.stringify(sessionData);
+
+                                                    redisHandler.SetObject(varUuid + "_data", jsonString, function(err, result)
+                                                    {
+                                                        if(err)
+                                                        {
+                                                            logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
+                                                            var xml = xmlGen.createNotFoundResponse();
+
+                                                            res.end(xml);
+                                                        }
+                                                        else
+                                                        {
+                                                            var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, masterUrl);
+                                                            res.end(xml);
+                                                        }
+
+                                                    });
+
+                                                }
+                                                else if(masterApp.ObjType === "SOCKET")
+                                                {
+                                                    var sessionData =
+                                                    {
+                                                        path: rule.Application.Url,
+                                                        company: rule.CompanyId,
+                                                        tenant: rule.TenantId,
+                                                        app: rule.Application.AppName
+                                                    };
+
+                                                    var jsonString = JSON.stringify(sessionData);
+
+                                                    redisHandler.SetObject(varUuid + "_data", jsonString, function(err, result)
+                                                    {
+                                                        if(err)
+                                                        {
+                                                            logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
+                                                            var xml = xmlGen.createNotFoundResponse();
+
+                                                            res.end(xml);
+                                                        }
+                                                        else
+                                                        {
+                                                            var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, rule.Application.Url);
+                                                            res.end(xml);
+                                                        }
+
+                                                    });
+                                                }
+                                                else
+                                                {
+                                                    var xml = xmlGen.createNotFoundResponse();
+
+                                                    res.end(xml);
+                                                }
+
+                                            }
+                                            else
+                                            {
+                                                var xml = xmlGen.createNotFoundResponse();
+
+                                                res.end(xml);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if(rule.Application.ObjType === 'HTTAPI')
+                                            {
+                                                masterUrl = rule.Application.MasterApplication.Url;
+                                                var sessionData =
+                                                {
+                                                    path: rule.Application.Url,
+                                                    company: rule.CompanyId,
+                                                    tenant: rule.TenantId,
+                                                    app: rule.Application.AppName
+                                                };
+
+                                                var jsonString = JSON.stringify(sessionData);
+
+                                                redisHandler.SetObject(varUuid + "_data", jsonString, function(err, result)
+                                                {
+                                                    if(err)
+                                                    {
+                                                        logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
+                                                        var xml = xmlGen.createNotFoundResponse();
+
+                                                        res.end(xml);
+                                                    }
+                                                    else
+                                                    {
+                                                        var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, rule.Application.Url);
+                                                        res.end(xml);
+                                                    }
+
+                                                });
+                                            }
+                                            else if(rule.Application.ObjType === 'SOCKET')
+                                            {
+                                                var sessionData =
+                                                {
+                                                    path: rule.Application.Url,
+                                                    company: rule.CompanyId,
+                                                    tenant: rule.TenantId,
+                                                    app: rule.Application.AppName
+                                                };
+
+                                                var jsonString = JSON.stringify(sessionData);
+
+                                                redisHandler.SetObject(varUuid + "_data", jsonString, function(err, result)
+                                                {
+                                                    if(err)
+                                                    {
+                                                        logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
+                                                        var xml = xmlGen.createNotFoundResponse();
+
+                                                        res.end(xml);
+                                                    }
+                                                    else
+                                                    {
+                                                        var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, rule.Application.Url);
+                                                        res.end(xml);
+                                                    }
+
+                                                });
+                                            }
+                                            else
+                                            {
+                                                var xml = xmlGen.createNotFoundResponse();
+
+                                                res.end(xml);
+                                            }
+                                        }
+
+
                                         var evtData =
                                         {
                                             SessionId: varUuid,
@@ -150,33 +304,12 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                         var jsonStr = JSON.stringify(evtData);
                                         redisClient.publish('DVPEVENTS', jsonStr);
 
+                                    }
+                                    else
+                                    {
+                                        var xml = xmlGen.createNotFoundResponse();
 
-                                        var sessionData =
-                                        {
-                                            path: rule.Application.Url,
-                                            company: rule.CompanyId,
-                                            tenant: rule.TenantId,
-                                            app: rule.Application.AppName
-                                        };
-
-                                        var jsonString = JSON.stringify(sessionData);
-
-                                        redisHandler.SetObject(varUuid + "_data", jsonString, function(err, result)
-                                        {
-                                            if(err)
-                                            {
-                                                logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
-                                                var xml = xmlGen.createNotFoundResponse();
-
-                                                res.end(xml);
-                                            }
-                                            else
-                                            {
-                                                var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext);
-                                                res.end(xml);
-                                            }
-
-                                        });
+                                        res.end(xml);
                                     }
 
 

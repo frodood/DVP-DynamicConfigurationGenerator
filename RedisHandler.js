@@ -1,5 +1,6 @@
 var redis = require("redis");
 var Config = require('config');
+var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 var redisIp = Config.Redis.IpAddress;
 var redisPort = Config.Redis.Port;
@@ -12,6 +13,14 @@ var SetObjectWithExpire = function(key, value, timeout, callback)
     {
         client.setex(key, timeout, value, function(err, response)
         {
+            if(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.SetObjectWithExpire] - REDIS ERROR', err)
+            }
+            else
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.SetObjectWithExpire] - REDIS SUCCESS', err)
+            }
             callback(err, response);
         });
 
@@ -29,6 +38,14 @@ var SetObject = function(key, value, callback)
     {
         client.set(key, value, function(err, response)
         {
+            if(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.SetObjectWithExpire] - REDIS ERROR', err)
+            }
+            else
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.SetObjectWithExpire] - REDIS SUCCESS', err)
+            }
             callback(err, response);
         });
 
@@ -47,8 +64,14 @@ var PublishToRedis = function(pattern, message, callback)
         if(client.connected)
         {
             var result = client.publish(pattern, message);
+            logger.debug('[DVP-DynamicConfigurationGenerator.SetObjectWithExpire] - REDIS SUCCESS');
+            callback(undefined, true);
         }
-        callback(undefined, true);
+        else
+        {
+            callback(new Error('REDIS CLIENT DISCONNECTED'), false);
+        }
+
 
     }
     catch(ex)
@@ -65,12 +88,20 @@ var GetFromSet = function(setName, callback)
         {
             client.smembers(setName).keys("*", function (err, setValues)
             {
+                if(err)
+                {
+                    logger.error('[DVP-DynamicConfigurationGenerator.SetObjectWithExpire] - REDIS ERROR', err)
+                }
+                else
+                {
+                    logger.debug('[DVP-DynamicConfigurationGenerator.SetObjectWithExpire] - REDIS SUCCESS')
+                }
                 callback(err, setValues);
             });
         }
         else
         {
-            callback(new Error('Redis Client Disconnected'), undefined);
+            callback(new Error('REDIS CLIENT DISCONNECTED'), undefined);
         }
 
 

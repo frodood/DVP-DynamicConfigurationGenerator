@@ -1,5 +1,6 @@
 var xmlBuilder = require('xmlbuilder');
 var Config = require('config');
+var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 var createNotFoundResponse = function()
 {
@@ -22,7 +23,7 @@ var createNotFoundResponse = function()
 
 }
 
-var CreateUserGroupDirectoryProfile = function(grp)
+var CreateUserGroupDirectoryProfile = function(grp, reqId)
 {
     try
     {
@@ -115,6 +116,7 @@ var CreateUserGroupDirectoryProfile = function(grp)
     }
     catch(ex)
     {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateUserGroupDirectoryProfile] - [%s] - Exception occurred creating xml', reqId, ex);
         return createNotFoundResponse();
     }
 
@@ -122,7 +124,7 @@ var CreateUserGroupDirectoryProfile = function(grp)
 
 }
 
-var CreateGatewayProfile = function(gwList)
+var CreateGatewayProfile = function(gwList, reqId)
 {
     try
     {
@@ -213,6 +215,7 @@ var CreateGatewayProfile = function(gwList)
     }
     catch(ex)
     {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateGatewayProfile] - [%s] - Exception occurred creating xml', reqId, ex);
         return createNotFoundResponse();
     }
 
@@ -220,7 +223,7 @@ var CreateGatewayProfile = function(gwList)
 
 }
 
-var createDirectoryProfile = function(extName, ext, domain, email, password, context)
+var createDirectoryProfile = function(extName, ext, domain, email, password, context, reqId)
 {
     try {
 
@@ -281,12 +284,13 @@ var createDirectoryProfile = function(extName, ext, domain, email, password, con
     }
     catch(ex)
     {
+        logger.error('[DVP-DynamicConfigurationGenerator.createDirectoryProfile] - [%s] - Exception occurred creating xml', reqId, ex);
         return createNotFoundResponse();
     }
 
 };
 
-var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl)
+var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, reqId)
 {
     try
     {
@@ -327,12 +331,13 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl)
     }
     catch(ex)
     {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateHttpApiDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
         return createNotFoundResponse();
     }
 
 };
 
-var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl)
+var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl, reqId)
 {
     try
     {
@@ -369,6 +374,7 @@ var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl)
     }
     catch(ex)
     {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateSocketApiDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
         return createNotFoundResponse();
     }
 

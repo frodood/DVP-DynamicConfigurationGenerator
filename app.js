@@ -1,13 +1,14 @@
 var restify = require('restify');
 var stringify = require('stringify');
 var config = require('config');
+var nodeUuid = require('node-uuid');
 var fsMediaFormatter = require('./FreeSwitchMediaFormatter.js');
 var backendHandler = require('./SipExtBackendOperations.js');
 var xmlGen = require('./XmlResponseGenerator.js');
-var logHandler = require('./LogHandler.js');
 var jsonFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var ruleHandler = require('DVP-RuleService/CallRuleBackendOperations.js');
 var redisHandler = require('./RedisHandler.js');
+var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 
 var hostIp = config.Host.Ip;
@@ -28,8 +29,6 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
-
-
 server.post('/RedisPublisher', function(req, res, next)
 {
     var message = JSON.stringify(req.body);
@@ -43,8 +42,13 @@ server.post('/RedisPublisher', function(req, res, next)
 
 server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', function(req,res,next)
 {
+    var reqId = nodeUuid.v1();
     try
     {
+        logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - HTTP FS DIALPLAN Request Received [CallApp]', reqId);
+
+        logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Request Body : %s', reqId, req.body);
+
         var data = fsMediaFormatter.convertUrlEncoded(req.body);
 
         var hostname = data["hostname"];
@@ -68,17 +72,20 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
             var destNum = (huntDestNum) ? huntDestNum:cdnum;
 
             //Get Context
+            logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to get context : %s', reqId, callerContext);
 
             backendHandler.GetContext(callerContext, function(err, ctxt)
             {
                 if(err)
                 {
+                    logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - get context fail', reqId, err);
                     var xml = xmlGen.createNotFoundResponse();
 
                     res.end(xml);
                 }
                 else if(!ctxt || ctxt.ContextCat.toUpperCase() === "PUBLIC")
                 {
+                    logger.info('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - context found category PUBLIC', reqId);
                     var decodedSipFromUri = decodeURIComponent(varSipFromUri);
                     var decodedSipToUri = decodeURIComponent(varSipToUri);
 
@@ -96,7 +103,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
 
                         var domainAndPort = domainS.split(":");
 
-                        if(domainAndPort.lenght == 2)
+                        if(domainAndPort.length == 2)
                         {
                             domain = domainAndPort[0];
                         }
@@ -111,12 +118,13 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                     }
 
                     //pick inbound call rule
+                    logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Calling GetPhoneNumberDetails with dnisNum : %s', reqId, dnisNum);
 
                     backendHandler.GetPhoneNumberDetails(dnisNum, function(err, num)
                     {
                         if(err)
                         {
-                            logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
+                            logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - GetPhoneNumberDetails returned exception', reqId, err);
                             var xml = xmlGen.createNotFoundResponse();
 
                             res.end(xml);
@@ -124,27 +132,36 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                         }
                         else if(num)
                         {
+                            logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - GetPhoneNumberDetails returned num obj : %j', reqId, num);
+
+                            logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, dnisNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, aniNum, dnisNum, domain, num.CompanyId, num.TenantId);
                             ruleHandler.PickCallRuleInbound(aniNum, dnisNum, domain, num.CompanyId, num.TenantId, function(err, rule)
                             {
                                 if(err)
                                 {
-                                    logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
+                                    logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - PickCallRuleInbound returned exception', reqId, err);
                                     var xml = xmlGen.createNotFoundResponse();
 
                                     res.end(xml);
                                 }
                                 else if(rule)
                                 {
+                                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - PickCallRuleInbound returned rule : %s', reqId, rule);
                                     if(rule.Application)
                                     {
                                         if(rule.Application.ObjClass === 'DEVELOPMENT')
                                         {
+                                            logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call rule has a developer app', reqId);
                                             var masterUrl = '';
                                             if(rule.Application.MasterApplication && rule.Application.MasterApplication.Url)
                                             {
                                                 var masterApp = rule.Application.MasterApplication;
+
+                                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master application found : %j', reqId, masterApp);
+
                                                 if(masterApp.ObjType === "HTTAPI")
                                                 {
+                                                    logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type is HTTAPI', reqId);
                                                     //add to redis
                                                     masterUrl = rule.Application.MasterApplication.Url;
                                                     var sessionData =
@@ -157,18 +174,24 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
 
                                                     var jsonString = JSON.stringify(sessionData);
 
+                                                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session Data Object created for HTTAPI : %s', reqId, jsonString);
+
                                                     redisHandler.SetObject(varUuid + "_data", jsonString, function(err, result)
                                                     {
                                                         if(err)
                                                         {
-                                                            logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
+                                                            logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Exception in setting sessionData on backend - Key : : %s_data', reqId, varUuid, err);
                                                             var xml = xmlGen.createNotFoundResponse();
 
                                                             res.end(xml);
                                                         }
                                                         else
                                                         {
-                                                            var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, masterUrl);
+                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session data added to redis successfully - Key : : %s_data', reqId, varUuid);
+
+                                                            var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, masterUrl, reqId);
+
+                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - HTTAPI dialplan created - Response Sent : : %s', reqId, xml);
                                                             res.end(xml);
                                                         }
 
@@ -177,6 +200,8 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                 }
                                                 else if(masterApp.ObjType === "SOCKET")
                                                 {
+                                                    logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type is SOCKET', reqId);
+
                                                     var sessionData =
                                                     {
                                                         path: rule.Application.Url,
@@ -187,18 +212,25 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
 
                                                     var jsonString = JSON.stringify(sessionData);
 
+                                                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session Data Object created for SOCKET : %s', reqId, jsonString);
+
                                                     redisHandler.SetObject(varUuid + "_data", jsonString, function(err, result)
                                                     {
                                                         if(err)
                                                         {
-                                                            logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
+                                                            logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Exception in setting sessionData on backend - Key : : %s_data', reqId, varUuid, err);
                                                             var xml = xmlGen.createNotFoundResponse();
 
                                                             res.end(xml);
                                                         }
                                                         else
                                                         {
-                                                            var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, rule.Application.Url);
+                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session data added to redis successfully - Key : : %s_data', reqId, varUuid);
+
+                                                            var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, rule.Application.Url, reqId);
+
+                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - SOCKET dialplan created - Response Sent : : %s', reqId, xml);
+
                                                             res.end(xml);
                                                         }
 
@@ -206,6 +238,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                 }
                                                 else
                                                 {
+                                                    logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type Undefined - Terminating', reqId);
                                                     var xml = xmlGen.createNotFoundResponse();
 
                                                     res.end(xml);
@@ -214,6 +247,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                             }
                                             else
                                             {
+                                                logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call rule developer app doesnt have a master app or master app url not set', reqId);
                                                 var xml = xmlGen.createNotFoundResponse();
 
                                                 res.end(xml);
@@ -221,9 +255,11 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                         }
                                         else
                                         {
+                                            logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call rule has a system or a master app assigned', reqId);
                                             if(rule.Application.ObjType === 'HTTAPI')
                                             {
-                                                masterUrl = rule.Application.MasterApplication.Url;
+                                                logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Application type is HTTAPI', reqId);
+
                                                 var sessionData =
                                                 {
                                                     path: rule.Application.Url,
@@ -234,18 +270,24 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
 
                                                 var jsonString = JSON.stringify(sessionData);
 
+                                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session Data Object created for HTTAPI : %s', reqId, jsonString);
+
                                                 redisHandler.SetObject(varUuid + "_data", jsonString, function(err, result)
                                                 {
                                                     if(err)
                                                     {
-                                                        logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
+                                                        logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Exception in setting sessionData on backend - Key : : %s_data', reqId, varUuid, err);
                                                         var xml = xmlGen.createNotFoundResponse();
 
                                                         res.end(xml);
                                                     }
                                                     else
                                                     {
-                                                        var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, rule.Application.Url);
+                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session data added to redis successfully - Key : : %s_data', reqId, varUuid);
+
+                                                        var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, rule.Application.Url, reqId);
+
+                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - HTTAPI dialplan created - Response Sent : : %s', reqId, xml);
                                                         res.end(xml);
                                                     }
 
@@ -253,6 +295,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                             }
                                             else if(rule.Application.ObjType === 'SOCKET')
                                             {
+                                                logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Application Type is SOCKET', reqId);
                                                 var sessionData =
                                                 {
                                                     path: rule.Application.Url,
@@ -263,18 +306,23 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
 
                                                 var jsonString = JSON.stringify(sessionData);
 
+                                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session Data Object created for SOCKET : %s', reqId, jsonString);
+
                                                 redisHandler.SetObject(varUuid + "_data", jsonString, function(err, result)
                                                 {
                                                     if(err)
                                                     {
-                                                        logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
+                                                        logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Exception in setting sessionData on backend - Key : : %s_data', reqId, varUuid, err);
                                                         var xml = xmlGen.createNotFoundResponse();
 
                                                         res.end(xml);
                                                     }
                                                     else
                                                     {
-                                                        var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, rule.Application.Url);
+                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session data added to redis successfully - Key : : %s_data', reqId, varUuid);
+                                                        var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, rule.Application.Url, reqId);
+
+                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - SOCKET dialplan created - Response Sent : : %s', reqId, xml);
                                                         res.end(xml);
                                                     }
 
@@ -282,6 +330,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                             }
                                             else
                                             {
+                                                logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Application Type Undefined - Terminating', reqId);
                                                 var xml = xmlGen.createNotFoundResponse();
 
                                                 res.end(xml);
@@ -307,6 +356,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                     }
                                     else
                                     {
+                                        logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call rule has no application, terminating', reqId);
                                         var xml = xmlGen.createNotFoundResponse();
 
                                         res.end(xml);
@@ -316,7 +366,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                 }
                                 else
                                 {
-                                    logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error('Invalid Phone Number'), 'ERROR', false, undefined));
+                                    logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call rule not found', reqId);
                                     var xml = xmlGen.createNotFoundResponse();
 
                                     res.end(xml);
@@ -325,7 +375,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                         }
                         else
                         {
-                            logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error('Invalid Phone Number'), 'ERROR', false, undefined));
+                            logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - GetPhoneNumberDetails returned num obj : EMPTY', reqId);
                             var xml = xmlGen.createNotFoundResponse();
 
                             res.end(xml);
@@ -336,7 +386,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                 }
                 else
                 {
-                    logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error('Invalid Phone Number'), 'ERROR', false, undefined));
+                    logger.warn('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - context found category NOT PUBLIC - Action not Implemented Yet', reqId);
                     var xml = xmlGen.createNotFoundResponse();
 
                     res.end(xml);
@@ -347,10 +397,17 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
 
 
         }
+        else
+        {
+            logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - cdnum OR callerContext OR hostname not found in request - Terminating', reqId);
+            var xml = xmlGen.createNotFoundResponse();
+
+            res.end(xml);
+        }
     }
     catch(ex)
     {
-        logHandler.WriteLog(ex, jsonFormatter.FormatMessage(new Error('Invalid Phone Number'), 'ERROR', false, undefined));
+        logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Exception occurred on CallApp Api Method - Error : ', reqId, ex);
         var xml = xmlGen.createNotFoundResponse();
 
         res.end(xml);
@@ -358,29 +415,45 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
 
     return next();
 
-})
+});
 
 
 server.get('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/LbRequestController/:direction/:number/:ip', function(req,res,next)
 {
+    var reqId = nodeUuid.v1();
+
     try
     {
+        logger.info('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - HTTP SIPLB Request Received [LbRequestController]', reqId);
+
         var direction = req.params.direction;
         var number = req.params.number;
 
+        logger.debug('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - Request Params - direction : %s, number : %s', reqId, direction, number);
+
         if(direction === "in")
         {
+            logger.info('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - call direction is IN', reqId);
             backendHandler.GetCloudForIncomingRequest(number, 0, function(err, cb)
             {
                 if(err || !cb)
                 {
+                    if(err)
+                    {
+                        logger.error('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - Exception occurred while executing GetCloudForIncomingRequest', reqId, err);
+                    }
+                    else
+                    {
+                        logger.error('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - GetCloudForIncomingRequest returned empty object', reqId);
+                    }
                     res.end(",,");
                 }
                 else
                 {
                     var returnMessage = cb.LimitId + "," + cb.LoadBalanceType + "," + cb.IpCode;
 
-                    logHandler.WriteLog('debug', returnMessage);
+                    logger.debug('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - GetCloudForIncomingRequest object found - Returning LB Details : %s', reqId, returnMessage);
+
                     res.end(returnMessage);
                 }
 
@@ -388,15 +461,28 @@ server.get('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/LbRequestControl
         }
         else if(direction === "out")
         {
+            logger.info('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - call direction is OUT', reqId);
             backendHandler.GetGatewayForOutgoingRequest(number, 0, function(err, cb)
             {
                 if(err || !cb)
                 {
+                    if(err)
+                    {
+                        logger.error('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - Exception occurred while executing GetGatewayForOutgoingRequest', reqId, err);
+                    }
+                    else
+                    {
+                        logger.error('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - GetGatewayForOutgoingRequest returned empty object', reqId);
+                    }
+
                     res.end(",");
                 }
                 else
                 {
                     var returnMessage = cb.LimitId + "," + cb.GwIpUrl;
+
+                    logger.debug('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - GetGatewayForOutgoingRequest object found - Returning Gateway Details : %s', reqId, returnMessage);
+
                     res.end(returnMessage);
                 }
 
@@ -404,25 +490,32 @@ server.get('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/LbRequestControl
         }
         else
         {
-            logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error("Invalid direction"), 'EXCEPTION', false, undefined));
+            logger.error('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - call direction is NOT DEFINED - Terminating', reqId);
+
             res.end(",");
         }
 
     }
     catch(ex)
     {
-        logHandler.WriteLog("error", jsonFormatter.FormatMessage(ex, 'EXCEPTION', false, undefined));
+        logger.error('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - Exception occurred on LbRequestController Api Method - Error : ', reqId, ex);
         res.end(",");
     }
 
     return next();
-})
+});
 
 
 server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/DirectoryProfile', function(req, res, next)
 {
+    var reqId = nodeUuid.v1();
+
     try
     {
+        logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - HTTP FS DIRECTORY_PROFILE Request Received [DirectoryProfile]', reqId);
+
+        logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - Request Body : %s', reqId, req.body);
+
         var data = fsMediaFormatter.convertUrlEncoded(req.body);
 
         var hostname = data["hostname"];
@@ -434,38 +527,45 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/DirectoryProfil
         var sipAuthRealm = data["sip_auth_realm"];
         var profile = data["profile"];
 
-        logHandler.WriteLog('debug', req.body);
-
         if(action && group && hostname && domain && action === "group_call")
         {
+            logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - ACTION TYPE GROUP_CALL', reqId);
+
             var tempAuthRealm = domain;
             if(sipAuthRealm != undefined)
             {
                 tempAuthRealm = sipAuthRealm;
             }
 
+            logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - Sip Auth Realm Set to : %s', reqId, tempAuthRealm);
+
             backendHandler.GetGroupBy_Name_Domain(group, tempAuthRealm, function(err, result)
             {
                 if(err)
                 {
-                    logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
+                    logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetGroupBy_Name_Domain threw an exception', reqId, err);
                     var xml = xmlGen.createNotFoundResponse();
+
+                    logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
 
                     res.end(xml);
                 }
                 else if(result)
                 {
-                    var xml = xmlGen.CreateUserGroupDirectoryProfile(result);
+                    logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetGroupBy_Name_Domain returned group details : %j', reqId, result);
+                    var xml = xmlGen.CreateUserGroupDirectoryProfile(result, reqId);
 
-                    logHandler.WriteLog("debug", xml);
+                    logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
 
                     res.end(xml);
 
                 }
                 else
                 {
-                    logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error('Group Not Found'), 'ERROR', false, undefined));
+                    logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetGroupBy_Name_Domain returned empty object', reqId);
                     var xml = xmlGen.createNotFoundResponse();
+
+                    logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
 
                     res.end(xml);
                 }
@@ -474,39 +574,54 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/DirectoryProfil
         }
         else if(action && user && hostname && domain && (action === 'sip_auth' || action === 'message-count'))
         {
+            logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - ACTION TYPE SIP_AUTH', reqId);
             var tempAuthRealm = domain;
             if(sipAuthRealm != undefined)
             {
                 tempAuthRealm = sipAuthRealm;
             }
 
+            logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - Sip Auth Realm Set to : %s', tempAuthRealm);
+
             backendHandler.GetUserBy_Name_Domain(user, tempAuthRealm, function(err, usr)
             {
                 if(err)
                 {
-                    logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error('Enduser not defined'), 'ERROR', false, undefined));
+                    logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetUserBy_Name_Domain threw an exception', reqId, err);
                     var xml = xmlGen.createNotFoundResponse();
+
+                    logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
+
+                    res.end(xml);
                 }
                 else if(usr)
                 {
                     //create xml
+                    logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetUserBy_Name_Domain returned user : %j', reqId, usr);
                     if(usr.CloudEndUser)
                     {
-                        var xml = xmlGen.createDirectoryProfile(usr.SipUsername, usr.SipExtension, usr.CloudEndUser.Domain, usr.EmailAddress, usr.Password, usr.ContextId);
-                        logHandler.WriteLog("debug", xml);
+                        logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - User Has a Cloud End User', reqId);
+
+                        var xml = xmlGen.createDirectoryProfile(usr.SipUsername, usr.SipExtension, usr.CloudEndUser.Domain, usr.EmailAddress, usr.Password, usr.ContextId, reqId);
+
+                        logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
+
                         res.end(xml);
                     }
                     else
                     {
-                        logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error('Enduser not defined'), 'ERROR', false, undefined));
+                        logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - User Has NO Cloud End User', reqId);
                         var xml = xmlGen.createNotFoundResponse();
+                        logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
                         res.end(xml);
                     }
                 }
                 else
                 {
-                    logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error('user undefined'), 'ERROR', false, undefined));
+                    logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetUserBy_Name_Domain returned empty object', reqId);
                     var xml = xmlGen.createNotFoundResponse();
+
+                    logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
 
                     res.end(xml);
                 }
@@ -514,36 +629,56 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/DirectoryProfil
         }
         else if(action && user && hostname && domain && (action === 'user_call' || action === 'voicemail-lookup'))
         {
+            if(action === 'user_call')
+            {
+                logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - ACTION TYPE USER_CALL', reqId);
+            }
+            else
+            {
+                logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - ACTION TYPE VOICEMAIL_LOOKUP', reqId);
+            }
+
             var tempAuthRealm = domain;
             if(sipAuthRealm != undefined)
             {
                 tempAuthRealm = sipAuthRealm;
             }
 
+            logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - Sip Auth Realm Set to : %s', tempAuthRealm);
+
             backendHandler.GetUserBy_Ext_Domain(user, tempAuthRealm, function(err, usr){
-                if(usr != undefined)
+
+                if(!err && usr)
                 {
+                    logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetUserBy_Ext_Domain returned user : %j', reqId, usr);
                     //create xml
                     if(usr.CloudEndUser)
                     {
-                        var xml = xmlGen.createDirectoryProfile(usr.SipUsername, usr.SipExtension, usr.CloudEndUser.Domain, usr.EmailAddress, usr.Password, usr.ContextId);
+                        logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - User Has a Cloud End User', reqId);
+                        var xml = xmlGen.createDirectoryProfile(usr.SipUsername, usr.SipExtension, usr.CloudEndUser.Domain, usr.EmailAddress, usr.Password, usr.ContextId, reqId);
+
+                        logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
 
                         res.end(xml);
                     }
                     else
                     {
+                        logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - User Has NO Cloud End User', reqId);
+
                         var xml = xmlGen.createNotFoundResponse();
+
+                        logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
 
                         res.end(xml);
                     }
-
-
                 }
                 else
                 {
-                    logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error('user undefined'), 'ERROR', false, undefined));
+                    logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - User not found', reqId, err);
 
                     var xml = xmlGen.createNotFoundResponse();
+
+                    logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
 
                     res.end(xml);
                 }
@@ -551,19 +686,26 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/DirectoryProfil
         }
         else if(purpose && profile && hostname && purpose === 'gateways')
         {
+            logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - ACTION TYPE GATEWAYS', reqId);
             var csId = parseInt(hostname);
-            backendHandler.GetGatewayListForCallServerProfile(profile, csId, function(err, result)
+            backendHandler.GetGatewayListForCallServerProfile(profile, csId, reqId, function(err, result)
             {
-                if (err)
+                if (!err && result && result.length > 0)
                 {
-                    logHandler.WriteLog("error", jsonFormatter.FormatMessage(err, 'ERROR', false, undefined));
-                    var xml = xmlGen.createNotFoundResponse();
+                    logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetGatewayListForCallServerProfile returned gw result - list count : %d', reqId, result.length);
+
+                    var xml = xmlGen.CreateGatewayProfile(result, reqId);
+
+                    logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
 
                     res.end(xml);
                 }
                 else
                 {
-                    var xml = xmlGen.CreateGatewayProfile(result);
+                    logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - Gateways not found', reqId, err);
+                    var xml = xmlGen.createNotFoundResponse();
+
+                    logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
 
                     res.end(xml);
                 }
@@ -572,15 +714,17 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/DirectoryProfil
         }
         else
         {
-            logHandler.WriteLog("error", jsonFormatter.FormatMessage(new Error('Invalid Parameters Passed'), 'ERROR', false, undefined));
-            res.end(xmlGen.createNotFoundResponse());
+            var xml = xmlGen.createNotFoundResponse();
+            logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
+            res.end(xml);
         }
 
     }
     catch(ex)
     {
-        logHandler.WriteLog("error", jsonFormatter.FormatMessage(ex, 'EXCEPTION', false, undefined));
-        res.end(xmlGen.createNotFoundResponse());
+        logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - Exception occurred on DirectoryProfile Api Method - Error : ', reqId, ex);
+        var xml = xmlGen.createNotFoundResponse();
+        logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
     }
 
     return next();

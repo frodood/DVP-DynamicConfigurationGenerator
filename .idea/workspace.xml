@@ -2,9 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66ecaa1d-b51b-4e7c-97f3-9a168c731a92" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DVP-DBModels/Application.js" afterPath="$PROJECT_DIR$/DVP-DBModels/Application.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/RedisHandler.js" afterPath="$PROJECT_DIR$/RedisHandler.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SipExtBackendOperations.js" afterPath="$PROJECT_DIR$/SipExtBackendOperations.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/XmlResponseGenerator.js" afterPath="$PROJECT_DIR$/XmlResponseGenerator.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app.js" afterPath="$PROJECT_DIR$/app.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="DVP-DynamicConfigurationGenerator.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -31,11 +34,9 @@
       <file leaf-file-name="app.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="5069" max-vertical-offset="7361">
-              <caret line="62" column="0" selection-start-line="62" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
-              <folding>
-                <element signature="e#18577#24319#0" expanded="false" />
-              </folding>
+            <state vertical-scroll-proportion="-5.28" vertical-offset="9252" max-vertical-offset="12614">
+              <caret line="552" column="31" selection-start-line="552" selection-start-column="31" selection-end-line="552" selection-end-column="31" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -43,9 +44,11 @@
       <file leaf-file-name="XmlResponseGenerator.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/XmlResponseGenerator.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="5987" max-vertical-offset="6579">
-              <caret line="381" column="65" selection-start-line="381" selection-start-column="65" selection-end-line="381" selection-end-column="65" />
-              <folding />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6375">
+              <caret line="25" column="35" selection-start-line="25" selection-start-column="4" selection-end-line="25" selection-end-column="35" />
+              <folding>
+                <element signature="e#187#662#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -63,38 +66,28 @@
       <file leaf-file-name="CallRuleBackendOperations.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DVP-RuleService/CallRuleBackendOperations.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1122" max-vertical-offset="13498">
+            <state vertical-scroll-proportion="0.0" vertical-offset="11852" max-vertical-offset="13498">
               <caret line="73" column="1" selection-start-line="73" selection-start-column="1" selection-end-line="73" selection-end-column="1" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CallRuleBackendOperations.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/node_modules/DVP-RuleService/CallRuleBackendOperations.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="2958" max-vertical-offset="14756">
-              <caret line="145" column="23" selection-start-line="145" selection-start-column="4" selection-end-line="145" selection-end-column="23" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RedisHandler.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="RedisHandler.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RedisHandler.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.29912025" vertical-offset="51" max-vertical-offset="1649">
-              <caret line="9" column="1" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1588" max-vertical-offset="2176">
+              <caret line="96" column="106" selection-start-line="96" selection-start-column="106" selection-end-line="96" selection-end-column="106" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="app.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/DVP-RuleService/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1071" max-vertical-offset="8228">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.3411371" vertical-offset="0" max-vertical-offset="8228">
+              <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -103,25 +96,8 @@
       <file leaf-file-name="SipExtBackendOperations.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SipExtBackendOperations.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="5" max-vertical-offset="2907">
-              <caret line="90" column="0" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
-              <folding>
-                <element signature="e#105#889#0" expanded="false" />
-                <element signature="e#955#1764#0" expanded="false" />
-                <element signature="e#1832#2297#0" expanded="false" />
-                <element signature="e#2344#2778#0" expanded="false" />
-                <element signature="e#7669#8685#0" expanded="false" />
-                <element signature="e#8755#16875#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DynamicConfigGeneratorLog.log" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/DynamicConfigGeneratorLog.log">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="153">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="7483" max-vertical-offset="8721">
+              <caret line="452" column="132" selection-start-line="452" selection-start-column="70" selection-end-line="452" selection-end-column="132" />
               <folding />
             </state>
           </provider>
@@ -147,11 +123,12 @@
         <option value="$PROJECT_DIR$/DynamicConfigurationApiHost.js" />
         <option value="$PROJECT_DIR$/config/custom-environment-variables.js" />
         <option value="$PROJECT_DIR$/package.json" />
-        <option value="$PROJECT_DIR$/SipExtBackendOperations.js" />
         <option value="$PROJECT_DIR$/config/default.js" />
+        <option value="$PROJECT_DIR$/DVP-DBModels/Application.js" />
+        <option value="$PROJECT_DIR$/SipExtBackendOperations.js" />
+        <option value="$PROJECT_DIR$/RedisHandler.js" />
         <option value="$PROJECT_DIR$/XmlResponseGenerator.js" />
         <option value="$PROJECT_DIR$/app.js" />
-        <option value="$PROJECT_DIR$/RedisHandler.js" />
       </list>
     </option>
   </component>
@@ -187,7 +164,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -206,27 +182,14 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DVP-DynamicConfigurationGenerator" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DVP-DynamicConfigurationGenerator" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="config" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../DVP-EventService" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
     <property name="recentsLimit" value="5" />
     <property name="FullScreen" value="false" />
@@ -349,8 +312,8 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24981412" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19553903" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.40228012" sideWeight="0.49962825" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4495114" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40228012" sideWeight="0.49962825" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4495114" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40228012" sideWeight="0.50037175" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
@@ -358,8 +321,8 @@
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
     </layout>
     <layout-to-restore>
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -403,137 +366,92 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>65</line>
+          <line>51</line>
           <option name="timeStamp" value="52" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/XmlResponseGenerator.js</url>
-          <line>215</line>
+          <line>218</line>
           <option name="timeStamp" value="65" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>64</line>
+          <line>50</line>
           <option name="timeStamp" value="69" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/XmlResponseGenerator.js</url>
-          <line>209</line>
+          <line>211</line>
           <option name="timeStamp" value="85" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/XmlResponseGenerator.js</url>
-          <line>211</line>
+          <line>213</line>
           <option name="timeStamp" value="86" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>228</line>
+          <line>243</line>
           <option name="timeStamp" value="103" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>305</line>
-          <option name="timeStamp" value="107" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>314</line>
-          <option name="timeStamp" value="108" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>413</line>
+          <line>500</line>
           <option name="timeStamp" value="109" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>321</line>
-          <option name="timeStamp" value="110" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>443</line>
+          <line>476</line>
           <option name="timeStamp" value="111" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>338</line>
-          <option name="timeStamp" value="112" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>363</line>
-          <option name="timeStamp" value="115" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>369</line>
-          <option name="timeStamp" value="116" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>373</line>
-          <option name="timeStamp" value="117" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>388</line>
-          <option name="timeStamp" value="119" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>367</line>
-          <option name="timeStamp" value="120" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>436</line>
+          <line>468</line>
           <option name="timeStamp" value="121" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>75</line>
+          <line>81</line>
           <option name="timeStamp" value="128" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/XmlResponseGenerator.js</url>
-          <line>329</line>
+          <line>334</line>
           <option name="timeStamp" value="140" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>75</line>
+          <line>61</line>
           <option name="timeStamp" value="145" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>79</line>
+          <line>74</line>
           <option name="timeStamp" value="146" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/XmlResponseGenerator.js</url>
-          <line>117</line>
+          <line>119</line>
           <option name="timeStamp" value="149" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/XmlResponseGenerator.js</url>
-          <line>103</line>
+          <line>104</line>
           <option name="timeStamp" value="151" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/XmlResponseGenerator.js</url>
-          <line>107</line>
+          <line>108</line>
           <option name="timeStamp" value="153" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/XmlResponseGenerator.js</url>
-          <line>110</line>
+          <line>111</line>
           <option name="timeStamp" value="155" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>448</line>
+          <line>543</line>
           <option name="timeStamp" value="161" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -543,27 +461,27 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>507</line>
+          <line>620</line>
           <option name="timeStamp" value="171" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>44</line>
+          <line>43</line>
           <option name="timeStamp" value="182" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>21</line>
+          <line>22</line>
           <option name="timeStamp" value="183" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>142</line>
+          <line>139</line>
           <option name="timeStamp" value="186" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>364</line>
+          <line>421</line>
           <option name="timeStamp" value="187" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -583,11 +501,16 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/XmlResponseGenerator.js</url>
-          <line>125</line>
+          <line>127</line>
           <option name="timeStamp" value="192" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
+          <line>113</line>
+          <option name="timeStamp" value="194" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="193" />
+      <option name="time" value="195" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="NodeJSConfigurationType">
@@ -596,16 +519,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="187" max-vertical-offset="663">
-          <caret line="11" column="5" selection-start-line="11" selection-start-column="5" selection-end-line="11" selection-end-column="5" />
-          <folding>
-            <element signature="e#18577#24319#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/SipExtBackendOperations.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="34" max-vertical-offset="136">
@@ -617,9 +530,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="306" max-vertical-offset="697">
           <caret line="18" column="43" selection-start-line="18" selection-start-column="43" selection-end-line="18" selection-end-column="43" />
-          <folding>
-            <element signature="e#18577#24319#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -634,9 +545,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="306" max-vertical-offset="697">
           <caret line="18" column="43" selection-start-line="18" selection-start-column="43" selection-end-line="18" selection-end-column="43" />
-          <folding>
-            <element signature="e#18577#24319#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -872,19 +781,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config/custom-environment-variables.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="33" max-vertical-offset="629">
-          <caret line="31" column="2" selection-start-line="31" selection-start-column="2" selection-end-line="31" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/config/default.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="493">
           <caret line="16" column="15" selection-start-line="16" selection-start-column="15" selection-end-line="16" selection-end-column="15" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -892,38 +792,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="588">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DVP-RuleService/app.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1071" max-vertical-offset="8228">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/package.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.2881356" vertical-offset="0" max-vertical-offset="680">
-          <caret line="6" column="4" selection-start-line="6" selection-start-column="4" selection-end-line="7" selection-end-column="47" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SipExtBackendOperations.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="5" max-vertical-offset="2907">
-          <caret line="90" column="0" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
-          <folding>
-            <element signature="e#105#889#0" expanded="false" />
-            <element signature="e#955#1764#0" expanded="false" />
-            <element signature="e#1832#2297#0" expanded="false" />
-            <element signature="e#2344#2778#0" expanded="false" />
-            <element signature="e#7669#8685#0" expanded="false" />
-            <element signature="e#8755#16875#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -935,52 +803,90 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DVP-RuleService/CallRuleBackendOperations.js">
+    <entry file="file://$PROJECT_DIR$/node_modules/redis/lib/commands.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1122" max-vertical-offset="13498">
-          <caret line="73" column="1" selection-start-line="73" selection-start-column="1" selection-end-line="73" selection-end-column="1" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2873">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33147633" vertical-offset="0" max-vertical-offset="680">
+          <caret line="7" column="47" selection-start-line="7" selection-start-column="47" selection-end-line="7" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DVP-DBModels/Application.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.14455782" vertical-offset="0" max-vertical-offset="588">
+          <caret line="5" column="39" selection-start-line="5" selection-start-column="39" selection-end-line="5" selection-end-column="39" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/node_modules/DVP-RuleService/CallRuleBackendOperations.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2244" max-vertical-offset="14756">
+        <state vertical-scroll-proportion="-20.375652" vertical-offset="14181" max-vertical-offset="14756">
           <caret line="145" column="23" selection-start-line="145" selection-start-column="4" selection-end-line="145" selection-end-column="23" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/redis/lib/commands.js">
+    <entry file="file://$PROJECT_DIR$/config/custom-environment-variables.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2873">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="33" max-vertical-offset="629">
+          <caret line="31" column="2" selection-start-line="31" selection-start-column="2" selection-end-line="31" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SipExtBackendOperations.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="7483" max-vertical-offset="8721">
+          <caret line="452" column="132" selection-start-line="452" selection-start-column="70" selection-end-line="452" selection-end-column="132" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RedisHandler.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1588" max-vertical-offset="2176">
+          <caret line="96" column="106" selection-start-line="96" selection-start-column="106" selection-end-line="96" selection-end-column="106" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/XmlResponseGenerator.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="5987" max-vertical-offset="6579">
-          <caret line="381" column="65" selection-start-line="381" selection-start-column="65" selection-end-line="381" selection-end-column="65" />
-          <folding />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6375">
+          <caret line="25" column="35" selection-start-line="25" selection-start-column="4" selection-end-line="25" selection-end-column="35" />
+          <folding>
+            <element signature="e#187#662#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="5069" max-vertical-offset="7361">
-          <caret line="62" column="0" selection-start-line="62" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
-          <folding>
-            <element signature="e#18577#24319#0" expanded="false" />
-          </folding>
+        <state vertical-scroll-proportion="-5.28" vertical-offset="9252" max-vertical-offset="12614">
+          <caret line="552" column="31" selection-start-line="552" selection-start-column="31" selection-end-line="552" selection-end-column="31" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/RedisHandler.js">
+    <entry file="file://$PROJECT_DIR$/DVP-RuleService/CallRuleBackendOperations.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.29912025" vertical-offset="51" max-vertical-offset="1649">
-          <caret line="9" column="1" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="11852" max-vertical-offset="13498">
+          <caret line="73" column="1" selection-start-line="73" selection-start-column="1" selection-end-line="73" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DVP-RuleService/app.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3411371" vertical-offset="0" max-vertical-offset="8228">
+          <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
           <folding />
         </state>
       </provider>

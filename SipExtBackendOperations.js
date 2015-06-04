@@ -55,6 +55,93 @@ var GetUserBy_Name_Domain = function(extName, domain, callback)
 
 };
 
+var GetExtensionForDid = function(reqId, didNumber, companyId, tenantId, callback)
+{
+    try
+    {
+        dbModel.DidNumber.find({where: [{DidNumber: didNumber},{TenantId: tenantId}], include : [{model: dbModel.Extension, as: 'Extension'}]})
+            .complete(function (err, didNumDetails)
+            {
+                if (err)
+                {
+                    logger.error('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query failed', reqId, err);
+                    callback(err, undefined);
+                }
+                else
+                {
+                    logger.debug('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query success', reqId);
+                    callback(err, didNumDetails);
+                }
+            });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, undefined);
+    }
+
+};
+
+var GetExtensionDB = function(reqId, ext, tenantId, callback)
+{
+    try
+    {
+        dbModel.Extension.find({where: [{Extension: ext},{TenantId: tenantId}]})
+            .complete(function (err, extDetails)
+            {
+                if (err)
+                {
+                    logger.error('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query failed', reqId, err);
+                    callback(err, undefined);
+                }
+                else
+                {
+                    logger.debug('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query success', reqId);
+                    callback(err, extDetails);
+                }
+            });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, undefined);
+    }
+
+};
+
+var GetAllDataForExt = function(reqId, extension, tenantId, extType, callback)
+{
+    try
+    {
+        if(extType === 'USER')
+        {
+            dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}], include: [{model: dbModel.SipUACEndpoint, as:'SipUACEndpoint', include: [{model: dbModel.CloudEndUser, as:'CloudEndUser'},{model: dbModel.UserGroup, as:'UserGroup', include: [{model: dbModel.Extension, as:'Extension'}]}]}]})
+                .complete(function (err, extData)
+                {
+                    callback(err, extData);
+                });
+        }
+        else if(extType === 'GROUP')
+        {
+            dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}], include: [{model: dbModel.UserGroup, as:'UserGroup'}]})
+                .complete(function (err, extData)
+                {
+                    callback(err, extData);
+                });
+        }
+        else
+        {
+            callback(new Error('Unsupported extension type'), undefined);
+        }
+
+    }
+    catch(ex)
+    {
+        callback(ex, false);
+    }
+
+};
+
 var GetGroupBy_Name_Domain = function(grpName, domain, callback)
 {
     try
@@ -109,6 +196,34 @@ var GetContext = function(context, callback)
         callback(ex, undefined);
     }
 };
+
+var GetEmergencyNumber = function(numb, tenantId, callback)
+{
+    try
+    {
+        dbModel.EmergencyNumber
+            .find({where :[{EmergencyNum: numb},{TenantId: tenantId}]})
+            .complete(function (err, eNum)
+            {
+                if(err)
+                {
+                    logger.error('[DVP-DynamicConfigurationGenerator.GetContext] PGSQL Get emergency number query failed', err);
+                }
+                else
+                {
+                    logger.debug('[DVP-DynamicConfigurationGenerator.GetContext] PGSQL Get emergency number query success');
+                }
+
+                callback(err, eNum);
+
+            });
+
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+    }
+}
 
 var GetPhoneNumberDetails = function(phnNum, callback)
 {
@@ -504,4 +619,8 @@ module.exports.GetGatewayForOutgoingRequest = GetGatewayForOutgoingRequest;
 module.exports.GetContext = GetContext;
 module.exports.GetPhoneNumberDetails = GetPhoneNumberDetails;
 module.exports.GetGroupBy_Name_Domain = GetGroupBy_Name_Domain;
+module.exports.GetAllDataForExt = GetAllDataForExt;
+module.exports.GetExtensionForDid = GetExtensionForDid;
+module.exports.GetExtensionDB = GetExtensionDB;
+module.exports.GetEmergencyNumber = GetEmergencyNumber;
 

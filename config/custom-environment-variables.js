@@ -27,6 +27,12 @@ module.exports = {
     },
 
     "Services": {
-        "HttApiUrl":"SYS_SERVICE_HTTPROGRAMMING"
+        "HttApiUrl":"SYS_SERVICE_HTTPROGRAMMING",
+        "SipUACApi":
+        {
+            "Ip":"SYS_SERVICE_SIPUACENDPOINT_IP",
+            "Port":"SYS_SERVICE_SIPUACENDPOINT_PORT",
+            "Version":"SYS_SERVICE_SIPUACENDPOINT_VERSION"
+        }
     }
 };

@@ -1,0 +1,523 @@
+var xmlBuilder = require('xmlbuilder');
+var config = require('config');
+var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
+var util = require('util');
+
+var createNotFoundResponse = function()
+{
+    try
+    {
+        var doc = xmlBuilder.create('document');
+        doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'result')
+            .ele('result').att('status', 'not found')
+            .up()
+            .up()
+            .end({pretty: true});
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+    }
+    catch(ex)
+    {
+        return createNotFoundResponse();
+    }
+
+};
+
+var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context)
+{
+    try
+    {
+        if (!destinationPattern) {
+            destinationPattern = "";
+        }
+
+        if (!context) {
+            context = "";
+        }
+
+        //var httpUrl = Config.Services.HttApiUrl;
+
+        var doc = xmlBuilder.create('document');
+
+        doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+            .ele('action').att('application', 'answer')
+            .up()
+            .ele('action').att('application', 'hangup').att('data', 'USER_BUSY')
+            .up()
+            .up()
+            .up()
+            .up()
+            .up()
+
+            .end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
+var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia)
+{
+    try
+    {
+        if (!destinationPattern) {
+            destinationPattern = "";
+        }
+
+        if (!context) {
+            context = "";
+        }
+
+        var bypassMedia = "bypass_media=true";
+        if (!ep.BypassMedia)
+        {
+            bypassMedia = "bypass_media=false";
+        }
+
+        var ignoreEarlyM = "ignore_early_media=false";
+        if (ignoreEarlyMedia)
+        {
+            ignoreEarlyM = "ignore_early_media=true";
+        }
+
+        var option = '';
+
+        if (ep.LegStartDelay > 0)
+            option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
+        else
+            option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
+
+        //var httpUrl = Config.Services.HttApiUrl;
+
+        var dnis = ep.Destination;
+
+        if (ep.Domain)
+        {
+            dnis = util.format('%s@%s', dnis, ep.Domain);
+        }
+        var protocol = 'sofia';
+        var destinationGroup = 'user';
+
+        if(ep.Type === 'GROUP')
+        {
+            destinationGroup = 'group';
+        }
+
+        var calling = util.format('%s%s/%s/%s', option, protocol, destinationGroup, dnis);
+
+        if(ep.Type === 'USER')
+        {
+            if (ep.Group)
+            {
+                calling = util.format("%s,pickup/%s", calling, ep.Group);
+            }
+        }
+
+
+
+        if(ep.IsVoicemailEnabled)
+        {
+            var doc = xmlBuilder.create('document');
+
+            doc.att('type', 'freeswitch/xml')
+                .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+                .ele('context').att('name', context)
+                .ele('extension').att('name', 'test')
+                .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+                .ele('action').att('application', 'set').att('data', 'ringback=${us-ring}')
+                .up()
+                .ele('action').att('application', 'set').att('data', 'continue_on_fail=true')
+                .up()
+                .ele('action').att('application', 'set').att('data', 'hangup_after_bridge=true')
+                .up()
+                .ele('action').att('application', 'set').att('data', ignoreEarlyM)
+                .up()
+                .ele('action').att('application', 'set').att('data', bypassMedia)
+                .up()
+                .ele('action').att('application', 'bind_meta_app').att('data', '3 ab s execute_extension::att_xfer XML PBXFeatures')
+                .up()
+                .ele('action').att('application', 'bind_meta_app').att('data', '4 ab s execute_extension::att_xfer_group XML PBXFeatures')
+                .up()
+                .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
+                .up()
+                .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
+                .up()
+                .ele('action').att('application', 'bridge').att('data', calling)
+                .up()
+                .ele('action').att('application', 'answer')
+                .up()
+                .ele('action').att('application', 'voicemail').att('data', 'default %s %s', ep.Domain, ep.Destination)
+                .up()
+                .up()
+                .up()
+                .up()
+                .up()
+
+                .end({pretty: true});
+
+
+            return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+        }
+        else
+        {
+            var doc = xmlBuilder.create('document');
+
+            doc.att('type', 'freeswitch/xml')
+                .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+                .ele('context').att('name', context)
+                .ele('extension').att('name', 'test')
+                .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+                .ele('action').att('application', 'set').att('data', 'ringback=${us-ring}')
+                .up()
+                .ele('action').att('application', 'set').att('data', 'continue_on_fail=true')
+                .up()
+                .ele('action').att('application', 'set').att('data', 'hangup_after_bridge=true')
+                .up()
+                .ele('action').att('application', 'set').att('data', ignoreEarlyM)
+                .up()
+                .ele('action').att('application', 'set').att('data', bypassMedia)
+                .up()
+                .ele('action').att('application', 'bind_meta_app').att('data', '3 ab s execute_extension::att_xfer XML PBXFeatures')
+                .up()
+                .ele('action').att('application', 'bind_meta_app').att('data', '4 ab s execute_extension::att_xfer_group XML PBXFeatures')
+                .up()
+                .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
+                .up()
+                .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
+                .up()
+                .ele('action').att('application', 'bridge').att('data', calling)
+                .up()
+                .ele('action').att('application', 'hangup')
+                .up()
+                .up()
+                .up()
+                .up()
+                .up()
+
+                .end({pretty: true});
+
+
+            return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+        }
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
+var CreateForwardingDialplan = function(reqId, endpoint, context, profile, destinationPattern, ignoreEarlyMedia, fwdKey)
+{
+    try
+    {
+        if (!destinationPattern) {
+            destinationPattern = "";
+        }
+
+        if (!context) {
+            context = "";
+        }
+
+        var bypassMedia = "bypass_media=true";
+        if (!endpoint.BypassMedia)
+        {
+            bypassMedia = "bypass_media=false";
+        }
+
+        var ignoreEarlyM = "ignore_early_media=false";
+        if (ignoreEarlyMedia)
+        {
+            ignoreEarlyM = "ignore_early_media=true";
+        }
+
+        var option = '';
+
+        if (endpoint.LegStartDelay > 0)
+            option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', endpoint.LegStartDelay, endpoint.LegTimeout, endpoint.Origination, endpoint.OriginationCallerIdNumber);
+        else
+            option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', endpoint.LegTimeout, endpoint.Origination, endpoint.OriginationCallerIdNumber);
+
+        //var httpUrl = Config.Services.HttApiUrl;
+
+        var dnis = endpoint.Destination;
+
+        if (endpoint.Domain)
+        {
+            dnis = util.format('%s@%s', dnis, endpoint.Domain);
+        }
+        var protocol = 'sofia';
+        var destinationGroup = 'user';
+
+        var calling = util.format('%s%s/%s/%s', option, protocol, destinationGroup, dnis);
+
+        if (endpoint.Group)
+        {
+            calling = util.format("%s,pickup/%s", calling, endpoint.Group);
+        }
+
+        var luaParams = util.format('CF.lua ${{originate_disposition}} \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\'', endpoint.CompanyId, endpoint.TenantId, context, endpoint.Domain, endpoint.Origination, endpoint.OriginationCallerIdNumber, fwdKey, endpoint.DodNumber, endpoint.DodActive);
+
+
+            var doc = xmlBuilder.create('document');
+
+            doc.att('type', 'freeswitch/xml')
+                .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+                .ele('context').att('name', context)
+                .ele('extension').att('name', 'test')
+                .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+                .ele('action').att('application', 'set').att('data', 'ringback=${us-ring}')
+                .up()
+                .ele('action').att('application', 'set').att('data', 'continue_on_fail=true')
+                .up()
+                .ele('action').att('application', 'set').att('data', 'hangup_after_bridge=true')
+                .up()
+                .ele('action').att('application', 'set').att('data', ignoreEarlyM)
+                .up()
+                .ele('action').att('application', 'set').att('data', bypassMedia)
+                .up()
+                .ele('action').att('application', 'bind_meta_app').att('data', '3 ab s execute_extension::att_xfer XML PBXFeatures')
+                .up()
+                .ele('action').att('application', 'bind_meta_app').att('data', '4 ab s execute_extension::att_xfer_group XML PBXFeatures')
+                .up()
+                .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
+                .up()
+                .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
+                .up()
+                .ele('action').att('application', 'bridge').att('data', calling)
+                .up()
+                .ele('action').att('application', 'lua').att('data', luaParams)
+                .up()
+                .ele('action').att('application', 'hangup')
+                .up()
+                .up()
+                .up()
+                .up()
+                .up()
+
+                .end({pretty: true});
+
+
+            return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
+var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia)
+{
+    try {
+        if (!destinationPattern) {
+            destinationPattern = "";
+        }
+
+        if (!context) {
+            context = "";
+        }
+
+        var ignoreEarlyM = "ignore_early_media=false";
+        if (ignoreEarlyMedia) {
+            ignoreEarlyM = "ignore_early_media=true";
+        }
+
+        var doc = xmlBuilder.create('document');
+
+        var cond = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+
+        cond.ele('action').att('application', 'set').att('data', 'ringback=${us-ring}')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'continue_on_fail=true')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'hangup_after_bridge=true')
+            .up()
+            .ele('action').att('application', 'set').att('data', ignoreEarlyM)
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '3 ab s execute_extension::att_xfer XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '4 ab s execute_extension::att_xfer_group XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
+            .up()
+
+
+        var option = '';
+        var bypassMed = 'bypass_media=false';
+
+        var destinationGroup = util.format('gateway/%s', ep.Profile);
+
+        if (ep.LegStartDelay > 0)
+            option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
+        else
+            option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
+
+
+        var dnis = '';
+
+        if (ep.Domain) {
+            dnis = util.format('%s@%s', ep.Destination, ep.Domain);
+        }
+
+        var protocol = 'sofia';
+        var calling = util.format('%s%s/%s/%s', option, protocol, destinationGroup, dnis);
+
+        cond.ele('action').att('application', 'set').att('data', bypassMed)
+            .up()
+        ele('action').att('application', 'set').att('data', calling)
+            .up()
+
+        return cond.end({pretty: true});
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
+var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, destinationPattern, ignoreEarlyMedia)
+{
+    try
+    {
+        if (!destinationPattern) {
+            destinationPattern = "";
+        }
+
+        if (!context) {
+            context = "";
+        }
+
+        var ignoreEarlyM = "ignore_early_media=false";
+        if (ignoreEarlyMedia)
+        {
+            ignoreEarlyM = "ignore_early_media=true";
+        }
+
+        var doc = xmlBuilder.create('document');
+
+        var cond = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+                .ele('context').att('name', context)
+                    .ele('extension').att('name', 'test')
+                        .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+
+        cond.ele('action').att('application', 'set').att('data', 'ringback=${us-ring}')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'continue_on_fail=true')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'hangup_after_bridge=true')
+            .up()
+            .ele('action').att('application', 'set').att('data', ignoreEarlyM)
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '3 ab s execute_extension::att_xfer XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '4 ab s execute_extension::att_xfer_group XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
+            .up()
+
+        fmEndpoints.forEach(function(ep)
+        {
+            var option = '';
+            var destinationGroup = '';
+            var bypassMed = 'bypass_media=false';
+
+
+            if(ep.Type === 'GATEWAY')
+            {
+                destinationGroup = util.format('gateway/%s', ep.Profile);
+
+                if (ep.LegStartDelay > 0)
+                    option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
+                else
+                    option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
+
+                bypassMed = 'bypass_media=false';
+            }
+            else
+            {
+                destinationGroup = 'user';
+
+                if (ep.LegStartDelay > 0)
+                    option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
+                else
+                    option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
+
+                if(ep.BypassMedia)
+                {
+                    bypassMed = 'bypass_media=true';
+                }
+                else
+                {
+                    bypassMed = 'bypass_media=false';
+                }
+
+            }
+
+            var dnis = '';
+
+            if (domain)
+            {
+                dnis = util.format('%s@%s', ep.Destination, ep.Domain);
+            }
+
+            var protocol = 'sofia';
+            var calling = util.format('%s%s/%s/%s', option, protocol, destinationGroup, dnis);
+
+            cond.ele('action').att('application', 'set').att('data', bypassMed)
+                .up()
+                ele('action').att('application', 'set').att('data', calling)
+                .up()
+
+        });
+
+        return cond.end({pretty: true});
+
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
+module.exports.createNotFoundResponse = createNotFoundResponse;
+module.exports.CreateSendBusyMessageDialplan = CreateSendBusyMessageDialplan;
+module.exports.CreateRouteUserDialplan = CreateRouteUserDialplan;
+module.exports.CreateFollowMeDialplan = CreateFollowMeDialplan;
+module.exports.CreateForwardingDialplan = CreateForwardingDialplan;
+module.exports.CreateRouteGatewayDialplan = CreateRouteGatewayDialplan;

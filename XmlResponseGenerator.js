@@ -30,9 +30,7 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
         var grpDomain = grp.Domain ? grp.Domain : "";
         //var element = new xmlBuilder.create('users');
         var obj = {
-            'users': [
-
-            ]
+            'users': []
         };
 
         if(grp.SipUACEndpoint)
@@ -380,9 +378,89 @@ var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl, r
 
 };
 
+var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia)
+{
+    try {
+        if (!destinationPattern) {
+            destinationPattern = "";
+        }
+
+        if (!context) {
+            context = "";
+        }
+
+        var ignoreEarlyM = "ignore_early_media=false";
+        if (ignoreEarlyMedia) {
+            ignoreEarlyM = "ignore_early_media=true";
+        }
+
+        var doc = xmlBuilder.create('document');
+
+        var cond = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+
+        cond.ele('action').att('application', 'set').att('data', 'ringback=${us-ring}')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'continue_on_fail=true')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'hangup_after_bridge=true')
+            .up()
+            .ele('action').att('application', 'set').att('data', ignoreEarlyM)
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '3 ab s execute_extension::att_xfer XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '4 ab s execute_extension::att_xfer_group XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
+            .up()
+
+
+        var option = '';
+        var bypassMed = 'bypass_media=false';
+
+        var destinationGroup = util.format('gateway/%s', ep.Profile);
+
+        if (ep.LegStartDelay > 0)
+            option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
+        else
+            option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
+
+
+        var dnis = '';
+
+        if (ep.Domain) {
+            dnis = util.format('%s@%s', ep.Destination, ep.Domain);
+        }
+
+        var protocol = 'sofia';
+        var calling = util.format('%s%s/%s/%s', option, protocol, destinationGroup, dnis);
+
+        cond.ele('action').att('application', 'set').att('data', bypassMed)
+            .up()
+        ele('action').att('application', 'set').att('data', calling)
+            .up()
+
+        return cond.end({pretty: true});
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
 module.exports.createDirectoryProfile = createDirectoryProfile;
 module.exports.createNotFoundResponse = createNotFoundResponse;
 module.exports.CreateGatewayProfile = CreateGatewayProfile;
 module.exports.CreateHttpApiDialplan = CreateHttpApiDialplan;
 module.exports.CreateUserGroupDirectoryProfile = CreateUserGroupDirectoryProfile;
 module.exports.CreateSocketApiDialplan = CreateSocketApiDialplan;
+module.exports.CreateRouteGatewayDialplan = CreateRouteGatewayDialplan;

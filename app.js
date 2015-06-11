@@ -185,7 +185,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                         data['TrunkFaxType'] = faxType;
                                     }
 
-                                    logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - GetPhoneNumberDetails returned num obj : %j', reqId, num);
+                                    logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - GetPhoneNumberDetails returned num obj : %j', reqId, JSON.stringify(num));
 
                                     logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, dnisNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, aniNum, dnisNum, domain, num.CompanyId, num.TenantId);
                                     ruleHandler.PickCallRuleInbound(aniNum, dnisNum, domain, callerContext, num.CompanyId, num.TenantId, function(err, rule)
@@ -199,7 +199,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                         }
                                         else if(rule)
                                         {
-                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - PickCallRuleInbound returned rule : %s', reqId, rule);
+                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - PickCallRuleInbound returned rule : %s', reqId, JSON.stringify(rule));
 
                                             //check dnis is a emergency number
 
@@ -213,7 +213,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                     {
                                                         var masterApp = rule.Application.MasterApplication;
 
-                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master application found : %j', reqId, masterApp);
+                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master application found : ', reqId, masterApp);
 
                                                         if(masterApp.ObjType === "HTTAPI")
                                                         {

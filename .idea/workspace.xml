@@ -2,10 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66ecaa1d-b51b-4e7c-97f3-9a168c731a92" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ExtendedDialplanEngine.js" afterPath="$PROJECT_DIR$/ExtendedDialplanEngine.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ExternalApiAccess.js" afterPath="$PROJECT_DIR$/ExternalApiAccess.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SipExtBackendOperations.js" afterPath="$PROJECT_DIR$/SipExtBackendOperations.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/XmlExtendedDialplanBuilder.js" afterPath="$PROJECT_DIR$/XmlExtendedDialplanBuilder.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app.js" afterPath="$PROJECT_DIR$/app.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
@@ -34,10 +30,11 @@
       <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.04682274" vertical-offset="13076" max-vertical-offset="13651">
-              <caret line="1085" column="32" selection-start-line="1085" selection-start-column="32" selection-end-line="1085" selection-end-column="32" />
+            <state vertical-scroll-proportion="0.6243478" vertical-offset="3500" max-vertical-offset="9877">
+              <caret line="227" column="90" selection-start-line="227" selection-start-column="90" selection-end-line="227" selection-end-column="90" />
               <folding>
-                <element signature="e#26958#50377#0" expanded="false" />
+                <element signature="e#26988#50407#0" expanded="false" />
+                <element signature="e#54683#64827#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -149,11 +146,11 @@
         <option value="$PROJECT_DIR$/RedisHandler.js" />
         <option value="$PROJECT_DIR$/XmlResponseGenerator.js" />
         <option value="$PROJECT_DIR$/ExternalApiAccess.js" />
-        <option value="$PROJECT_DIR$/app.js" />
         <option value="$PROJECT_DIR$/SipExtBackendOperations.js" />
         <option value="$PROJECT_DIR$/node_modules/DVP-RuleService/CallRuleBackendOperations.js" />
         <option value="$PROJECT_DIR$/XmlExtendedDialplanBuilder.js" />
         <option value="$PROJECT_DIR$/ExtendedDialplanEngine.js" />
+        <option value="$PROJECT_DIR$/app.js" />
       </list>
     </option>
   </component>
@@ -332,7 +329,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="1" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -343,7 +340,7 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19553903" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40228012" sideWeight="0.49962825" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4495114" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4495114" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33876222" sideWeight="0.50037175" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
@@ -1023,10 +1020,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.04682274" vertical-offset="13076" max-vertical-offset="13651">
-          <caret line="1085" column="32" selection-start-line="1085" selection-start-column="32" selection-end-line="1085" selection-end-column="32" />
+        <state vertical-scroll-proportion="0.6243478" vertical-offset="3500" max-vertical-offset="9877">
+          <caret line="227" column="90" selection-start-line="227" selection-start-column="90" selection-end-line="227" selection-end-column="90" />
           <folding>
-            <element signature="e#26958#50377#0" expanded="false" />
+            <element signature="e#26988#50407#0" expanded="false" />
+            <element signature="e#54683#64827#0" expanded="false" />
           </folding>
         </state>
       </provider>

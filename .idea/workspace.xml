@@ -2,10 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66ecaa1d-b51b-4e7c-97f3-9a168c731a92" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ConferenceOperations.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/DVP-DBModels/Conference.js" afterPath="$PROJECT_DIR$/node_modules/DVP-DBModels/Conference.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/DVP-DBModels/ConferenceUser.js" afterPath="$PROJECT_DIR$/node_modules/DVP-DBModels/ConferenceUser.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ExtendedDialplanEngine.js" afterPath="$PROJECT_DIR$/ExtendedDialplanEngine.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/XmlExtendedDialplanBuilder.js" afterPath="$PROJECT_DIR$/XmlExtendedDialplanBuilder.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SipExtBackendOperations.js" afterPath="$PROJECT_DIR$/SipExtBackendOperations.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app.js" afterPath="$PROJECT_DIR$/app.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/DVP-DBModels/index.js" afterPath="$PROJECT_DIR$/node_modules/DVP-DBModels/index.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/DVP-DBModels/package.json" afterPath="$PROJECT_DIR$/node_modules/DVP-DBModels/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/.bin/uuid" afterPath="$PROJECT_DIR$/node_modules/.bin/uuid" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="DVP-DynamicConfigurationGenerator.iws" />
@@ -30,36 +34,52 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="app.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="6766" max-vertical-offset="15283">
-              <caret line="414" column="50" selection-start-line="414" selection-start-column="50" selection-end-line="414" selection-end-column="50" />
+            <state vertical-scroll-proportion="0.3979933" vertical-offset="4318" max-vertical-offset="15300">
+              <caret line="261" column="61" selection-start-line="261" selection-start-column="61" selection-end-line="261" selection-end-column="61" />
               <folding>
-                <element signature="e#54865#65009#0" expanded="false" />
+                <element signature="e#54957#65101#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FreeSwitchMediaFormatter.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/FreeSwitchMediaFormatter.js">
+      <file leaf-file-name="ExtendedDialplanEngine.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ExtendedDialplanEngine.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="323">
-              <caret line="3" column="4" selection-start-line="3" selection-start-column="4" selection-end-line="7" selection-end-column="5" />
+            <state vertical-scroll-proportion="0.8" vertical-offset="1227" max-vertical-offset="9894">
+              <caret line="327" column="8" selection-start-line="327" selection-start-column="8" selection-end-line="327" selection-end-column="8" />
+              <folding>
+                <element signature="e#725#4192#0" expanded="false" />
+                <element signature="e#4368#11358#0" expanded="false" />
+                <element signature="e#12751#32970#0" expanded="false" />
+                <element signature="e#13688#28318#0" expanded="false" />
+                <element signature="e#28417#29876#0" expanded="false" />
+                <element signature="e#29977#32139#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ConferenceOperations.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ConferenceOperations.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="731">
+              <caret line="9" column="33" selection-start-line="9" selection-start-column="33" selection-end-line="9" selection-end-column="33" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ExtendedDialplanEngine.js" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/ExtendedDialplanEngine.js">
+      <file leaf-file-name="SipExtBackendOperations.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SipExtBackendOperations.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.58" vertical-offset="9660" max-vertical-offset="17748">
-              <caret line="715" column="48" selection-start-line="715" selection-start-column="48" selection-end-line="715" selection-end-column="48" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="2139" max-vertical-offset="11016">
+              <caret line="162" column="294" selection-start-line="162" selection-start-column="294" selection-end-line="162" selection-end-column="294" />
               <folding>
-                <element signature="e#725#4192#0" expanded="false" />
-                <element signature="e#28417#29876#0" expanded="false" />
+                <element signature="e#179#933#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -151,12 +171,15 @@
         <option value="$PROJECT_DIR$/config/default.js" />
         <option value="$PROJECT_DIR$/RedisHandler.js" />
         <option value="$PROJECT_DIR$/ExternalApiAccess.js" />
-        <option value="$PROJECT_DIR$/SipExtBackendOperations.js" />
         <option value="$PROJECT_DIR$/node_modules/DVP-RuleService/CallRuleBackendOperations.js" />
-        <option value="$PROJECT_DIR$/app.js" />
         <option value="$PROJECT_DIR$/XmlResponseGenerator.js" />
         <option value="$PROJECT_DIR$/XmlExtendedDialplanBuilder.js" />
         <option value="$PROJECT_DIR$/ExtendedDialplanEngine.js" />
+        <option value="$PROJECT_DIR$/ConferenceHandler.js" />
+        <option value="$PROJECT_DIR$/ConferenceBackendHandler.js" />
+        <option value="$PROJECT_DIR$/SipExtBackendOperations.js" />
+        <option value="$PROJECT_DIR$/ConferenceOperations.js" />
+        <option value="$PROJECT_DIR$/app.js" />
       </list>
     </option>
   </component>
@@ -346,7 +369,7 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19553903" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40228012" sideWeight="0.49962825" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4495114" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4495114" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33876222" sideWeight="0.50037175" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
@@ -424,22 +447,22 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>387</line>
+          <line>395</line>
           <option name="timeStamp" value="103" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>879</line>
+          <line>880</line>
           <option name="timeStamp" value="109" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>620</line>
+          <line>628</line>
           <option name="timeStamp" value="111" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>612</line>
+          <line>620</line>
           <option name="timeStamp" value="121" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -449,12 +472,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>177</line>
+          <line>185</line>
           <option name="timeStamp" value="145" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>190</line>
+          <line>198</line>
           <option name="timeStamp" value="146" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -479,7 +502,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>922</line>
+          <line>923</line>
           <option name="timeStamp" value="161" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -489,7 +512,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>999</line>
+          <line>1000</line>
           <option name="timeStamp" value="171" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -504,7 +527,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>800</line>
+          <line>801</line>
           <option name="timeStamp" value="187" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -579,7 +602,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
-          <line>168</line>
+          <line>176</line>
           <option name="timeStamp" value="221" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -900,24 +923,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DVP-DBModels/Application.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.14455782" vertical-offset="0" max-vertical-offset="588">
-          <caret line="5" column="39" selection-start-line="5" selection-start-column="39" selection-end-line="5" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SipExtBackendOperations.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-10.68" vertical-offset="532" max-vertical-offset="10880">
-          <caret line="69" column="20" selection-start-line="69" selection-start-column="20" selection-end-line="69" selection-end-column="20" />
-          <folding>
-            <element signature="e#179#933#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/FreeSwitchMediaFormatter.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="323">
@@ -960,16 +965,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="6766" max-vertical-offset="15283">
-          <caret line="414" column="50" selection-start-line="414" selection-start-column="50" selection-end-line="414" selection-end-column="50" />
-          <folding>
-            <element signature="e#54865#65009#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/XmlResponseGenerator.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="54" max-vertical-offset="629">
@@ -1006,13 +1001,61 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/DVP-DBModels/Application.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.14455782" vertical-offset="0" max-vertical-offset="588">
+          <caret line="5" column="39" selection-start-line="5" selection-start-column="39" selection-end-line="5" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/DVP-DBModels/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-4.563158" vertical-offset="1734" max-vertical-offset="4097">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ExtendedDialplanEngine.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.58" vertical-offset="9660" max-vertical-offset="17748">
-          <caret line="715" column="48" selection-start-line="715" selection-start-column="48" selection-end-line="715" selection-end-column="48" />
+        <state vertical-scroll-proportion="0.8" vertical-offset="1227" max-vertical-offset="9894">
+          <caret line="327" column="8" selection-start-line="327" selection-start-column="8" selection-end-line="327" selection-end-column="8" />
           <folding>
             <element signature="e#725#4192#0" expanded="false" />
+            <element signature="e#4368#11358#0" expanded="false" />
+            <element signature="e#12751#32970#0" expanded="false" />
+            <element signature="e#13688#28318#0" expanded="false" />
             <element signature="e#28417#29876#0" expanded="false" />
+            <element signature="e#29977#32139#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SipExtBackendOperations.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2139" max-vertical-offset="11016">
+          <caret line="162" column="294" selection-start-line="162" selection-start-column="294" selection-end-line="162" selection-end-column="294" />
+          <folding>
+            <element signature="e#179#933#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ConferenceOperations.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="731">
+          <caret line="9" column="33" selection-start-line="9" selection-start-column="33" selection-end-line="9" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3979933" vertical-offset="4318" max-vertical-offset="15300">
+          <caret line="261" column="61" selection-start-line="261" selection-start-column="61" selection-end-line="261" selection-end-column="61" />
+          <folding>
+            <element signature="e#54957#65101#0" expanded="false" />
           </folding>
         </state>
       </provider>

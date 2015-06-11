@@ -639,6 +639,10 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
 
                             }
+                            else if(extDetails.ObjCategory === 'CONFERENCE')
+                            {
+                                //call conference handler
+                            }
                             else
                             {
                                 callback(err, xmlBuilder.createNotFoundResponse());

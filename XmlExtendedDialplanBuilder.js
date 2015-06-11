@@ -2,6 +2,7 @@ var xmlBuilder = require('xmlbuilder');
 var config = require('config');
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 var util = require('util');
+var redisHandler = require('./RedisHandler.js');
 
 var createNotFoundResponse = function()
 {
@@ -126,8 +127,6 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
             }
         }
 
-
-
         if(ep.IsVoicemailEnabled)
         {
             var doc = xmlBuilder.create('document');
@@ -218,6 +217,490 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
     catch(ex)
     {
         logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
+var CreateRouteFaxGatewayDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia, fromFaxType, toFaxType)
+{
+    try {
+        if (!destinationPattern) {
+            destinationPattern = "";
+        }
+
+        if (!context) {
+            context = "";
+        }
+
+        var ignoreEarlyM = "ignore_early_media=false";
+        if (ignoreEarlyMedia) {
+            ignoreEarlyM = "ignore_early_media=true";
+        }
+
+        var doc = xmlBuilder.create('document');
+
+        var cond = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+
+        if(fromFaxType === 'T38' && toFaxType === 'AUDIO')
+        {
+            cond.ele('action').att('application', 'set').att('data', 'fax_enable_t38=true')
+                .up()
+                .ele('action').att('application', 'export').att('data', 'sip_execute_on_image=t38_gateway self nocng')
+                .up()
+        }
+        else if(fromFaxType === 'AUDIO' && toFaxType === 'T38')
+        {
+            cond.ele('action').att('application', 'set').att('data', 'fax_enable_t38=true')
+                .up()
+                .ele('action').att('application', 'export').att('data', 'sip_execute_on_image=t38_gateway self nocng')
+                .up()
+        }
+        else if(fromFaxType === 'T30AUDIO' && toFaxType === 'T38')
+        {
+            cond.ele('action').att('application', 'set').att('data', 'fax_enable_t38=true')
+                .up()
+                .ele('action').att('application', 'export').att('data', 'sip_execute_on_image=t38_gateway peer nocng')
+                .up()
+        }
+        else if(fromFaxType === 'T38' && toFaxType === 'T38')
+        {
+            cond.ele('action').att('application', 'set').att('data', 't38_passthru=true')
+                .up()
+                .ele('action').att('application', 'export').att('data', 'refuse_t38=true')
+                .up()
+        }
+        else if(fromFaxType === 'T38PASSTHRU' && toFaxType === 'T38PASSTHRU')
+        {
+            cond.ele('action').att('application', 'export').att('data', 'refuse_t38=true')
+                .up()
+        }
+        else
+        {
+            cond.ele('action').att('application', 'set').att('data', 'fax_enable_t38=true')
+                .up()
+                .ele('action').att('application', 'export').att('data', 'sip_execute_on_image=t38_gateway self nocng')
+                .up()
+        }
+
+        cond.ele('action').att('application', 'set').att('data', 'ringback=${us-ring}')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'continue_on_fail=true')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'hangup_after_bridge=true')
+            .up()
+            .ele('action').att('application', 'set').att('data', ignoreEarlyM)
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '3 ab s execute_extension::att_xfer XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '4 ab s execute_extension::att_xfer_group XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
+            .up()
+
+
+        var option = '';
+        var bypassMed = 'bypass_media=false';
+
+        var destinationGroup = util.format('gateway/%s', ep.Profile);
+
+        if (ep.LegStartDelay > 0)
+            option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
+        else
+            option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
+
+
+        var dnis = '';
+
+        if (ep.Domain) {
+            dnis = util.format('%s@%s', ep.Destination, ep.Domain);
+        }
+
+        var protocol = 'sofia';
+        var calling = util.format('%s%s/%s/%s', option, protocol, destinationGroup, dnis);
+
+        cond.ele('action').att('application', 'set').att('data', bypassMed)
+            .up()
+        ele('action').att('application', 'set').att('data', calling)
+            .up()
+
+        return cond.end({pretty: true});
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
+var CreateRouteFaxUserDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia, fromFaxType, toFaxType)
+{
+    try
+    {
+        if (!destinationPattern) {
+            destinationPattern = "";
+        }
+
+        if (!context) {
+            context = "";
+        }
+
+        var ignoreEarlyM = "ignore_early_media=false";
+        if (ignoreEarlyMedia)
+        {
+            ignoreEarlyM = "ignore_early_media=true";
+        }
+
+        var option = '';
+
+        if (ep.LegStartDelay > 0)
+            option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
+        else
+            option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
+
+        //var httpUrl = Config.Services.HttApiUrl;
+
+        var dnis = ep.Destination;
+
+        if (ep.Domain)
+        {
+            dnis = util.format('%s@%s', dnis, ep.Domain);
+        }
+        var protocol = 'sofia';
+        var destinationGroup = 'user';
+
+
+        var calling = util.format('%s%s/%s/%s', option, protocol, destinationGroup, dnis);
+
+        if(ep.Type === 'USER')
+        {
+            if (ep.Group)
+            {
+                calling = util.format("%s,pickup/%s", calling, ep.Group);
+            }
+        }
+
+
+        var doc = xmlBuilder.create('document');
+
+        var cond = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+
+        if(fromFaxType === 'AUDIO' && toFaxType === 'T38')
+        {
+            cond.ele('action').att('application', 'set').att('data', 'fax_enable_t38=true')
+                .up()
+                .ele('action').att('application', 'export').att('data', 'sip_execute_on_image=t38_gateway self nocng')
+                .up()
+        }
+        else if(fromFaxType === 'T38' && toFaxType === 'AUDIO')
+        {
+            cond.ele('action').att('application', 'set').att('data', 'sip_execute_on_image=t38_gateway self nocng')
+                .up()
+                .ele('action').att('application', 'export').att('data', 'refuse_t38=true')
+                .up()
+        }
+        else if(fromFaxType === 'T38' && toFaxType === 'T30AUDIO')
+        {
+            cond.ele('action').att('application', 'set').att('data', 'fax_enable_t38=true')
+                .up()
+                .ele('action').att('application', 'export').att('data', 'sip_execute_on_image=t38_gateway peer nocng')
+                .up()
+        }
+        else if(fromFaxType === 'T38' && toFaxType === 'T38')
+        {
+            cond.ele('action').att('application', 'set').att('data', 't38_passthru=true')
+                .up()
+                .ele('action').att('application', 'export').att('data', 'refuse_t38=true')
+                .up()
+        }
+        else if(fromFaxType === 'T38PASSTHRU' && toFaxType === 'T38PASSTHRU')
+        {
+            cond.ele('action').att('application', 'set').att('data', 't38_passthru=true')
+                .up()
+                .ele('action').att('application', 'export').att('data', 'refuse_t38=true')
+                .up()
+        }
+        else
+        {
+            cond.ele('action').att('application', 'set').att('data', 'fax_enable_t38=true')
+                .up()
+                .ele('action').att('application', 'export').att('data', 'sip_execute_on_image=t38_gateway self nocng')
+                .up()
+        }
+
+
+
+        cond.ele('action').att('application', 'set').att('data', 'continue_on_fail=true')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'hangup_after_bridge=true')
+            .up()
+            .ele('action').att('application', 'set').att('data', ignoreEarlyM)
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '3 ab s execute_extension::att_xfer XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '4 ab s execute_extension::att_xfer_group XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bridge').att('data', calling)
+            .up()
+
+            .end({pretty: true});
+
+
+            return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
+var CreatePickUpDialplan = function(reqId, extension, context, destinationPattern)
+{
+    try
+    {
+        if (!destinationPattern)
+        {
+            destinationPattern = "";
+        }
+
+        if (!context)
+        {
+            context = "";
+        }
+
+        var doc = xmlBuilder.create('document');
+
+        doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+            .ele('action').att('application', 'pickup').att('data', extension)
+            .up()
+            .up()
+            .up()
+            .up()
+            .up()
+
+            .end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreatePickUpDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
+var CreateVoicemailDialplan = function(reqId, extension, context, destinationPattern, domain)
+{
+    try
+    {
+        if (!destinationPattern)
+        {
+            destinationPattern = "";
+        }
+
+        if (!context)
+        {
+            context = "";
+        }
+
+        var voicemailStr = 'check auth default ' + domain + ' ' + extension;
+
+        var doc = xmlBuilder.create('document');
+
+        doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+            .ele('action').att('application', 'answer')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'voicemail_authorized=${sip_authorized}')
+            .up()
+            .ele('action').att('application', 'voicemail').att('data', voicemailStr)
+            .up()
+            .up()
+            .up()
+            .up()
+            .up()
+
+            .end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateVoicemailDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
+var CreateInterceptDialplan = function(reqId, uuid, context, destinationPattern)
+{
+    try
+    {
+        if (!destinationPattern)
+        {
+            destinationPattern = "";
+        }
+
+        if (!context)
+        {
+            context = "";
+        }
+
+        var doc = xmlBuilder.create('document');
+
+        doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+            .ele('action').att('application', 'set').att('data', 'intercept_unanswered_only=true')
+            .up()
+            .ele('action').att('application', 'intercept').att('data', uuid)
+            .up()
+            .up()
+            .up()
+            .up()
+            .up()
+
+            .end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateInterceptDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
+var CreateParkDialplan = function(reqId, extension, context, destinationPattern, parkId)
+{
+    try
+    {
+        if (!destinationPattern)
+        {
+            destinationPattern = "";
+        }
+
+        if (!context)
+        {
+            context = "";
+        }
+
+        var parkStr = context + ' ' + parkId;
+
+        var doc = xmlBuilder.create('document');
+
+        doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+            .ele('action').att('application', 'answer')
+            .up()
+            .ele('action').att('application', 'valet_park').att('data', parkStr)
+            .up()
+            .up()
+            .up()
+            .up()
+            .up()
+
+            .end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateParkDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
+var CreateBargeDialplan = function(reqId, uuid, context, destinationPattern, caller)
+{
+    try
+    {
+        if (!destinationPattern)
+        {
+            destinationPattern = "";
+        }
+
+        if (!context)
+        {
+            context = "";
+        }
+
+        var dtmfString = "w1@500";
+        if (!caller)
+        {
+            dtmfString = "w2@500";
+        }
+
+        var doc = xmlBuilder.create('document');
+
+        doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+            .ele('action').att('application', 'set').att('data', 'eavesdrop_enable_dtmf=true')
+            .up()
+            .ele('action').att('application', 'queue_dtmf').att('data', dtmfString)
+            .up()
+            .ele('action').att('application', 'eavesdrop').att('data', uuid)
+            .up()
+            .up()
+            .up()
+            .up()
+            .up()
+
+            .end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateBargeDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
         return createNotFoundResponse();
     }
 
@@ -521,3 +1004,10 @@ module.exports.CreateRouteUserDialplan = CreateRouteUserDialplan;
 module.exports.CreateFollowMeDialplan = CreateFollowMeDialplan;
 module.exports.CreateForwardingDialplan = CreateForwardingDialplan;
 module.exports.CreateRouteGatewayDialplan = CreateRouteGatewayDialplan;
+module.exports.CreatePickUpDialplan = CreatePickUpDialplan;
+module.exports.CreateInterceptDialplan= CreateInterceptDialplan;
+module.exports.CreateBargeDialplan = CreateBargeDialplan;
+module.exports.CreateVoicemailDialplan = CreateVoicemailDialplan;
+module.exports.CreateParkDialplan = CreateParkDialplan;
+module.exports.CreateRouteFaxUserDialplan = CreateRouteFaxUserDialplan;
+module.exports.CreateRouteFaxGatewayDialplan = CreateRouteFaxGatewayDialplan;

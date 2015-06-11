@@ -177,6 +177,14 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                 }
                                 else if(num)
                                 {
+                                    var faxType = undefined;
+                                    if(num.Trunk)
+                                    {
+                                        faxType = num.Trunk.FaxType;
+
+                                        data['TrunkFaxType'] = faxType;
+                                    }
+
                                     logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - GetPhoneNumberDetails returned num obj : %j', reqId, num);
 
                                     logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, dnisNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, aniNum, dnisNum, domain, num.CompanyId, num.TenantId);
@@ -440,16 +448,23 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                         }
                         else
                         {
-                            backendHandler.GetExtensionDB(reqId, aniNum, ctxt.TenantId, function(err, fromExt)
+                            //Get from user
+                            backendHandler.GetAllDataForExt(reqId, aniNum, ctxt.TenantId, 'USER', function(err, fromExt)
                             {
                                 var dodActive = false;
                                 var dodNumber = '';
+                                var fromUserUuid = '';
                                 if(fromExt)
                                 {
                                     if(fromExt.DodActive)
                                     {
                                         dodActive = true;
                                         dodNumber = fromExt.DodNumber;
+                                    }
+
+                                    if(fromExt.SipUACEndpoint && fromExt.SipUACEndpoint.UserUuid)
+                                    {
+                                        fromUserUuid = fromExt.SipUACEndpoint.UserUuid;
                                     }
                                 }
 
@@ -615,6 +630,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                     }
                                                     else if(rule.Application.ObjClass === 'EXTENDED')
                                                     {
+                                                        data.FromUserUuid = fromUserUuid;
                                                         extDialplanEngine.ProcessExtendedDialplan(decodedSipFromUri, decodedSipToUri, callerContext, direction, data, rule.CompanyId, rule.TenantId, 'test', function(err, extDialplan)
                                                         {
                                                             logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan created - Response Sent : : %s', reqId, extDialplan);

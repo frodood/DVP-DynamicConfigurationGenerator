@@ -110,7 +110,7 @@ var RemoteGetSipUserDetailsForExtension = function(reqId, extension, securityTok
     }
 };
 
-var RemoteGetPBXDialplanConfig = function(reqId, ani, dnis, context, direction, userUuid, securityToken, callback)
+var RemoteGetPBXDialplanConfig = function(reqId, ani, dnis, context, direction, userUuid, fromUserUuid, securityToken, callback)
 {
     try
     {
@@ -123,7 +123,7 @@ var RemoteGetPBXDialplanConfig = function(reqId, ani, dnis, context, direction, 
         {
             var httpUrl = util.format('http://%s:%d/DVP/API/%s/PBXService/GeneratePBXConfig', sipUACIp, sipUACPort, apiVersion);
 
-            var jsonObj = { ANI: ani, DNIS: dnis, Context: context, Direction: direction, ExtraData: {UserUuid: userUuid} };
+            var jsonObj = { ANI: ani, DNIS: dnis, Context: context, Direction: direction, ExtraData: {UserUuid: userUuid, FromUserUuid: fromUserUuid} };
 
             var jsonStr = JSON.stringify(jsonObj);
 

@@ -55,6 +55,35 @@ var GetUserBy_Name_Domain = function(extName, domain, callback)
 
 };
 
+var GetUserByNameTenantDB = function(extName, tenantId, callback)
+{
+    try
+    {
+        dbModel.SipUACEndpoint
+            .find({where: [{SipUsername: extName},{TenantId: tenantId}], include:[{model: dbModel.Extension, as: 'Extension'}]})
+            .complete(function (err, usr)
+            {
+                if(err)
+                {
+                    logger.error('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query failed', err);
+                }
+                else
+                {
+                    logger.debug('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query success');
+                }
+
+                callback(err, usr);
+            })
+
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+    }
+
+
+};
+
 var GetExtensionForDid = function(reqId, didNumber, companyId, tenantId, callback)
 {
     try
@@ -230,7 +259,7 @@ var GetPhoneNumberDetails = function(phnNum, callback)
     try
     {
         dbModel.TrunkPhoneNumber
-            .find({where :[{PhoneNumber: phnNum},{Enable: true}]})
+            .find({where :[{PhoneNumber: phnNum},{Enable: true}], include: [{model:dbModel.Trunk, as : 'Trunk'}]})
             .complete(function (err, phnInfo)
             {
                 if(err)
@@ -623,4 +652,5 @@ module.exports.GetAllDataForExt = GetAllDataForExt;
 module.exports.GetExtensionForDid = GetExtensionForDid;
 module.exports.GetExtensionDB = GetExtensionDB;
 module.exports.GetEmergencyNumber = GetEmergencyNumber;
+module.exports.GetUserByNameTenantDB = GetUserByNameTenantDB;
 

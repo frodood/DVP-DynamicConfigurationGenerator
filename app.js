@@ -415,7 +415,10 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                 };
 
                                                 var jsonStr = JSON.stringify(evtData);
-                                                redisClient.publish('DVPEVENTS', jsonStr);
+                                                redisHandler.PublishToRedis('DVPEVENTS', jsonStr, function(err, redisRes)
+                                                {
+
+                                                });
 
                                             }
                                             else

@@ -127,11 +127,61 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
             }
         }
 
+        var doc = xmlBuilder.create('document');
+
+        var cond = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+
+        cond.ele('action').att('application', 'set').att('data', 'ringback=${us-ring}')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'continue_on_fail=true')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'hangup_after_bridge=true')
+            .up()
+            .ele('action').att('application', 'set').att('data', ignoreEarlyM)
+            .up()
+            .ele('action').att('application', 'set').att('data', bypassMedia)
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '3 ab s execute_extension::att_xfer XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '4 ab s execute_extension::att_xfer_group XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bridge').att('data', calling)
+            .up()
+            .ele('action').att('application', 'answer')
+            .up()
+
+        if(ep.PersonalGreeting)
+        {
+            var greetingPath = 'sounds/' + ep.PersonalGreeting;
+            cond.ele('action').att('application', 'playback').att('data', greetingPath)
+                .up()
+        }
+
+
+
         if(ep.IsVoicemailEnabled)
         {
-            var doc = xmlBuilder.create('document');
+            cond.ele('action').att('application', 'voicemail').att('data', 'default %s %s', ep.Domain, ep.Destination)
+                .up()
+        }
 
-            doc.att('type', 'freeswitch/xml')
+        cond.end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+
+
+
+            /*doc.att('type', 'freeswitch/xml')
                 .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
                 .ele('context').att('name', context)
                 .ele('extension').att('name', 'test')
@@ -163,55 +213,11 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
                 .up()
                 .up()
                 .up()
-                .up()
-
-                .end({pretty: true});
+                .up()*/
 
 
-            return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
-
-        }
-        else
-        {
-            var doc = xmlBuilder.create('document');
-
-            doc.att('type', 'freeswitch/xml')
-                .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
-                .ele('context').att('name', context)
-                .ele('extension').att('name', 'test')
-                .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
-                .ele('action').att('application', 'set').att('data', 'ringback=${us-ring}')
-                .up()
-                .ele('action').att('application', 'set').att('data', 'continue_on_fail=true')
-                .up()
-                .ele('action').att('application', 'set').att('data', 'hangup_after_bridge=true')
-                .up()
-                .ele('action').att('application', 'set').att('data', ignoreEarlyM)
-                .up()
-                .ele('action').att('application', 'set').att('data', bypassMedia)
-                .up()
-                .ele('action').att('application', 'bind_meta_app').att('data', '3 ab s execute_extension::att_xfer XML PBXFeatures')
-                .up()
-                .ele('action').att('application', 'bind_meta_app').att('data', '4 ab s execute_extension::att_xfer_group XML PBXFeatures')
-                .up()
-                .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
-                .up()
-                .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
-                .up()
-                .ele('action').att('application', 'bridge').att('data', calling)
-                .up()
-                .ele('action').att('application', 'hangup')
-                .up()
-                .up()
-                .up()
-                .up()
-                .up()
-
-                .end({pretty: true});
 
 
-            return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
-        }
 
     }
     catch(ex)

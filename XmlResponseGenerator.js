@@ -313,7 +313,7 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, req
                         .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
                             .ele('action').att('application', 'answer')
                             .up()
-                            .ele('action').att('application', 'httapi').att('value', httpApiUrl)
+                            .ele('action').att('application', 'httapi').att('data', httpApiUrl)
                             .up()
                         .up()
                     .up()

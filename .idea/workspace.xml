@@ -30,11 +30,10 @@
       <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6243478" vertical-offset="3500" max-vertical-offset="9877">
-              <caret line="227" column="90" selection-start-line="227" selection-start-column="90" selection-end-line="227" selection-end-column="90" />
+            <state vertical-scroll-proportion="-6.001739" vertical-offset="12529" max-vertical-offset="15232">
+              <caret line="534" column="190" selection-start-line="534" selection-start-column="190" selection-end-line="534" selection-end-column="190" />
               <folding>
-                <element signature="e#26988#50407#0" expanded="false" />
-                <element signature="e#54683#64827#0" expanded="false" />
+                <element signature="e#54731#64875#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -53,8 +52,8 @@
       <file leaf-file-name="ExtendedDialplanEngine.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ExtendedDialplanEngine.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1481" max-vertical-offset="6052">
-              <caret line="353" column="65" selection-start-line="353" selection-start-column="43" selection-end-line="353" selection-end-column="69" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1175" max-vertical-offset="6052">
+              <caret line="337" column="17" selection-start-line="337" selection-start-column="17" selection-end-line="337" selection-end-column="17" />
               <folding>
                 <element signature="e#725#4192#0" expanded="false" />
                 <element signature="e#4368#11528#0" expanded="false" />
@@ -70,24 +69,9 @@
       <file leaf-file-name="CallRuleBackendOperations.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/node_modules/DVP-RuleService/CallRuleBackendOperations.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1646" max-vertical-offset="19363">
-              <caret line="108" column="33" selection-start-line="108" selection-start-column="33" selection-end-line="108" selection-end-column="33" />
-              <folding>
-                <marker date="1434001388368" expanded="true" signature="292:982" placeholder="{...}" />
-                <marker date="1434001388368" expanded="true" signature="306:926" placeholder="{...}" />
-                <marker date="1434001388368" expanded="true" signature="959:980" placeholder="{...}" />
-                <marker date="1434001388368" expanded="true" signature="1859:2517" placeholder="{...}" />
-                <marker date="1434001388368" expanded="true" signature="1873:2461" placeholder="{...}" />
-                <marker date="1434001388368" expanded="true" signature="2494:2515" placeholder="{...}" />
-                <marker date="1434001388368" expanded="true" signature="4523:4945" placeholder="{...}" />
-                <marker date="1434001388368" expanded="true" signature="39978:44010" placeholder="{...}" />
-                <marker date="1434001388368" expanded="true" signature="39992:43876" placeholder="{...}" />
-                <marker date="1434001388368" expanded="true" signature="40113:43874" placeholder="{...}" />
-                <marker date="1434001388368" expanded="true" signature="43895:44008" placeholder="{...}" />
-                <marker date="1434001388368" expanded="true" signature="47138:48644" placeholder="{...}" />
-                <marker date="1434001388368" expanded="true" signature="47152:48603" placeholder="{...}" />
-                <marker date="1434001388368" expanded="true" signature="48637:48647" placeholder="{...}" />
-              </folding>
+            <state vertical-scroll-proportion="0.0" vertical-offset="4723" max-vertical-offset="19363">
+              <caret line="319" column="25" selection-start-line="319" selection-start-column="25" selection-end-line="319" selection-end-column="25" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -962,44 +946,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ExtendedDialplanEngine.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1481" max-vertical-offset="6052">
-          <caret line="353" column="65" selection-start-line="353" selection-start-column="43" selection-end-line="353" selection-end-column="69" />
-          <folding>
-            <element signature="e#725#4192#0" expanded="false" />
-            <element signature="e#4368#11528#0" expanded="false" />
-            <element signature="e#28297#29756#0" expanded="false" />
-            <element signature="e#29857#32019#0" expanded="false" />
-            <element signature="e#32677#61921#0" expanded="false" />
-            <element signature="e#33624#50701#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/DVP-RuleService/CallRuleBackendOperations.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1646" max-vertical-offset="19363">
-          <caret line="108" column="33" selection-start-line="108" selection-start-column="33" selection-end-line="108" selection-end-column="33" />
-          <folding>
-            <marker date="1434001388368" expanded="true" signature="292:982" placeholder="{...}" />
-            <marker date="1434001388368" expanded="true" signature="306:926" placeholder="{...}" />
-            <marker date="1434001388368" expanded="true" signature="959:980" placeholder="{...}" />
-            <marker date="1434001388368" expanded="true" signature="1859:2517" placeholder="{...}" />
-            <marker date="1434001388368" expanded="true" signature="1873:2461" placeholder="{...}" />
-            <marker date="1434001388368" expanded="true" signature="2494:2515" placeholder="{...}" />
-            <marker date="1434001388368" expanded="true" signature="4523:4945" placeholder="{...}" />
-            <marker date="1434001388368" expanded="true" signature="39978:44010" placeholder="{...}" />
-            <marker date="1434001388368" expanded="true" signature="39992:43876" placeholder="{...}" />
-            <marker date="1434001388368" expanded="true" signature="40113:43874" placeholder="{...}" />
-            <marker date="1434001388368" expanded="true" signature="43895:44008" placeholder="{...}" />
-            <marker date="1434001388368" expanded="true" signature="47138:48644" placeholder="{...}" />
-            <marker date="1434001388368" expanded="true" signature="47152:48603" placeholder="{...}" />
-            <marker date="1434001388368" expanded="true" signature="48637:48647" placeholder="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ExternalApiAccess.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="626" max-vertical-offset="2210">
@@ -1018,13 +964,35 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/ExtendedDialplanEngine.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1175" max-vertical-offset="6052">
+          <caret line="337" column="17" selection-start-line="337" selection-start-column="17" selection-end-line="337" selection-end-column="17" />
+          <folding>
+            <element signature="e#725#4192#0" expanded="false" />
+            <element signature="e#4368#11528#0" expanded="false" />
+            <element signature="e#28297#29756#0" expanded="false" />
+            <element signature="e#29857#32019#0" expanded="false" />
+            <element signature="e#32677#61921#0" expanded="false" />
+            <element signature="e#33624#50701#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/DVP-RuleService/CallRuleBackendOperations.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="4723" max-vertical-offset="19363">
+          <caret line="319" column="25" selection-start-line="319" selection-start-column="25" selection-end-line="319" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6243478" vertical-offset="3500" max-vertical-offset="9877">
-          <caret line="227" column="90" selection-start-line="227" selection-start-column="90" selection-end-line="227" selection-end-column="90" />
+        <state vertical-scroll-proportion="-6.001739" vertical-offset="12529" max-vertical-offset="15232">
+          <caret line="534" column="190" selection-start-line="534" selection-start-column="190" selection-end-line="534" selection-end-column="190" />
           <folding>
-            <element signature="e#26988#50407#0" expanded="false" />
-            <element signature="e#54683#64827#0" expanded="false" />
+            <element signature="e#54731#64875#0" expanded="false" />
           </folding>
         </state>
       </provider>

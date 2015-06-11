@@ -213,7 +213,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                     {
                                                         var masterApp = rule.Application.MasterApplication;
 
-                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master application found : ', reqId, masterApp);
+                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master application found : ', reqId, JSON.stringify(masterApp));
 
                                                         if(masterApp.ObjType === "HTTAPI")
                                                         {
@@ -480,7 +480,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                     }
                                     else if(rule)
                                     {
-                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - PickCallRuleInbound returned rule : %s', reqId, rule);
+                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - PickCallRuleInbound returned rule : %s', reqId, JSON.stringify(rule));
 
                                         backendHandler.GetEmergencyNumber(dnisNum, rule.TenantId, function(err, emNum)
                                         {
@@ -532,7 +532,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                         {
                                                             var masterApp = rule.Application.MasterApplication;
 
-                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master application found : %j', reqId, masterApp);
+                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master application found : %j', reqId, JSON.stringify(masterApp));
 
                                                             if(masterApp.ObjType === "HTTAPI")
                                                             {

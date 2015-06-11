@@ -193,7 +193,6 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                 {
                                     if (extDetails.SipUACEndpoint && extDetails.SipUACEndpoint.CloudEndUser)
                                     {
-                                        var voicemailEnabled = pbxObj.VoicemailEnabled;
                                         var bypassMedia = pbxObj.BypassMedia;
 
                                         var grp = '';
@@ -222,7 +221,6 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                             Destination: fwdRule.Destination,
                                             Domain: domain,
                                             Group: grp,
-                                            IsVoicemailEnabled: voicemailEnabled,
                                             CompanyId: companyId,
                                             TenantId: tenantId
                                         };
@@ -366,6 +364,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 var usrStatus = pbxObj.PBXUserTemplate.UserStatus;
                                                 var advancedMethod = pbxObj.PBXUserTemplate.AdvancedRouteMethod;
                                                 var voicemailEnabled = pbxObj.VoicemailEnabled;
+                                                var personalGreeting = pbxObj.PersonalGreeting;
                                                 var bypassMedia = pbxObj.BypassMedia;
 
                                                 var dodNumber = undefined;
@@ -481,6 +480,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             Destination: dnisNum,
                                                             Domain: domain,
                                                             Group: grp,
+                                                            IsVoicemailEnabled: voicemailEnabled,
+                                                            PersonalGreeting: personalGreeting,
                                                             CompanyId: companyId,
                                                             TenantId: tenantId
                                                         };
@@ -716,6 +717,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         var operationType = pbxObj.OperationType;
                                                         var advancedMethod = pbxObj.PBXUserTemplate.AdvancedRouteMethod;
                                                         var voicemailEnabled = pbxObj.VoicemailEnabled;
+                                                        var personalGreeting = pbxObj.PersonalGreeting;
                                                         var bypassMedia = pbxObj.BypassMedia;
 
                                                         var dodNumber = undefined;
@@ -832,6 +834,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 Destination: dnisNum,
                                                                 Domain: domain,
                                                                 Group: grp,
+                                                                IsVoicemailEnabled: voicemailEnabled,
+                                                                PersonalGreeting: personalGreeting,
                                                                 CompanyId: companyId,
                                                                 TenantId: tenantId
                                                             };

@@ -2,7 +2,6 @@ var xmlBuilder = require('xmlbuilder');
 var config = require('config');
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 var util = require('util');
-var redisHandler = require('./RedisHandler.js');
 
 var createNotFoundResponse = function()
 {

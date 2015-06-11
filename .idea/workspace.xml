@@ -2,15 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66ecaa1d-b51b-4e7c-97f3-9a168c731a92" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ConferenceOperations.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/DVP-DBModels/Conference.js" afterPath="$PROJECT_DIR$/node_modules/DVP-DBModels/Conference.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/DVP-DBModels/ConferenceUser.js" afterPath="$PROJECT_DIR$/node_modules/DVP-DBModels/ConferenceUser.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ExtendedDialplanEngine.js" afterPath="$PROJECT_DIR$/ExtendedDialplanEngine.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SipExtBackendOperations.js" afterPath="$PROJECT_DIR$/SipExtBackendOperations.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app.js" afterPath="$PROJECT_DIR$/app.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/DVP-DBModels/index.js" afterPath="$PROJECT_DIR$/node_modules/DVP-DBModels/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/DVP-DBModels/package.json" afterPath="$PROJECT_DIR$/node_modules/DVP-DBModels/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="DVP-DynamicConfigurationGenerator.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -37,10 +29,10 @@
       <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.3979933" vertical-offset="4318" max-vertical-offset="15300">
-              <caret line="261" column="61" selection-start-line="261" selection-start-column="61" selection-end-line="261" selection-end-column="61" />
+            <state vertical-scroll-proportion="-1.4782609" vertical-offset="4726" max-vertical-offset="15317">
+              <caret line="228" column="90" selection-start-line="228" selection-start-column="90" selection-end-line="228" selection-end-column="90" />
               <folding>
-                <element signature="e#54957#65101#0" expanded="false" />
+                <element signature="e#55049#65193#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -369,7 +361,7 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19553903" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40228012" sideWeight="0.49962825" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4495114" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4495114" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33876222" sideWeight="0.50037175" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
@@ -452,7 +444,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>880</line>
+          <line>881</line>
           <option name="timeStamp" value="109" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -502,7 +494,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>923</line>
+          <line>924</line>
           <option name="timeStamp" value="161" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -512,7 +504,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>1000</line>
+          <line>1001</line>
           <option name="timeStamp" value="171" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -527,7 +519,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>801</line>
+          <line>802</line>
           <option name="timeStamp" value="187" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -1052,10 +1044,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3979933" vertical-offset="4318" max-vertical-offset="15300">
-          <caret line="261" column="61" selection-start-line="261" selection-start-column="61" selection-end-line="261" selection-end-column="61" />
+        <state vertical-scroll-proportion="-1.4782609" vertical-offset="4726" max-vertical-offset="15317">
+          <caret line="228" column="90" selection-start-line="228" selection-start-column="90" selection-end-line="228" selection-end-column="90" />
           <folding>
-            <element signature="e#54957#65101#0" expanded="false" />
+            <element signature="e#55049#65193#0" expanded="false" />
           </folding>
         </state>
       </provider>

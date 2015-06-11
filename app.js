@@ -331,7 +331,8 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                             path: rule.Application.Url,
                                                             company: rule.CompanyId,
                                                             tenant: rule.TenantId,
-                                                            app: rule.Application.AppName
+                                                            app: rule.Application.AppName,
+                                                            appid: rule.Application.id
                                                         };
 
                                                         var jsonString = JSON.stringify(sessionData);
@@ -367,7 +368,8 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                             path: rule.Application.Url,
                                                             company: rule.CompanyId,
                                                             tenant: rule.TenantId,
-                                                            app: rule.Application.AppName
+                                                            app: rule.Application.AppName,
+                                                            appid: rule.Application.id
                                                         };
 
                                                         var jsonString = JSON.stringify(sessionData);
@@ -549,7 +551,8 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                                     path: rule.Application.Url,
                                                                     company: rule.CompanyId,
                                                                     tenant: rule.TenantId,
-                                                                    app: rule.Application.AppName
+                                                                    app: rule.Application.AppName,
+                                                                    appid: rule.Application.id
                                                                 };
 
                                                                 var jsonString = JSON.stringify(sessionData);
@@ -587,7 +590,8 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                                     path: rule.Application.Url,
                                                                     company: rule.CompanyId,
                                                                     tenant: rule.TenantId,
-                                                                    app: rule.Application.AppName
+                                                                    app: rule.Application.AppName,
+                                                                    appid: rule.Application.id
                                                                 };
 
                                                                 var jsonString = JSON.stringify(sessionData);
@@ -654,7 +658,8 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                                 path: rule.Application.Url,
                                                                 company: rule.CompanyId,
                                                                 tenant: rule.TenantId,
-                                                                app: rule.Application.AppName
+                                                                app: rule.Application.AppName,
+                                                                appid: rule.Application.id
                                                             };
 
                                                             var jsonString = JSON.stringify(sessionData);
@@ -690,7 +695,8 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                                 path: rule.Application.Url,
                                                                 company: rule.CompanyId,
                                                                 tenant: rule.TenantId,
-                                                                app: rule.Application.AppName
+                                                                app: rule.Application.AppName,
+                                                                appid: rule.Application.id
                                                             };
 
                                                             var jsonString = JSON.stringify(sessionData);

@@ -29,10 +29,10 @@
       <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.4782609" vertical-offset="4726" max-vertical-offset="15317">
-              <caret line="228" column="90" selection-start-line="228" selection-start-column="90" selection-end-line="228" selection-end-column="90" />
+            <state vertical-scroll-proportion="0.3547826" vertical-offset="3553" max-vertical-offset="15419">
+              <caret line="221" column="100" selection-start-line="221" selection-start-column="100" selection-end-line="221" selection-end-column="100" />
               <folding>
-                <element signature="e#55049#65193#0" expanded="false" />
+                <element signature="e#55601#65745#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -444,7 +444,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>881</line>
+          <line>887</line>
           <option name="timeStamp" value="109" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -494,7 +494,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>924</line>
+          <line>930</line>
           <option name="timeStamp" value="161" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -504,7 +504,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>1001</line>
+          <line>1007</line>
           <option name="timeStamp" value="171" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -519,7 +519,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>802</line>
+          <line>808</line>
           <option name="timeStamp" value="187" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -1044,10 +1044,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.4782609" vertical-offset="4726" max-vertical-offset="15317">
-          <caret line="228" column="90" selection-start-line="228" selection-start-column="90" selection-end-line="228" selection-end-column="90" />
+        <state vertical-scroll-proportion="0.3547826" vertical-offset="3553" max-vertical-offset="15419">
+          <caret line="221" column="100" selection-start-line="221" selection-start-column="100" selection-end-line="221" selection-end-column="100" />
           <folding>
-            <element signature="e#55049#65193#0" expanded="false" />
+            <element signature="e#55601#65745#0" expanded="false" />
           </folding>
         </state>
       </provider>

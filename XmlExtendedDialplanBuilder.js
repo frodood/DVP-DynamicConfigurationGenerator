@@ -69,6 +69,127 @@ var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context)
 
 };
 
+var CreateConferenceDialplan = function(reqId, epList, context, destinationPattern, ignoreEarlyMedia, confName, domain, pin, mode)
+{
+    try
+    {
+        if (!destinationPattern) {
+            destinationPattern = "";
+        }
+
+        if (!context) {
+            context = "";
+        }
+
+        var ignoreEarlyM = "ignore_early_media=false";
+        if (ignoreEarlyMedia)
+        {
+            ignoreEarlyM = "ignore_early_media=true";
+        }
+
+        var doc = xmlBuilder.create('document');
+
+        var cond = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+
+        cond.ele('action').att('application', 'set').att('data', 'ringback=${us-ring}')
+            .up()
+
+        epList.forEach(function(ep)
+        {
+            var option = '';
+            var destinationGroup = '';
+            var bypassMed = 'bypass_media=false';
+
+
+            if(ep.Type === 'GATEWAY')
+            {
+                destinationGroup = util.format('gateway/%s', ep.Profile);
+
+                if (ep.LegStartDelay > 0)
+                    option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
+                else
+                    option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
+
+                bypassMed = 'bypass_media=false';
+            }
+            else
+            {
+                destinationGroup = 'user';
+
+                if (ep.LegStartDelay > 0)
+                    option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
+                else
+                    option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
+
+                if(ep.BypassMedia)
+                {
+                    bypassMed = 'bypass_media=true';
+                }
+                else
+                {
+                    bypassMed = 'bypass_media=false';
+                }
+
+            }
+
+            var dnis = '';
+
+            if (domain)
+            {
+                dnis = util.format('%s@%s', ep.Destination, ep.Domain);
+            }
+
+            var protocol = 'sofia';
+            var calling = util.format('%s%s/%s/%s', option, protocol, destinationGroup, dnis);
+
+            cond.ele('action').att('application', 'conference_set_auto_outcall').att('data', calling)
+                .up()
+
+        });
+
+        if(mode)
+        {
+            var confStr = confName + '@' + domain + '+' + pin + '+flags{' + mode + '}';
+            cond.ele('action').att('application', 'conference').att('data', confStr)
+                .up()
+        }
+        else
+        {
+            var confStr = confName + '@' + domain + '+' + pin;
+            cond.ele('action').att('application', 'conference').att('data', confStr)
+                .up()
+        }
+
+        if(epList && epList.length > 0)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'conference_auto_outcall_timeout=20')
+                .up()
+                .ele('action').att('application', 'set').att('data', 'conference_auto_outcall_flags=none')
+                .up()
+                .ele('action').att('application', 'set').att('data', 'conference_auto_outcall_profile=default')
+                .up()
+        }
+
+        cond.end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
 var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia)
 {
     try
@@ -1016,3 +1137,4 @@ module.exports.CreateVoicemailDialplan = CreateVoicemailDialplan;
 module.exports.CreateParkDialplan = CreateParkDialplan;
 module.exports.CreateRouteFaxUserDialplan = CreateRouteFaxUserDialplan;
 module.exports.CreateRouteFaxGatewayDialplan = CreateRouteFaxGatewayDialplan;
+module.exports.CreateConferenceDialplan = CreateConferenceDialplan;

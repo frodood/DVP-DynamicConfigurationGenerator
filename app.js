@@ -939,7 +939,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/DirectoryProfil
                 }
                 else if(result)
                 {
-                    logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetGroupBy_Name_Domain returned group details : %j', reqId, result);
+                    logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetGroupBy_Name_Domain returned group details : %s', reqId, JSON.stringify(result));
                     var xml = xmlGen.CreateUserGroupDirectoryProfile(result, reqId);
 
                     logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
@@ -984,7 +984,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/DirectoryProfil
                 else if(usr)
                 {
                     //create xml
-                    logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetUserBy_Name_Domain returned user : %j', reqId, usr);
+                    logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetUserBy_Name_Domain returned user : %s', reqId, JSON.stringify(usr));
                     if(usr.CloudEndUser)
                     {
                         logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - User Has a Cloud End User', reqId);
@@ -1037,7 +1037,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/DirectoryProfil
 
                 if(!err && usr)
                 {
-                    logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetUserBy_Ext_Domain returned user : %j', reqId, usr);
+                    logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetUserBy_Ext_Domain returned user : %s', reqId, JSON.stringify(usr));
                     //create xml
                     if(usr.CloudEndUser)
                     {

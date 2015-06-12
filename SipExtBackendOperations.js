@@ -6,7 +6,7 @@ var GetUserBy_Ext_Domain = function(extension, domain, callback)
     try
     {
         dbModel.SipUACEndpoint
-            .find({where: {SipExtension: extension}, include: [{model: dbModel.CloudEndUser, where: {Domain: domain}}]})
+            .find({where: {SipExtension: extension}, include: [{model: dbModel.CloudEndUser, as: "CloudEndUser", where: {Domain: domain}}]})
             .complete(function (err, ext)
             {
                 if(err)

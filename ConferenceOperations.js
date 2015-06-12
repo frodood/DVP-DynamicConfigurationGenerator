@@ -189,6 +189,29 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
 
                                 var epList = CreateConferenceEndpointList(reqId, context, companyId, tenantId, dialOutUsers, ext.Extension);
 
+                                var mode = '';
+                                var isFirst = true;
+
+                                if (usr.Def)
+                                {
+                                    mode = mode + 'deaf';
+                                    isFirst = false;
+                                }
+                                if (confUsr.Mod)
+                                {
+                                    if(isFirst)
+                                    {
+                                        mode = mode + 'moderator'
+                                    }
+                                    else
+                                    {
+
+                                    }
+                                }
+                                if (confUsr.InitMuteFlag)
+                                {
+                                }
+
                                 var xml = xmlBuilder.CreateConferenceDialplan(reqId, epList, context, '[^\\s]*', false, conferenceName, conferenceDomain, pin, '');
 
                                 callback(undefined, xml);

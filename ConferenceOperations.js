@@ -197,22 +197,30 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                                     mode = mode + 'deaf';
                                     isFirst = false;
                                 }
-                                if (confUsr.Mod)
+                                if (usr.Mod)
                                 {
                                     if(isFirst)
                                     {
-                                        mode = mode + 'moderator'
+                                        mode = mode + 'moderator';
                                     }
                                     else
                                     {
-
+                                        mode = mode + '|moderator';
                                     }
                                 }
-                                if (confUsr.InitMuteFlag)
+                                if (usr.Mute)
                                 {
+                                    if(isFirst)
+                                    {
+                                        mode = mode + 'mute';
+                                    }
+                                    else
+                                    {
+                                        mode = mode + '|mute';
+                                    }
                                 }
 
-                                var xml = xmlBuilder.CreateConferenceDialplan(reqId, epList, context, '[^\\s]*', false, conferenceName, conferenceDomain, pin, '');
+                                var xml = xmlBuilder.CreateConferenceDialplan(reqId, epList, context, '[^\\s]*', false, conferenceName, conferenceDomain, pin, mode);
 
                                 callback(undefined, xml);
 
@@ -223,7 +231,15 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                             {
                                 if(allowAnonymous)
                                 {
+                                    var emptyArr = [];
+                                    //normal conference dialplan
+                                    var xml = xmlBuilder.CreateConferenceDialplan(reqId, emptyArr, context, '[^\\s]*', false, conferenceName, conferenceDomain, pin, '');
 
+                                    callback(undefined, xml);
+                                }
+                                else
+                                {
+                                    callback(new Error('Anonymous users not allowed'), xBuilder.createNotFoundResponse());
                                 }
                             }
                         }
@@ -231,7 +247,15 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                         {
                             if(allowAnonymous)
                             {
+                                var emptyArr = [];
+                                //normal conference dialplan
+                                var xml = xmlBuilder.CreateConferenceDialplan(reqId, emptyArr, context, '[^\\s]*', false, conferenceName, conferenceDomain, pin, '');
 
+                                callback(undefined, xml);
+                            }
+                            else
+                            {
+                                callback(new Error('Anonymous users not allowed'), xBuilder.createNotFoundResponse());
                             }
                         }
 
@@ -240,23 +264,25 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                 else
                 {
                     //dont allow
+                    callback(new Error('Max allowed users reached'), xBuilder.createNotFoundResponse());
                 }
 
-
-
-
             }
-            //check conference has started or not
-            //check conference limit
-
-
-
-
+            else
+            {
+                callback(new Error('Conference not started yet'), xBuilder.createNotFoundResponse());
+            }
+        }
+        else
+        {
+            callback(new Error('Conference not found'), xBuilder.createNotFoundResponse());
         }
 
     }
     catch(ex)
     {
-
+        callback(ex, xBuilder.createNotFoundResponse());
     }
-}
+};
+
+module.exports.ConferenceHandlerOperation = ConferenceHandlerOperation;

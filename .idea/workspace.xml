@@ -2,8 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66ecaa1d-b51b-4e7c-97f3-9a168c731a92" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Dockerfile" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/DVP-DBModels/Campaign.js" afterPath="$PROJECT_DIR$/node_modules/DVP-DBModels/Campaign.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/DVP-DBModels/Conference.js" afterPath="$PROJECT_DIR$/node_modules/DVP-DBModels/Conference.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ConferenceOperations.js" afterPath="$PROJECT_DIR$/ConferenceOperations.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SipExtBackendOperations.js" afterPath="$PROJECT_DIR$/SipExtBackendOperations.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ExtendedDialplanEngine.js" afterPath="$PROJECT_DIR$/ExtendedDialplanEngine.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ExternalApiAccess.js" afterPath="$PROJECT_DIR$/ExternalApiAccess.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/DVP-DBModels/PBXUser.js" afterPath="$PROJECT_DIR$/node_modules/DVP-DBModels/PBXUser.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/DVP-DBModels/package.json" afterPath="$PROJECT_DIR$/node_modules/DVP-DBModels/package.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="DVP-DynamicConfigurationGenerator.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -45,21 +52,37 @@
       <file leaf-file-name="ExtendedDialplanEngine.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ExtendedDialplanEngine.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="17" max-vertical-offset="18768">
-              <caret line="16" column="32" selection-start-line="16" selection-start-column="32" selection-end-line="16" selection-end-column="32" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="6956" max-vertical-offset="11458">
+              <caret line="967" column="69" selection-start-line="967" selection-start-column="47" selection-end-line="967" selection-end-column="73" />
               <folding>
-                <element signature="e#28417#29876#0" expanded="false" />
-                <element signature="e#29977#32139#0" expanded="false" />
+                <element signature="e#13750#26605#0" expanded="false" />
+                <element signature="e#26704#28163#0" expanded="false" />
+                <element signature="e#28264#30426#0" expanded="false" />
+                <element signature="e#30532#30923#0" expanded="false" />
+                <element signature="e#33217#49059#0" expanded="false" />
+                <element signature="e#49174#49685#0" expanded="false" />
+                <element signature="e#49802#52252#0" expanded="false" />
+                <element signature="e#52374#52757#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ConferenceOperations.js" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/ConferenceOperations.js">
+      <file leaf-file-name="Conference.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node_modules/DVP-DBModels/Conference.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.67478263" vertical-offset="3199" max-vertical-offset="4539">
-              <caret line="211" column="33" selection-start-line="211" selection-start-column="33" selection-end-line="211" selection-end-column="33" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="493">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CloudEndUser.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node_modules/DVP-DBModels/CloudEndUser.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="289">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -78,8 +101,8 @@
       <file leaf-file-name="SipExtBackendOperations.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SipExtBackendOperations.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1" max-vertical-offset="10948">
-              <caret line="11" column="23" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="10948">
+              <caret line="9" column="41" selection-start-line="9" selection-start-column="41" selection-end-line="9" selection-end-column="41" />
               <folding>
                 <element signature="e#1881#2659#0" expanded="false" />
               </folding>
@@ -87,11 +110,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="XmlExtendedDialplanBuilder.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="XmlExtendedDialplanBuilder.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/XmlExtendedDialplanBuilder.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1772" max-vertical-offset="3434">
-              <caret line="71" column="64" selection-start-line="71" selection-start-column="64" selection-end-line="71" selection-end-column="64" />
+            <state vertical-scroll-proportion="0.55839413" vertical-offset="2958" max-vertical-offset="5117">
+              <caret line="843" column="25" selection-start-line="843" selection-start-column="25" selection-end-line="843" selection-end-column="25" />
               <folding>
                 <element signature="e#770#1994#0" expanded="false" />
                 <element signature="e#6438#12494#0" expanded="false" />
@@ -102,7 +125,6 @@
                 <element signature="e#25497#26717#0" expanded="false" />
                 <element signature="e#26809#28032#0" expanded="false" />
                 <element signature="e#28120#29546#0" expanded="false" />
-                <element signature="e#29670#33837#0" expanded="false" />
                 <element signature="e#33949#37039#0" expanded="false" />
                 <element signature="e#37156#41395#0" expanded="false" />
               </folding>
@@ -113,8 +135,8 @@
       <file leaf-file-name="ExternalApiAccess.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ExternalApiAccess.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="626" max-vertical-offset="2210">
-              <caret line="150" column="47" selection-start-line="150" selection-start-column="40" selection-end-line="150" selection-end-column="47" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1187" max-vertical-offset="2210">
+              <caret line="112" column="4" selection-start-line="112" selection-start-column="4" selection-end-line="112" selection-end-column="4" />
               <folding>
                 <element signature="e#298#2274#0" expanded="false" />
               </folding>
@@ -145,16 +167,16 @@
         <option value="$PROJECT_DIR$/config/custom-environment-variables.js" />
         <option value="$PROJECT_DIR$/config/default.js" />
         <option value="$PROJECT_DIR$/RedisHandler.js" />
-        <option value="$PROJECT_DIR$/ExternalApiAccess.js" />
         <option value="$PROJECT_DIR$/node_modules/DVP-RuleService/CallRuleBackendOperations.js" />
         <option value="$PROJECT_DIR$/XmlResponseGenerator.js" />
-        <option value="$PROJECT_DIR$/ExtendedDialplanEngine.js" />
         <option value="$PROJECT_DIR$/ConferenceHandler.js" />
         <option value="$PROJECT_DIR$/ConferenceBackendHandler.js" />
         <option value="$PROJECT_DIR$/XmlExtendedDialplanBuilder.js" />
         <option value="$PROJECT_DIR$/app.js" />
         <option value="$PROJECT_DIR$/SipExtBackendOperations.js" />
         <option value="$PROJECT_DIR$/ConferenceOperations.js" />
+        <option value="$PROJECT_DIR$/ExternalApiAccess.js" />
+        <option value="$PROJECT_DIR$/ExtendedDialplanEngine.js" />
       </list>
     </option>
   </component>
@@ -190,6 +212,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -224,12 +247,11 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../DVP-PBXService" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
     <property name="recentsLimit" value="5" />
     <property name="FullScreen" value="false" />
@@ -347,7 +369,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="0" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -358,7 +380,7 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19553903" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40228012" sideWeight="0.49962825" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4495114" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4495114" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33876222" sideWeight="0.50037175" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
@@ -585,11 +607,6 @@
           <option name="timeStamp" value="204" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/ExtendedDialplanEngine.js</url>
-          <line>275</line>
-          <option name="timeStamp" value="206" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/SipExtBackendOperations.js</url>
           <line>176</line>
           <option name="timeStamp" value="221" />
@@ -651,11 +668,16 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/ExtendedDialplanEngine.js</url>
-          <line>327</line>
+          <line>328</line>
           <option name="timeStamp" value="241" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/ExtendedDialplanEngine.js</url>
+          <line>282</line>
+          <option name="timeStamp" value="246" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="245" />
+      <option name="time" value="249" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="NodeJSConfigurationType">
@@ -664,53 +686,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/XmlResponseGenerator.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="54" max-vertical-offset="629">
-          <caret line="291" column="0" selection-start-line="291" selection-start-column="0" selection-end-line="291" selection-end-column="0" />
-          <folding>
-            <element signature="e#187#662#0" expanded="false" />
-            <element signature="e#723#3791#0" expanded="false" />
-            <element signature="e#3844#7482#0" expanded="false" />
-            <element signature="e#7577#9881#0" expanded="false" />
-            <element signature="e#9968#11344#0" expanded="false" />
-            <element signature="e#11433#12613#0" expanded="false" />
-            <element signature="e#12725#15815#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/XmlExtendedDialplanBuilder.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1661" max-vertical-offset="3995">
-          <caret line="168" column="32" selection-start-line="168" selection-start-column="14" selection-end-line="168" selection-end-column="32" />
-          <folding>
-            <element signature="e#770#1994#0" expanded="false" />
-            <element signature="e#6438#12494#0" expanded="false" />
-            <element signature="e#12633#17545#0" expanded="false" />
-            <element signature="e#17681#22740#0" expanded="false" />
-            <element signature="e#22826#23928#0" expanded="false" />
-            <element signature="e#24025#25413#0" expanded="false" />
-            <element signature="e#25497#26717#0" expanded="false" />
-            <element signature="e#26809#28032#0" expanded="false" />
-            <element signature="e#28120#29546#0" expanded="false" />
-            <element signature="e#29670#33837#0" expanded="false" />
-            <element signature="e#33949#37039#0" expanded="false" />
-            <element signature="e#37156#41395#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ExternalApiAccess.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="626" max-vertical-offset="2210">
-          <caret line="150" column="47" selection-start-line="150" selection-start-column="40" selection-end-line="150" selection-end-column="47" />
-          <folding>
-            <element signature="e#298#2274#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/DVP-DBModels/node_modules/sequelize/lib/hooks.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-4.2961955" vertical-offset="1581" max-vertical-offset="6834">
@@ -964,16 +939,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ExternalApiAccess.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="626" max-vertical-offset="2210">
-          <caret line="150" column="47" selection-start-line="150" selection-start-column="40" selection-end-line="150" selection-end-column="47" />
-          <folding>
-            <element signature="e#298#2274#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/DynamicConfigGeneratorLog.log">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="299">
@@ -985,7 +950,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1463" max-vertical-offset="2669">
           <caret line="87" column="4" selection-start-line="87" selection-start-column="4" selection-end-line="87" selection-end-column="4" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1007,14 +971,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="1.5130435" vertical-offset="4213" max-vertical-offset="19363">
           <caret line="299" column="0" selection-start-line="299" selection-start-column="0" selection-end-line="299" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/DVP-DBModels/ConferenceUser.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="476">
-          <caret line="13" column="46" selection-start-line="13" selection-start-column="43" selection-end-line="13" selection-end-column="46" />
           <folding />
         </state>
       </provider>
@@ -1043,35 +999,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/XmlExtendedDialplanBuilder.js">
+    <entry file="file://$PROJECT_DIR$/node_modules/DVP-DBModels/CloudEndUser.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="497" max-vertical-offset="3434">
-          <caret line="71" column="64" selection-start-line="71" selection-start-column="64" selection-end-line="71" selection-end-column="64" />
-          <folding>
-            <element signature="e#770#1994#0" expanded="false" />
-            <element signature="e#6438#12494#0" expanded="false" />
-            <element signature="e#12633#17545#0" expanded="false" />
-            <element signature="e#17681#22740#0" expanded="false" />
-            <element signature="e#22826#23928#0" expanded="false" />
-            <element signature="e#24025#25413#0" expanded="false" />
-            <element signature="e#25497#26717#0" expanded="false" />
-            <element signature="e#26809#28032#0" expanded="false" />
-            <element signature="e#28120#29546#0" expanded="false" />
-            <element signature="e#29670#33837#0" expanded="false" />
-            <element signature="e#33949#37039#0" expanded="false" />
-            <element signature="e#37156#41395#0" expanded="false" />
-          </folding>
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="588">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ExtendedDialplanEngine.js">
+    <entry file="file://$PROJECT_DIR$/node_modules/DVP-DBModels/ConferenceUser.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="17" max-vertical-offset="18768">
-          <caret line="16" column="32" selection-start-line="16" selection-start-column="32" selection-end-line="16" selection-end-column="32" />
-          <folding>
-            <element signature="e#28417#29876#0" expanded="false" />
-            <element signature="e#29977#32139#0" expanded="false" />
-          </folding>
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="476">
+          <caret line="13" column="46" selection-start-line="13" selection-start-column="43" selection-end-line="13" selection-end-column="46" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1088,21 +1028,86 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/DVP-DBModels/PBXUserTemplate.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="588">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ConferenceOperations.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.68" vertical-offset="0" max-vertical-offset="3400">
+          <caret line="116" column="29" selection-start-line="116" selection-start-column="29" selection-end-line="116" selection-end-column="29" />
+          <folding>
+            <element signature="e#269#3425#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/DVP-DBModels/PBXUser.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="527">
+          <caret line="12" column="42" selection-start-line="12" selection-start-column="42" selection-end-line="12" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/SipExtBackendOperations.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1" max-vertical-offset="10948">
-          <caret line="11" column="23" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="10948">
+          <caret line="9" column="41" selection-start-line="9" selection-start-column="41" selection-end-line="9" selection-end-column="41" />
           <folding>
             <element signature="e#1881#2659#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ConferenceOperations.js">
+    <entry file="file://$PROJECT_DIR$/ExtendedDialplanEngine.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.67478263" vertical-offset="3199" max-vertical-offset="4539">
-          <caret line="211" column="33" selection-start-line="211" selection-start-column="33" selection-end-line="211" selection-end-column="33" />
-          <folding />
+        <state vertical-scroll-proportion="0.0" vertical-offset="6956" max-vertical-offset="11458">
+          <caret line="967" column="69" selection-start-line="967" selection-start-column="47" selection-end-line="967" selection-end-column="73" />
+          <folding>
+            <element signature="e#13750#26605#0" expanded="false" />
+            <element signature="e#26704#28163#0" expanded="false" />
+            <element signature="e#28264#30426#0" expanded="false" />
+            <element signature="e#30532#30923#0" expanded="false" />
+            <element signature="e#33217#49059#0" expanded="false" />
+            <element signature="e#49174#49685#0" expanded="false" />
+            <element signature="e#49802#52252#0" expanded="false" />
+            <element signature="e#52374#52757#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ExternalApiAccess.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1187" max-vertical-offset="2210">
+          <caret line="112" column="4" selection-start-line="112" selection-start-column="4" selection-end-line="112" selection-end-column="4" />
+          <folding>
+            <element signature="e#298#2274#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/XmlExtendedDialplanBuilder.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.55839413" vertical-offset="2958" max-vertical-offset="5117">
+          <caret line="843" column="25" selection-start-line="843" selection-start-column="25" selection-end-line="843" selection-end-column="25" />
+          <folding>
+            <element signature="e#770#1994#0" expanded="false" />
+            <element signature="e#6438#12494#0" expanded="false" />
+            <element signature="e#12633#17545#0" expanded="false" />
+            <element signature="e#17681#22740#0" expanded="false" />
+            <element signature="e#22826#23928#0" expanded="false" />
+            <element signature="e#24025#25413#0" expanded="false" />
+            <element signature="e#25497#26717#0" expanded="false" />
+            <element signature="e#26809#28032#0" expanded="false" />
+            <element signature="e#28120#29546#0" expanded="false" />
+            <element signature="e#33949#37039#0" expanded="false" />
+            <element signature="e#37156#41395#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>

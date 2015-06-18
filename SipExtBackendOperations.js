@@ -55,7 +55,7 @@ var GetUserBy_Name_Domain = function(extName, domain, callback)
 
 };
 
-var GetUserByNameTenantDB = function(extName, tenantId, callback)
+var GetUserByNameTenantDB = function(reqId, extName, tenantId, callback)
 {
     try
     {
@@ -166,6 +166,14 @@ var GetAllDataForExt = function(reqId, extension, tenantId, extType, callback)
                     callback(err, extData);
                 });
         }
+        else if(extType === 'VOICE_PORTAL')
+        {
+            dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}]})
+                .complete(function (err, extData)
+                {
+                    callback(err, extData);
+                });
+        }
         else
         {
             callback(new Error('Unsupported extension type'), undefined);
@@ -267,7 +275,7 @@ var GetPhoneNumberDetails = function(phnNum, callback)
     try
     {
         dbModel.TrunkPhoneNumber
-            .find({where :[{PhoneNumber: phnNum},{Enable: true}], include: [{model:dbModel.Trunk, as : 'Trunk'}]})
+            .find({where :[{PhoneNumber: phnNum},{Enable: true}], include: [{model: dbModel.LimitInfo, as: 'LimitInfoInbound'},{model: dbModel.LimitInfo, as: 'LimitInfoBoth'},{model:dbModel.Trunk, as : 'Trunk'}]})
             .complete(function (err, phnInfo)
             {
                 if(err)

@@ -110,20 +110,16 @@ var RemoteGetSipUserDetailsForExtension = function(reqId, extension, securityTok
     }
 };
 
-var RemoteGetPBXDialplanConfig = function(reqId, ani, dnis, context, direction, userUuid, fromUserUuid, opType, securityToken, callback)
+var RemoteGetDialplanConfig = function(reqId, ani, dnis, context, direction, userUuid, fromUserUuid, opType, extExtraData, url, securityToken, callback)
 {
     try
     {
         logger.debug('[DVP-PBXService.RemoteGetPBXDialplanConfig] - [%s] -  Trying to get pbx details from pbx app', reqId);
-        var sipUACIp = config.Services.SipUACApi.Ip;
-        var sipUACPort = config.Services.SipUACApi.Port;
-        var apiVersion = config.Services.SipUACApi.Version;
 
-        if(sipUACIp && sipUACPort && apiVersion)
-        {
-            var httpUrl = util.format('http://%s:%d/DVP/API/%s/PBXService/GeneratePBXConfig', sipUACIp, sipUACPort, apiVersion);
 
-            var jsonObj = { ANI: ani, DNIS: dnis, Context: context, Direction: direction, ExtraData: {UserUuid: userUuid, FromUserUuid: fromUserUuid, OperationType: opType} };
+            var httpUrl = url;
+
+            var jsonObj = { ANI: ani, DNIS: dnis, Context: context, Direction: direction, ExtraData: {UserUuid: userUuid, FromUserUuid: fromUserUuid, OperationType: opType, ExtExtraData: extExtraData} };
 
             var jsonStr = JSON.stringify(jsonObj);
 
@@ -156,12 +152,6 @@ var RemoteGetPBXDialplanConfig = function(reqId, ani, dnis, context, direction, 
                     callback(error, undefined);
                 }
             })
-        }
-        else
-        {
-            logger.error('[DVP-PBXService.RemoteGetPBXDialplanConfig] - [%s] - Sip uac service ip, port or version not set', reqId);
-            callback(new Error('Sip uac service ip, port or version not set'), undefined)
-        }
     }
     catch(ex)
     {
@@ -172,4 +162,4 @@ var RemoteGetPBXDialplanConfig = function(reqId, ani, dnis, context, direction, 
 
 module.exports.RemoteGetSipUserDetailsForUuid = RemoteGetSipUserDetailsForUuid;
 module.exports.RemoteGetSipUserDetailsForExtension =RemoteGetSipUserDetailsForExtension;
-module.exports.RemoteGetPBXDialplanConfig = RemoteGetPBXDialplanConfig;
+module.exports.RemoteGetDialplanConfig = RemoteGetDialplanConfig;

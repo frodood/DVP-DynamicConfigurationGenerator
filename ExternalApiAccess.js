@@ -142,13 +142,13 @@ var RemoteGetDialplanConfig = function(reqId, ani, dnis, context, direction, use
                 {
                     var apiResp = JSON.parse(body);
 
-                    logger.debug('[DVP-PBXService.RemoteGetPBXDialplanConfig] - [%s] - Sip UAC Api returned : %s', reqId, body);
+                    logger.debug('[DVP-PBXService.RemoteGetPBXDialplanConfig] - [%s] - Extended Dialplan Api returned : %s', reqId, body);
 
                     callback(undefined, apiResp);
                 }
                 else
                 {
-                    logger.error('[DVP-PBXService.RemoteGetPBXDialplanConfig] - [%s] - Sip UAC Api call failed', reqId, error);
+                    logger.error('[DVP-PBXService.RemoteGetPBXDialplanConfig] - [%s] - Extended Dialplan Api call failed', reqId, error);
                     callback(error, undefined);
                 }
             })

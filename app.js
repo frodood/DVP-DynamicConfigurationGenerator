@@ -73,6 +73,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
         var varSipToUri = data["variable_sip_to_uri"];
         var varUsrContext = data["variable_user_context"];
         var varFromNumber = data["variable_FromNumber"];
+        var callerIdNum = data["Caller-Caller-ID-Number"];
 
         if (cdnum && callerContext && hostname)
         {
@@ -186,15 +187,26 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                 }
                                 else if(num)
                                 {
-                                    if((num.ObjCategory === 'INBOUND' && num.LimitInfoInbound && typeof num.LimitInfoInbound.MaxCount != 'undefined') || (num.ObjCategory === 'BOTH' && ((num.LimitInfoInbound && typeof num.LimitInfoInbound.MaxCount != 'undefined') || (num.LimitInfoBoth && typeof num.LimitInfoBoth.MaxCount != 'undefined'))))
+                                    if((num.ObjCategory === 'INBOUND' && num.LimitInfoInbound && num.LimitInfoInbound.Enable && typeof num.LimitInfoInbound.MaxCount != 'undefined') || (num.ObjCategory === 'BOTH' && ((num.LimitInfoInbound && num.LimitInfoInbound.Enable && typeof num.LimitInfoInbound.MaxCount != 'undefined') || (num.LimitInfoBoth && num.LimitInfoBoth.Enable && typeof num.LimitInfoBoth.MaxCount != 'undefined'))))
                                     {
+                                        var bothLim = undefined;
+                                        var inbLim = undefined;
+                                        if(num.LimitInfoInbound)
+                                        {
+                                            inbLim = num.LimitInfoInbound.MaxCount;
+                                        }
+
+                                        if(num.LimitInfoBoth)
+                                        {
+                                            bothLim = num.LimitInfoBoth.MaxCount;
+                                        }
 
                                         var NumLimitInfo =
                                         {
                                             NumType : num.ObjCategory,
                                             TrunkNumber : num.PhoneNumber,
-                                            InboundLimit : num.LimitInfoInbound.MaxCount,
-                                            BothLimit : num.LimitInfoBoth.MaxCount,
+                                            InboundLimit : inbLim,
+                                            BothLimit : bothLim,
                                             CompanyId : num.CompanyId,
                                             TenantId : num.TenantId,
                                             CheckLimit : true
@@ -230,137 +242,31 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
 
                                                 //check dnis is a emergency number
 
-                                                if(rule.Application)
+                                                if(rule.Application && rule.Application.Availability)
                                                 {
-                                                    if(rule.Application.ObjClass === 'DEVELOPMENT')
+                                                    var app = rule.Application;
+
+                                                    logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call rule has a developer app', reqId);
+
+                                                    if(rule.Application.MasterApplication && rule.Application.MasterApplication.Availability && rule.Application.MasterApplication.Url)
                                                     {
-                                                        logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call rule has a developer app', reqId);
                                                         var masterUrl = '';
-                                                        if(rule.Application.MasterApplication && rule.Application.MasterApplication.Url)
+                                                        var masterApp = rule.Application.MasterApplication;
+
+                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master application found : ', reqId, JSON.stringify(masterApp));
+
+                                                        if(masterApp.ObjType === "HTTAPI")
                                                         {
-                                                            var masterApp = rule.Application.MasterApplication;
-
-                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master application found : ', reqId, JSON.stringify(masterApp));
-
-                                                            if(masterApp.ObjType === "HTTAPI")
-                                                            {
-                                                                logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type is HTTAPI', reqId);
-                                                                //add to redis
-                                                                masterUrl = rule.Application.MasterApplication.Url;
-                                                                var sessionData =
-                                                                {
-                                                                    path: rule.Application.Url,
-                                                                    company: rule.CompanyId,
-                                                                    tenant: rule.TenantId,
-                                                                    app: rule.Application.AppName,
-                                                                    appid: rule.Application.id
-                                                                };
-
-                                                                var jsonString = JSON.stringify(sessionData);
-
-                                                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session Data Object created for HTTAPI : %s', reqId, jsonString);
-
-                                                                redisHandler.SetObject(varUuid + "_data", jsonString, function(err, result)
-                                                                {
-                                                                    if(err)
-                                                                    {
-                                                                        logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Exception in setting sessionData on backend - Key : : %s_data', reqId, varUuid, err);
-                                                                        var xml = xmlGen.createNotFoundResponse();
-
-                                                                        res.end(xml);
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session data added to redis successfully - Key : : %s_data', reqId, varUuid);
-
-                                                                        var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, masterUrl, reqId, NumLimitInfo);
-
-                                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - HTTAPI dialplan created - Response Sent : : %s', reqId, xml);
-                                                                        res.end(xml);
-                                                                    }
-
-                                                                });
-
-                                                            }
-                                                            else if(masterApp.ObjType === "SOCKET")
-                                                            {
-                                                                logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type is SOCKET', reqId);
-
-                                                                var sessionData =
-                                                                {
-                                                                    path: rule.Application.Url,
-                                                                    company: rule.CompanyId,
-                                                                    tenant: rule.TenantId,
-                                                                    app: rule.Application.AppName,
-                                                                    appid: rule.Application.id
-                                                                };
-
-                                                                var jsonString = JSON.stringify(sessionData);
-
-                                                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session Data Object created for SOCKET : %s', reqId, jsonString);
-
-                                                                redisHandler.SetObject(varUuid + "_data", jsonString, function(err, result)
-                                                                {
-                                                                    if(err)
-                                                                    {
-                                                                        logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Exception in setting sessionData on backend - Key : : %s_data', reqId, varUuid, err);
-                                                                        var xml = xmlGen.createNotFoundResponse();
-
-                                                                        res.end(xml);
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session data added to redis successfully - Key : : %s_data', reqId, varUuid);
-
-                                                                        var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, rule.Application.Url, reqId, NumLimitInfo);
-
-                                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - SOCKET dialplan created - Response Sent : : %s', reqId, xml);
-
-                                                                        res.end(xml);
-                                                                    }
-
-                                                                });
-                                                            }
-                                                            else
-                                                            {
-                                                                logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type Undefined - Terminating', reqId);
-                                                                var xml = xmlGen.createNotFoundResponse();
-
-                                                                res.end(xml);
-                                                            }
-
-                                                        }
-                                                        else
-                                                        {
-                                                            logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call rule developer app doesnt have a master app or master app url not set', reqId);
-                                                            var xml = xmlGen.createNotFoundResponse();
-
-                                                            res.end(xml);
-                                                        }
-                                                    }
-                                                    else if(rule.Application.ObjClass === 'EXTENDED')
-                                                    {
-                                                        data.DVPAppUrl = rule.Application.Url;
-                                                        extDialplanEngine.ProcessExtendedDialplan(reqId, decodedSipFromUri, decodedSipToUri, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, 'test', NumLimitInfo, function(err, extDialplan)
-                                                        {
-                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan created - Response Sent : : %s', reqId, extDialplan);
-                                                            res.end(extDialplan);
-                                                        })
-                                                    }
-                                                    else
-                                                    {
-                                                        logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call rule has a system or a master app assigned', reqId);
-                                                        if(rule.Application.ObjType === 'HTTAPI')
-                                                        {
-                                                            logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Application type is HTTAPI', reqId);
-
+                                                            logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type is HTTAPI', reqId);
+                                                            //add to redis
+                                                            masterUrl = masterApp.Url;
                                                             var sessionData =
                                                             {
-                                                                path: rule.Application.Url,
+                                                                path: app.Url,
                                                                 company: rule.CompanyId,
                                                                 tenant: rule.TenantId,
-                                                                app: rule.Application.AppName,
-                                                                appid: rule.Application.id
+                                                                app: app.AppName,
+                                                                appid: app.id
                                                             };
 
                                                             var jsonString = JSON.stringify(sessionData);
@@ -380,24 +286,26 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                                 {
                                                                     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session data added to redis successfully - Key : : %s_data', reqId, varUuid);
 
-                                                                    var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, rule.Application.Url, reqId, NumLimitInfo);
+                                                                    var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, masterUrl, reqId, NumLimitInfo);
 
                                                                     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - HTTAPI dialplan created - Response Sent : : %s', reqId, xml);
                                                                     res.end(xml);
                                                                 }
 
                                                             });
+
                                                         }
-                                                        else if(rule.Application.ObjType === 'SOCKET')
+                                                        else if(masterApp.ObjType === "SOCKET")
                                                         {
-                                                            logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Application Type is SOCKET', reqId);
+                                                            logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type is SOCKET', reqId);
+
                                                             var sessionData =
                                                             {
-                                                                path: rule.Application.Url,
+                                                                path: app.Url,
                                                                 company: rule.CompanyId,
                                                                 tenant: rule.TenantId,
-                                                                app: rule.Application.AppName,
-                                                                appid: rule.Application.id
+                                                                app: app.AppName,
+                                                                appid: app.id
                                                             };
 
                                                             var jsonString = JSON.stringify(sessionData);
@@ -416,23 +324,76 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                                 else
                                                                 {
                                                                     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session data added to redis successfully - Key : : %s_data', reqId, varUuid);
-                                                                    var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, rule.Application.Url, reqId, NumLimitInfo);
+
+                                                                    var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, app.Url, reqId, NumLimitInfo);
 
                                                                     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - SOCKET dialplan created - Response Sent : : %s', reqId, xml);
+
                                                                     res.end(xml);
                                                                 }
 
                                                             });
                                                         }
+                                                        else if(masterApp.ObjType === 'EXTENDED')
+                                                        {
+                                                            data.DVPAppUrl = masterApp.Url;
+                                                            extDialplanEngine.ProcessExtendedDialplan(reqId, decodedSipFromUri, decodedSipToUri, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, 'test', NumLimitInfo, function(err, extDialplan)
+                                                            {
+                                                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan created - Response Sent : : %s', reqId, extDialplan);
+                                                                res.end(extDialplan);
+                                                            })
+                                                        }
                                                         else
                                                         {
-                                                            logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Application Type Undefined - Terminating', reqId);
+                                                            logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type Undefined - Terminating', reqId);
                                                             var xml = xmlGen.createNotFoundResponse();
 
                                                             res.end(xml);
                                                         }
-                                                    }
 
+                                                    }
+                                                    else
+                                                    {
+                                                        if(app.ObjType === "HTTAPI")
+                                                        {
+                                                            logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type is HTTAPI', reqId);
+                                                            //add to redis
+
+                                                            var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, app.Url, reqId, NumLimitInfo);
+
+                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - HTTAPI dialplan created - Response Sent : : %s', reqId, xml);
+                                                            res.end(xml);
+
+
+                                                        }
+                                                        else if(app.ObjType === "SOCKET")
+                                                        {
+                                                            logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - App Type is SOCKET', reqId);
+
+                                                            var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, app.Url, reqId, NumLimitInfo);
+
+                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - SOCKET dialplan created - Response Sent : : %s', reqId, xml);
+
+                                                            res.end(xml);
+                                                        }
+                                                        else if(app.ObjType === 'EXTENDED')
+                                                        {
+                                                            data.DVPAppUrl = app.Url;
+                                                            extDialplanEngine.ProcessExtendedDialplan(reqId, decodedSipFromUri, decodedSipToUri, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, 'test', NumLimitInfo, function(err, extDialplan)
+                                                            {
+                                                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan created - Response Sent : : %s', reqId, extDialplan);
+                                                                res.end(extDialplan);
+                                                            })
+                                                        }
+                                                        else
+                                                        {
+                                                            logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call rule developer app doesnt have a master app or master app url not set', reqId);
+                                                            var xml = xmlGen.createNotFoundResponse();
+
+                                                            res.end(xml);
+                                                        }
+
+                                                    }
 
                                                     var evtData =
                                                     {
@@ -567,137 +528,29 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                             else
                                             {
                                                 //do normal op
-                                                if(rule.Application)
+                                                if(rule.Application && rule.Application.Availability)
                                                 {
-                                                    if(rule.Application.ObjClass === 'DEVELOPMENT')
+                                                    var app = rule.Application;
+
+                                                    var masterUrl = '';
+                                                    if(app.MasterApplication && app.MasterApplication.Availability && app.MasterApplication.Url)
                                                     {
-                                                        logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call rule has a developer app', reqId);
-                                                        var masterUrl = '';
-                                                        if(rule.Application.MasterApplication && rule.Application.MasterApplication.Url)
+                                                        var masterApp = app.MasterApplication;
+
+                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master application found : %j', reqId, JSON.stringify(masterApp));
+
+                                                        if(masterApp.ObjType === "HTTAPI")
                                                         {
-                                                            var masterApp = rule.Application.MasterApplication;
-
-                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master application found : %j', reqId, JSON.stringify(masterApp));
-
-                                                            if(masterApp.ObjType === "HTTAPI")
-                                                            {
-                                                                logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type is HTTAPI', reqId);
-                                                                //add to redis
-                                                                masterUrl = rule.Application.MasterApplication.Url;
-                                                                var sessionData =
-                                                                {
-                                                                    path: rule.Application.Url,
-                                                                    company: rule.CompanyId,
-                                                                    tenant: rule.TenantId,
-                                                                    app: rule.Application.AppName,
-                                                                    appid: rule.Application.id
-                                                                };
-
-                                                                var jsonString = JSON.stringify(sessionData);
-
-                                                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session Data Object created for HTTAPI : %s', reqId, jsonString);
-
-                                                                redisHandler.SetObject(varUuid + "_data", jsonString, function(err, result)
-                                                                {
-                                                                    if(err)
-                                                                    {
-                                                                        logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Exception in setting sessionData on backend - Key : : %s_data', reqId, varUuid, err);
-                                                                        var xml = xmlGen.createNotFoundResponse();
-
-                                                                        res.end(xml);
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session data added to redis successfully - Key : : %s_data', reqId, varUuid);
-
-                                                                        var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, masterUrl, reqId, undefined);
-
-                                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - HTTAPI dialplan created - Response Sent : : %s', reqId, xml);
-                                                                        res.end(xml);
-                                                                    }
-
-                                                                });
-
-                                                            }
-                                                            else if(masterApp.ObjType === "SOCKET")
-                                                            {
-                                                                logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type is SOCKET', reqId);
-
-                                                                var sessionData =
-                                                                {
-                                                                    path: rule.Application.Url,
-                                                                    company: rule.CompanyId,
-                                                                    tenant: rule.TenantId,
-                                                                    app: rule.Application.AppName,
-                                                                    appid: rule.Application.id
-                                                                };
-
-                                                                var jsonString = JSON.stringify(sessionData);
-
-                                                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session Data Object created for SOCKET : %s', reqId, jsonString);
-
-                                                                redisHandler.SetObject(varUuid + "_data", jsonString, function(err, result)
-                                                                {
-                                                                    if(err)
-                                                                    {
-                                                                        logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Exception in setting sessionData on backend - Key : : %s_data', reqId, varUuid, err);
-                                                                        var xml = xmlGen.createNotFoundResponse();
-
-                                                                        res.end(xml);
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session data added to redis successfully - Key : : %s_data', reqId, varUuid);
-
-                                                                        var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, rule.Application.Url, reqId, undefined);
-
-                                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - SOCKET dialplan created - Response Sent : : %s', reqId, xml);
-
-                                                                        res.end(xml);
-                                                                    }
-
-                                                                });
-                                                            }
-                                                            else
-                                                            {
-                                                                logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type Undefined - Terminating', reqId);
-                                                                var xml = xmlGen.createNotFoundResponse();
-
-                                                                res.end(xml);
-                                                            }
-
-                                                        }
-                                                        else
-                                                        {
-                                                            logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call rule developer app doesnt have a master app or master app url not set', reqId);
-                                                            var xml = xmlGen.createNotFoundResponse();
-
-                                                            res.end(xml);
-                                                        }
-                                                    }
-                                                    else if(rule.Application.ObjClass === 'EXTENDED')
-                                                    {
-                                                        data.DVPAppUrl = rule.Application.Url;
-                                                        extDialplanEngine.ProcessExtendedDialplan(reqId, decodedSipFromUri, decodedSipToUri, callerContext, direction, data, fromUsr, rule.CompanyId, rule.TenantId, 'test', undefined, function(err, extDialplan)
-                                                        {
-                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan created - Response Sent : : %s', reqId, extDialplan);
-                                                            res.end(extDialplan);
-                                                        })
-                                                    }
-                                                    else
-                                                    {
-                                                        logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call rule has a system or a master app assigned', reqId);
-                                                        if(rule.Application.ObjType === 'HTTAPI')
-                                                        {
-                                                            logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Application type is HTTAPI', reqId);
-
+                                                            logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type is HTTAPI', reqId);
+                                                            //add to redis
+                                                            masterUrl = masterApp.Url;
                                                             var sessionData =
                                                             {
-                                                                path: rule.Application.Url,
+                                                                path: app.Url,
                                                                 company: rule.CompanyId,
                                                                 tenant: rule.TenantId,
-                                                                app: rule.Application.AppName,
-                                                                appid: rule.Application.id
+                                                                app: app.AppName,
+                                                                appid: app.id
                                                             };
 
                                                             var jsonString = JSON.stringify(sessionData);
@@ -717,24 +570,26 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                                 {
                                                                     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session data added to redis successfully - Key : : %s_data', reqId, varUuid);
 
-                                                                    var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, rule.Application.Url, reqId, undefined);
+                                                                    var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, masterUrl, reqId, undefined);
 
                                                                     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - HTTAPI dialplan created - Response Sent : : %s', reqId, xml);
                                                                     res.end(xml);
                                                                 }
 
                                                             });
+
                                                         }
-                                                        else if(rule.Application.ObjType === 'SOCKET')
+                                                        else if(masterApp.ObjType === "SOCKET")
                                                         {
-                                                            logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Application Type is SOCKET', reqId);
+                                                            logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type is SOCKET', reqId);
+
                                                             var sessionData =
                                                             {
-                                                                path: rule.Application.Url,
+                                                                path: app.Url,
                                                                 company: rule.CompanyId,
                                                                 tenant: rule.TenantId,
-                                                                app: rule.Application.AppName,
-                                                                appid: rule.Application.id
+                                                                app: app.AppName,
+                                                                appid: app.id
                                                             };
 
                                                             var jsonString = JSON.stringify(sessionData);
@@ -753,17 +608,68 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                                 else
                                                                 {
                                                                     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session data added to redis successfully - Key : : %s_data', reqId, varUuid);
-                                                                    var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, rule.Application.Url, reqId, undefined);
+
+                                                                    var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, masterUrl, reqId, undefined);
 
                                                                     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - SOCKET dialplan created - Response Sent : : %s', reqId, xml);
+
                                                                     res.end(xml);
                                                                 }
 
                                                             });
                                                         }
+                                                        else if(masterApp.ObjType === 'EXTENDED')
+                                                        {
+                                                            data.DVPAppUrl = masterApp.Url;
+                                                            extDialplanEngine.ProcessExtendedDialplan(reqId, decodedSipFromUri, decodedSipToUri, callerContext, direction, data, fromUsr, rule.CompanyId, rule.TenantId, 'test', undefined, function(err, extDialplan)
+                                                            {
+                                                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan created - Response Sent : : %s', reqId, extDialplan);
+                                                                res.end(extDialplan);
+                                                            })
+                                                        }
                                                         else
                                                         {
-                                                            logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Application Type Undefined - Terminating', reqId);
+                                                            logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type Undefined - Terminating', reqId);
+                                                            var xml = xmlGen.createNotFoundResponse();
+
+                                                            res.end(xml);
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        if(app.ObjType === "HTTAPI")
+                                                        {
+                                                            logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type is HTTAPI', reqId);
+                                                            //add to redis
+                                                            var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, app.Url, reqId, undefined);
+
+                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - HTTAPI dialplan created - Response Sent : : %s', reqId, xml);
+                                                            res.end(xml);
+
+                                                        }
+                                                        else if(app.ObjType === "SOCKET")
+                                                        {
+                                                            logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type is SOCKET', reqId);
+
+                                                            var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, app.Url, reqId, undefined);
+
+                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - SOCKET dialplan created - Response Sent : : %s', reqId, xml);
+
+                                                            res.end(xml);
+                                                        }
+                                                        else if(app.ObjType === 'EXTENDED')
+                                                        {
+                                                            data.DVPAppUrl = app.Url;
+                                                            extDialplanEngine.ProcessExtendedDialplan(reqId, decodedSipFromUri, decodedSipToUri, callerContext, direction, data, fromUsr, rule.CompanyId, rule.TenantId, 'test', undefined, function(err, extDialplan)
+                                                            {
+                                                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan created - Response Sent : : %s', reqId, extDialplan);
+                                                                res.end(extDialplan);
+                                                            })
+                                                        }
+                                                        else
+                                                        {
+                                                            logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Master App Type Undefined - Terminating', reqId);
                                                             var xml = xmlGen.createNotFoundResponse();
 
                                                             res.end(xml);

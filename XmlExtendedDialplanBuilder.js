@@ -348,7 +348,7 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
 
         if(ep.IsVoicemailEnabled)
         {
-            cond.ele('action').att('application', 'voicemail').att('data', 'default %s %s', ep.Domain, ep.Destination)
+            cond.ele('action').att('application', 'voicemail').att('data', util.format('default %s %s', ep.Domain, ep.Destination))
                 .up()
         }
 

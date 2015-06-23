@@ -288,7 +288,7 @@ var createDirectoryProfile = function(extName, ext, domain, email, password, con
 
 };
 
-var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, reqId)
+var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, reqId, numLimitInfo)
 {
     try
     {
@@ -306,21 +306,46 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, req
 
         var doc = xmlBuilder.create('document');
 
-        doc.att('type', 'freeswitch/xml')
+        var cond = doc.att('type', 'freeswitch/xml')
             .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
-                .ele('context').att('name', context)
-                    .ele('extension').att('name', 'test')
-                        .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
-                            .ele('action').att('application', 'answer')
-                            .up()
-                            .ele('action').att('application', 'httapi').att('data', httpApiUrl)
-                            .up()
-                        .up()
+            .ele('context').att('name', context)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+
+        if(numLimitInfo && numLimitInfo.CheckLimit)
+        {
+            if(numLimitInfo.NumType === 'INBOUND')
+            {
+                var limitStr = util.format('hash %d_%d_inbound %s %d !USER_BUSY', numLimitInfo.TenantId, numLimitInfo.CompanyId, numLimitInfo.TrunkNumber, numLimitInfo.InboundLimit);
+                cond.ele('action').att('application', 'limit').att('data', limitStr)
                     .up()
-                .up()
+            }
+            else if(numLimitInfo.NumType === 'BOTH')
+            {
+                if(numLimitInfo.InboundLimit)
+                {
+                    var limitStr = util.format('hash %d_%d_inbound %s %d !USER_BUSY', numLimitInfo.TenantId, numLimitInfo.CompanyId, numLimitInfo.TrunkNumber, numLimitInfo.InboundLimit);
+                    cond.ele('action').att('application', 'limit').att('data', limitStr)
+                        .up()
+                }
+
+                if(numLimitInfo.BothLimit)
+                {
+                    var limitStr = util.format('hash %d_%d_both %s %d !USER_BUSY', numLimitInfo.TenantId, numLimitInfo.CompanyId, numLimitInfo.TrunkNumber, numLimitInfo.BothLimit);
+                    cond.ele('action').att('application', 'limit').att('data', limitStr)
+                        .up()
+                }
+            }
+
+        }
+
+        cond.ele('action').att('application', 'answer')
+            .up()
+            .ele('action').att('application', 'httapi').att('data', httpApiUrl)
             .up()
 
-        .end({pretty: true});
+
+        cond.end({pretty: true});
 
 
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
@@ -335,7 +360,7 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, req
 
 };
 
-var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl, reqId)
+var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl, reqId, numLimitInfo)
 {
     try
     {
@@ -349,21 +374,46 @@ var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl, r
 
         var doc = xmlBuilder.create('document');
 
-        doc.att('type', 'freeswitch/xml')
+        var cond = doc.att('type', 'freeswitch/xml')
             .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
             .ele('context').att('name', context)
             .ele('extension').att('name', 'test')
             .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
-            .ele('action').att('application', 'answer')
+
+        if(numLimitInfo && numLimitInfo.CheckLimit)
+        {
+            if(numLimitInfo.NumType === 'INBOUND')
+            {
+                var limitStr = util.format('hash %d_%d_inbound %s %d !USER_BUSY', numLimitInfo.TenantId, numLimitInfo.CompanyId, numLimitInfo.TrunkNumber, numLimitInfo.InboundLimit);
+                cond.ele('action').att('application', 'limit').att('data', limitStr)
+                    .up()
+            }
+            else if(numLimitInfo.NumType === 'BOTH')
+            {
+                if(numLimitInfo.InboundLimit)
+                {
+                    var limitStr = util.format('hash %d_%d_inbound %s %d !USER_BUSY', numLimitInfo.TenantId, numLimitInfo.CompanyId, numLimitInfo.TrunkNumber, numLimitInfo.InboundLimit);
+                    cond.ele('action').att('application', 'limit').att('data', limitStr)
+                        .up()
+                }
+
+                if(numLimitInfo.BothLimit)
+                {
+                    var limitStr = util.format('hash %d_%d_both %s %d !USER_BUSY', numLimitInfo.TenantId, numLimitInfo.CompanyId, numLimitInfo.TrunkNumber, numLimitInfo.BothLimit);
+                    cond.ele('action').att('application', 'limit').att('data', limitStr)
+                        .up()
+                }
+            }
+
+        }
+
+        cond.ele('action').att('application', 'answer')
             .up()
             .ele('action').att('application', 'socket').att('data', socketUrl + ' async full')
             .up()
-            .up()
-            .up()
-            .up()
-            .up()
 
-            .end({pretty: true});
+
+        cond.end({pretty: true});
 
 
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});

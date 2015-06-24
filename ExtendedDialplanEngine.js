@@ -575,7 +575,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 }
                                                 else if(pbxObj.OperationType === 'CALL_DIVERT')
                                                 {
-                                                    //Check if divert number
+                                                    //Check if divert number is an extension or not
                                                     callback(err, xmlBuilder.createNotFoundResponse());
                                                 }
                                                 else

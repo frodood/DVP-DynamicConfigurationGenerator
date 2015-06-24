@@ -25,7 +25,7 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
                 if (fm.ObjCategory === 'GATEWAY')
                 {
                     //pick outbound rule
-                    ruleBackendHandler.PickCallRuleOutboundComplete(aniNum, fm.DestinationNumber, '', context, companyId, tenantId, false, function (err, rule)
+                    ruleHandler.PickCallRuleOutboundComplete(aniNum, fm.DestinationNumber, '', context, companyId, tenantId, false, function (err, rule)
                     {
                         if (!err && rule)
                         {
@@ -35,9 +35,9 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
                                 Type: 'GATEWAY',
                                 LegStartDelay: 0,
                                 BypassMedia: false,
-                                LegTimeout: rule.Timeout,
+                                LegTimeout: fm.RingTimeout,
                                 Destination: rule.DNIS,
-                                Domain: rule.Domain
+                                Domain: rule.IpUrl
                             };
 
                             if(dodActive && dodNum)
@@ -60,11 +60,20 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
                                 callback(undefined, epList);
                             }
                         }
+                        else
+                        {
+                            count++;
+
+                            if(count >= len)
+                            {
+                                callback(undefined, epList);
+                            }
+                        }
                     })
                 }
                 else
                 {
-                    backendHandler.GetAllUserDataForExt(reqId, fm.DestinationNumber, tenantId, function (err, extDetails)
+                    backendHandler.GetAllDataForExt(reqId, fm.DestinationNumber, tenantId, 'USER', function (err, extDetails)
                     {
 
                         if (!err && extDetails)
@@ -93,7 +102,26 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
                                     callback(undefined, epList);
                                 }
                             }
+                            else
+                            {
+                                count++;
+
+                                if(count >= len)
+                                {
+                                    callback(undefined, epList);
+                                }
+                            }
                         }
+                        else
+                        {
+                            count++;
+
+                            if(count >= len)
+                            {
+                                callback(undefined, epList);
+                            }
+                        }
+
                     });
                     //Get User Info for extension
 
@@ -171,7 +199,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                         Origination: rule.ANI,
                                         OriginationCallerIdNumber: rule.ANI,
                                         Destination: rule.DNIS,
-                                        Domain: rule.Domain,
+                                        Domain: rule.IpUrl,
                                         OutLimit: rule.OutLimit,
                                         BothLimit: rule.BothLimit,
                                         TrunkNumber: rule.TrunkNumber,
@@ -1212,7 +1240,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         Origination: rule.ANI,
                                                         OriginationCallerIdNumber: rule.ANI,
                                                         Destination: rule.DNIS,
-                                                        Domain: rule.Domain,
+                                                        Domain: rule.IpUrl,
                                                         OutLimit: rule.OutLimit,
                                                         BothLimit: rule.BothLimit,
                                                         TrunkNumber: rule.TrunkNumber,

@@ -505,7 +505,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                             BypassMedia: false,
                                                             LegTimeout: rule.Timeout,
                                                             Destination: rule.DNIS,
-                                                            Domain: rule.Domain
+                                                            Domain: rule.IpUrl
                                                         };
 
                                                         if(dodActive && dodNumber)

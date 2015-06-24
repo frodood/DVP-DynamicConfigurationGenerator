@@ -1248,9 +1248,13 @@ var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, dest
 
             var dnis = '';
 
-            if (domain)
+            if (ep.Domain)
             {
                 dnis = util.format('%s@%s', ep.Destination, ep.Domain);
+            }
+            else
+            {
+                dnis = util.format('%s', ep.Destination);
             }
 
             var protocol = 'sofia';
@@ -1258,7 +1262,7 @@ var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, dest
 
             cond.ele('action').att('application', 'set').att('data', bypassMed)
                 .up()
-                ele('action').att('application', 'bridge').att('data', calling)
+                .ele('action').att('application', 'bridge').att('data', calling)
                 .up()
 
         });

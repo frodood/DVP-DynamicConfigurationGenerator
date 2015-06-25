@@ -71,7 +71,7 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
                         }
                     })
                 }
-                else
+                else if(fm.ObjCategory === 'PBXUSER' || fm.ObjCategory === 'USER')
                 {
                     backendHandler.GetAllDataForExt(reqId, fm.DestinationNumber, tenantId, 'USER', function (err, extDetails)
                     {
@@ -123,7 +123,15 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
                         }
 
                     });
-                    //Get User Info for extension
+                }
+                else
+                {
+                    count++;
+
+                    if(count >= len)
+                    {
+                        callback(undefined, epList);
+                    }
 
                 }
             }

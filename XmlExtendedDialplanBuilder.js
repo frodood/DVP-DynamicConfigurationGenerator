@@ -1010,19 +1010,25 @@ var CreateForwardingDialplan = function(reqId, endpoint, context, profile, desti
 
 var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia)
 {
-    try {
-        if (!destinationPattern) {
+    try
+    {
+        if (!destinationPattern)
+        {
             destinationPattern = "";
         }
 
-        if (!context) {
+        if (!context)
+        {
             context = "";
         }
 
         var ignoreEarlyM = "ignore_early_media=false";
-        if (ignoreEarlyMedia) {
+        if (ignoreEarlyMedia)
+        {
             ignoreEarlyM = "ignore_early_media=true";
         }
+
+        var bypassMed = 'bypass_media=false';
 
         var doc = xmlBuilder.create('document');
 
@@ -1053,19 +1059,19 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
 
 
         var option = '';
-        var bypassMed = 'bypass_media=false';
 
         var destinationGroup = util.format('gateway/%s', ep.Profile);
 
         if (ep.LegStartDelay > 0)
-            option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
+            option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain);
         else
-            option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
+            option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain);
 
 
         var dnis = '';
 
-        if (ep.Domain) {
+        if (ep.Domain)
+        {
             dnis = util.format('%s@%s', ep.Destination, ep.Domain);
         }
 

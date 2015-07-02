@@ -246,7 +246,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                 {
                                                     var app = rule.Application;
 
-                                                    logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call rule has a developer app', reqId);
+                                                    logger.info('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call rule has a app', reqId);
 
                                                     if(rule.Application.MasterApplication && rule.Application.MasterApplication.Availability && rule.Application.MasterApplication.Url)
                                                     {

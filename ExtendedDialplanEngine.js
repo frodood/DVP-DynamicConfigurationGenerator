@@ -147,7 +147,7 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
     }
 };
 
-var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, context, direction, extraData, companyId, tenantId, disconReason, fwdId, securityToken, callback)
+var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, context, direction, extraData, companyId, tenantId, disconReason, fwdId, dodNumber, securityToken, callback)
 {
     try
     {
@@ -215,6 +215,13 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                         CompanyId: rule.CompanyId,
                                         TenantId: rule.TenantId
                                     };
+
+                                    if(dodNumber)
+                                    {
+                                        ep.Origination = dodNumber;
+                                        ep.OriginationCallerIdNumber = dodNumber;
+                                    }
+
                                     var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false);
 
                                     callback(undefined, xml);
@@ -961,7 +968,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     }
                                                     else
                                                     {
-                                                        var pbxObj = JSON.parse(pbxDetails);
+                                                        var pbxObj = pbxDetails;
 
                                                         if(pbxObj)
                                                         {
@@ -1360,7 +1367,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                         else
                         {
 
-                            extApi.RemoteGetDialplanConfig(reqId, ani, dnis, context, direction, undefined, variableUserId, undefined, undefined, url, securityToken, function(err, pbxDetails)
+                            extApi.RemoteGetDialplanConfig(reqId, ani, dnis, context, direction, undefined, fromUserUuid, undefined, undefined, url, securityToken, function(err, pbxDetails)
                             {
                                 if(err || !pbxDetails)
                                 {
@@ -1368,7 +1375,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                 }
                                 else
                                 {
-                                    var pbxObj = JSON.parse(pbxDetails);
+                                    var pbxObj = pbxDetails;
 
                                     if(pbxObj)
                                     {

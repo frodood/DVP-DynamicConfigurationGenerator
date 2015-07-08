@@ -10,7 +10,6 @@ var ruleHandler = require('DVP-RuleService/CallRuleBackendOperations.js');
 var redisHandler = require('./RedisHandler.js');
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 var extDialplanEngine = require('./ExtendedDialplanEngine.js');
-var testEml = require('./XmlExtendedDialplanBuilder.js');
 
 
 var hostIp = config.Host.Ip;
@@ -31,26 +30,11 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
-server.post('/RedisPublisher', function(req, res, next)
-{
-    var message = JSON.stringify(req.body);
-    redisHandler.PublishToRedis('DVPEVENTS', message, function(err, result)
-    {
-        res.end();
-    })
-});
-
-
 
 server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', function(req,res,next)
 {
 
     var reqId = nodeUuid.v1();
-
-    //extDialplanEngine.ProcessExtendedDialplan(reqId, '99999', '1000', 'TestContext', 'OUT', 'xxx', 1, 3, '3434', function(err, ss)
-   //{
-
-    //})
 
     try
     {
@@ -99,7 +83,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                     var contextCompany = undefined;
                     var contextTenant = undefined;
 
-                    if(ctxt && ctxt.ContextCat.toUpperCase() === "INTERNAL")
+                    if(ctxt && ctxt.ContextCat && ctxt.ContextCat.toUpperCase() === "INTERNAL")
                     {
                         direction = 'OUT';
                         contextCompany = ctxt.CompanyId;
@@ -154,7 +138,12 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                         var dodNumber = dnisSplitArr[5];
                         var dodActive = dnisSplitArr[6];
 
-                        extDialplanEngine.ProcessCallForwarding(reqId, aniNum, dnisNum, domain, callerContext, direction, data, companyId, tenantId, disconReason, fwdId, '', function(err, xml)
+                        if(!dodActive || !dodNumber)
+                        {
+                            dodNumber = '';
+                        }
+
+                        extDialplanEngine.ProcessCallForwarding(reqId, aniNum, dnisNum, domain, callerContext, direction, data, companyId, tenantId, disconReason, fwdId, dodNumber, '', function(err, xml)
                         {
                             if(err)
                             {
@@ -468,9 +457,9 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                         dodNumber = fromUsr.Extension.DodNumber;
                                     }
 
-                                    if(fromUsr && fromUsr.UserUuid)
+                                    if(fromUsr && fromUsr.SipUserUuid)
                                     {
-                                        fromUserUuid = fromUsr.UserUuid;
+                                        fromUserUuid = fromUsr.SipUserUuid;
                                     }
                                 }
 

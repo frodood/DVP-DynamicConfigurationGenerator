@@ -168,7 +168,17 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
             }
 
             var protocol = 'sofia';
-            var calling = util.format('%s%s/%s/%s', option, protocol, destinationGroup, dnis);
+            var calling = '';
+
+            if(ep.Type === 'GATEWAY')
+            {
+                calling = util.format('%s%s/%s/%s', option, protocol, destinationGroup, dnis);
+            }
+            else
+            {
+                calling = util.format('%s%s/%s', option, destinationGroup, dnis);
+            }
+
 
             cond.ele('action').att('application', 'conference_set_auto_outcall').att('data', calling)
                 .up()
@@ -261,7 +271,7 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
             destinationGroup = 'group';
         }
 
-        var calling = util.format('%s/%s/%s', option, destinationGroup, dnis);
+        var calling = util.format('%s%s/%s', option, destinationGroup, dnis);
 
         if(ep.Type === 'USER')
         {
@@ -525,7 +535,7 @@ var CreateRouteFaxUserDialplan = function(reqId, ep, context, profile, destinati
         var destinationGroup = 'user';
 
 
-        var calling = util.format('%s/%s/%s', option, protocol, destinationGroup, dnis);
+        var calling = util.format('%s%s/%s', option, protocol, destinationGroup, dnis);
 
         if(ep.Type === 'USER')
         {
@@ -921,7 +931,7 @@ var CreateForwardingDialplan = function(reqId, endpoint, context, profile, desti
         var protocol = 'sofia';
         var destinationGroup = 'user';
 
-        var calling = util.format('%s/%s/%s', option, destinationGroup, dnis);
+        var calling = util.format('%s%s/%s', option, destinationGroup, dnis);
 
         if (endpoint.Group)
         {
@@ -1272,7 +1282,7 @@ var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, dest
             }
             else
             {
-                calling = util.format('%s/%s/%s', option, destinationGroup, dnis);
+                calling = util.format('%s%s/%s', option, destinationGroup, dnis);
             }
 
 

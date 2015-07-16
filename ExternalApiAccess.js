@@ -62,6 +62,7 @@ var RemoteGetSipUserDetailsForExtension = function(reqId, extension, securityTok
     try
     {
         logger.debug('[DVP-PBXService.RemoteGetSipUserDetailsForExtension] - [%s] -  Trying to get Sip User Details From Api - Params - extension : %s', reqId, extension);
+
         var sipUACIp = config.Services.SipUACApi.Ip;
         var sipUACPort = config.Services.SipUACApi.Port;
         var apiVersion = config.Services.SipUACApi.Version;

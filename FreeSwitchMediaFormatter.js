@@ -1,10 +1,19 @@
-var convertUrlEncoded = function(payload) {
-
-    var keyValArr = payload.split('&');
+var convertUrlEncoded = function(payload)
+{
     var obj = {};
-    for (var i = 0; i < keyValArr.length; i++) {
-        var bits = keyValArr[i].split('=');
-        obj[bits[0]] = bits[1];
+
+    try
+    {
+        var keyValArr = payload.split('&');
+
+        for (var i = 0; i < keyValArr.length; i++) {
+            var bits = keyValArr[i].split('=');
+            obj[bits[0]] = bits[1];
+        }
+    }
+    catch(ex)
+    {
+
     }
 
     return obj;

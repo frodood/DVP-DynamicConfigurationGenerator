@@ -75,6 +75,8 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                     logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - get context fail', reqId, err);
                     var xml = xmlGen.createNotFoundResponse();
 
+                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
                     res.end(xml);
                 }
                 else //Same dialplan for all - only use context to find direction
@@ -88,9 +90,15 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                         direction = 'OUT';
                         contextCompany = ctxt.CompanyId;
                         contextTenant = ctxt.TenantId;
+
+                        logger.info('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - context found category INTERNAL', reqId);
+                    }
+                    else
+                    {
+                        logger.info('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - context found category PUBLIC', reqId);
                     }
 
-                    logger.info('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - context found category PUBLIC', reqId);
+
                     var decodedSipFromUri = decodeURIComponent(varSipFromUri);
                     var decodedSipToUri = decodeURIComponent(varSipToUri);
 
@@ -149,6 +157,8 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                             {
                                 logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - GetPhoneNumberDetails returned exception', reqId, err);
                                 var xml = xmlGen.createNotFoundResponse();
+
+                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
                                 res.end(xml);
                             }

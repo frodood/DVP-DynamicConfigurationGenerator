@@ -893,6 +893,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                         }
                         else if(extInfo)
                         {
+                            logger.debug('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extension found', reqId);
                             backendHandler.GetAllDataForExt(reqId, dnisNum, tenantId, extInfo.ObjCategory, function(err, extDetails)
                             {
                                 if(err)
@@ -902,6 +903,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                 }
                                 else if(extDetails)
                                 {
+                                    logger.debug('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extension Category : %s', reqId, extDetails.ObjCategory);
                                     toFaxType = extDetails.ExtraData;
                                     if(extDetails.ObjCategory === 'USER')
                                     {
@@ -1366,6 +1368,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                         }
                         else
                         {
+                            logger.debug('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extension not found', reqId);
 
                             extApi.RemoteGetDialplanConfig(reqId, ani, dnis, context, direction, undefined, fromUserUuid, undefined, undefined, url, securityToken, function(err, pbxDetails)
                             {

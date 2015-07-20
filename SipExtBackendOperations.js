@@ -303,7 +303,7 @@ var GetGatewayListForCallServerProfile = function(profile, csId, reqId, callback
         var gatewayList = [];
 
         dbModel.SipNetworkProfile
-            .find({where :[{ProfileName: profile},{ObjType: 'EXTERNAL'}], include: [{model: dbModel.CallServer, as: "CallServer", where:[{Code: csId}]},{model: dbModel.Trunk, as: "Trunk"}]})
+            .find({where :[{ProfileName: profile},{ObjType: 'EXTERNAL'}], include: [{model: dbModel.CallServer, as: "CallServer", where:[{id: csId}]},{model: dbModel.Trunk, as: "Trunk"}]})
             .complete(function (err, result)
             {
                 try

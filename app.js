@@ -226,7 +226,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                         logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - GetPhoneNumberDetails returned num obj : %j', reqId, JSON.stringify(num));
 
                                         logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, dnisNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, aniNum, dnisNum, domain, num.CompanyId, num.TenantId);
-                                        ruleHandler.PickCallRuleInbound(aniNum, dnisNum, domain, callerContext, num.CompanyId, num.TenantId, function(err, rule)
+                                        ruleHandler.PickCallRuleInbound(reqId, aniNum, dnisNum, domain, callerContext, num.CompanyId, num.TenantId, function(err, rule)
                                         {
                                             if(err)
                                             {
@@ -336,9 +336,10 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                         else if(masterApp.ObjType === 'EXTENDED')
                                                         {
                                                             data.DVPAppUrl = masterApp.Url;
+                                                            data.AppId = masterApp.id;
                                                             extDialplanEngine.ProcessExtendedDialplan(reqId, decodedSipFromUri, decodedSipToUri, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, 'test', NumLimitInfo, function(err, extDialplan)
                                                             {
-                                                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan created - Response Sent : : %s', reqId, extDialplan);
+                                                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan created - Response Sent : ', reqId, extDialplan);
                                                                 res.end(extDialplan);
                                                             })
                                                         }
@@ -378,6 +379,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                         else if(app.ObjType === 'EXTENDED')
                                                         {
                                                             data.DVPAppUrl = app.Url;
+                                                            data.AppId = app.id;
                                                             extDialplanEngine.ProcessExtendedDialplan(reqId, decodedSipFromUri, decodedSipToUri, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, 'test', NumLimitInfo, function(err, extDialplan)
                                                             {
                                                                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan created - Response Sent : : %s', reqId, extDialplan);
@@ -474,7 +476,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                 }
 
                                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, dnisNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, aniNum, dnisNum, domain, contextCompany, contextTenant);
-                                ruleHandler.PickCallRuleInbound(aniNum, dnisNum, domain, callerContext, contextCompany, contextTenant, function(err, rule)
+                                ruleHandler.PickCallRuleInbound(reqId, aniNum, dnisNum, domain, callerContext, contextCompany, contextTenant, function(err, rule)
                                 {
                                     if(err)
                                     {
@@ -620,6 +622,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                         else if(masterApp.ObjType === 'EXTENDED')
                                                         {
                                                             data.DVPAppUrl = masterApp.Url;
+                                                            data.AppId = masterApp.id;
                                                             extDialplanEngine.ProcessExtendedDialplan(reqId, decodedSipFromUri, decodedSipToUri, callerContext, direction, data, fromUsr, rule.CompanyId, rule.TenantId, 'test', undefined, function(err, extDialplan)
                                                             {
                                                                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan created - Response Sent : : %s', reqId, extDialplan);
@@ -660,6 +663,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                         else if(app.ObjType === 'EXTENDED')
                                                         {
                                                             data.DVPAppUrl = app.Url;
+                                                            data.AppId = app.id;
                                                             extDialplanEngine.ProcessExtendedDialplan(reqId, decodedSipFromUri, decodedSipToUri, callerContext, direction, data, fromUsr, rule.CompanyId, rule.TenantId, 'test', undefined, function(err, extDialplan)
                                                             {
                                                                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan created - Response Sent : : %s', reqId, extDialplan);

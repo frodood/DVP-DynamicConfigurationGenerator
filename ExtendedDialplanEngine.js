@@ -25,7 +25,7 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
                 if (fm.ObjCategory === 'GATEWAY')
                 {
                     //pick outbound rule
-                    ruleHandler.PickCallRuleOutboundComplete(aniNum, fm.DestinationNumber, '', context, companyId, tenantId, false, function (err, rule)
+                    ruleHandler.PickCallRuleOutboundComplete(reqId, aniNum, fm.DestinationNumber, '', context, companyId, tenantId, false, function (err, rule)
                     {
                         if (!err && rule)
                         {
@@ -189,7 +189,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                         if(fwdRule.ObjCategory === 'GATEWAY')
                         {
                             //pick outbound rule
-                            ruleHandler.PickCallRuleOutboundComplete(aniNum, fwdRule.Destination, '', context, companyId, tenantId, false, function(err, rule)
+                            ruleHandler.PickCallRuleOutboundComplete(reqId, aniNum, fwdRule.Destination, '', context, companyId, tenantId, false, function(err, rule)
                             {
                                 if(err)
                                 {
@@ -595,7 +595,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     if (pbxObj.Endpoints && pbxObj.Endpoints.ObjCategory === 'GATEWAY')
                                                     {
                                                         //pick outbound rule
-                                                        ruleHandler.PickCallRuleOutboundComplete(aniNum, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, function (err, rule)
+                                                        ruleHandler.PickCallRuleOutboundComplete(reqId, aniNum, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, function (err, rule)
                                                         {
                                                             if (!err && rule)
                                                             {
@@ -1091,7 +1091,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 if (pbxObj.Endpoints && pbxObj.Endpoints.ObjCategory === 'GATEWAY')
                                                                 {
                                                                     //pick outbound rule
-                                                                    ruleHandler.PickCallRuleOutboundComplete(aniNum, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, function (err, rule)
+                                                                    ruleHandler.PickCallRuleOutboundComplete(reqId, aniNum, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, function (err, rule)
                                                                     {
                                                                         if (!err && rule)
                                                                         {
@@ -1397,7 +1397,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         if(operationType === 'GATEWAY')
                                         {
                                             //xml DND response
-                                            ruleHandler.PickCallRuleOutboundComplete(aniNum, dnisNum, '', context, companyId, tenantId, true, function(err, rule)
+                                            ruleHandler.PickCallRuleOutboundComplete(reqId, aniNum, dnisNum, '', context, companyId, tenantId, true, function(err, rule)
                                             {
                                                 if(err)
                                                 {

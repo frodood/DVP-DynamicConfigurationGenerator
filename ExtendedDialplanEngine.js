@@ -1390,9 +1390,6 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         var voicemailEnabled = pbxObj.VoicemailEnabled;
                                         var bypassMedia = pbxObj.BypassMedia;
 
-                                        var dodNumber = undefined;
-                                        var dodActive = undefined;
-
                                         var grp = '';
 
                                         var domain = '';
@@ -1532,7 +1529,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                             if(extraData)
                                             {
-                                                backendHandler.GetAllUserDataForExt(reqId, extraData, tenantId, 'USER', function(err, extDetails)
+                                                backendHandler.GetAllDataForExt(reqId, extraData, tenantId, 'USER', function(err, extDetails)
                                                 {
                                                     if(err || !extDetails || !extDetails.SipUACEndpoint || !extDetails.SipUACEndpoint.CloudEndUser)
                                                     {

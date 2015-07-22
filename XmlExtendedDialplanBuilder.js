@@ -337,27 +337,26 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
         }
 
 
-        cond.ele('action').att('application', 'bridge').att('data', calling)
-            .up()
-
-        if(ep.PersonalGreeting || ep.IsVoicemailEnabled)
-        {
-            cond.ele('action').att('application', 'answer')
-                .up()
-        }
-
-
         if(ep.PersonalGreeting)
         {
-            var greetingPath = 'sounds/' + ep.PersonalGreeting;
-            cond.ele('action').att('application', 'playback').att('data', greetingPath)
-                .up()
+            var personalGreetingExportVar = util.format('nolocal:api_on_answer=uuid_broadcast ${uuid} %s both', ep.PersonalGreeting);
+            cond.ele('action').att('application', 'export').att('data', personalGreetingExportVar)
+            .up()
+            //var greetingPath = 'sounds/' + ep.PersonalGreeting;
+            //.ele('action').att('application', 'playback').att('data', greetingPath)
+            //    .up()
         }
+
+        cond.ele('action').att('application', 'bridge').att('data', calling)
+            .up()
 
 
 
         if(ep.IsVoicemailEnabled)
         {
+            cond.ele('action').att('application', 'answer')
+                .up()
+
             cond.ele('action').att('application', 'voicemail').att('data', util.format('default %s %s', ep.Domain, ep.Destination))
                 .up()
         }

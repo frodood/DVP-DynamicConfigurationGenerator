@@ -111,7 +111,7 @@ var RemoteGetSipUserDetailsForExtension = function(reqId, extension, securityTok
     }
 };
 
-var RemoteGetDialplanConfig = function(reqId, ani, dnis, context, direction, userUuid, fromUserUuid, opType, extExtraData, url, securityToken, callback)
+var RemoteGetDialplanConfig = function(reqId, ani, dnis, context, direction, userUuid, fromUserUuid, opType, extExtraData, appId, url, securityToken, callback)
 {
     try
     {
@@ -120,7 +120,7 @@ var RemoteGetDialplanConfig = function(reqId, ani, dnis, context, direction, use
 
             var httpUrl = url;
 
-            var jsonObj = { ANI: ani, DNIS: dnis, Context: context, Direction: direction, ExtraData: {UserUuid: userUuid, FromUserUuid: fromUserUuid, OperationType: opType, ExtExtraData: extExtraData} };
+            var jsonObj = { ANI: ani, DNIS: dnis, Context: context, Direction: direction, ExtraData: {UserUuid: userUuid, FromUserUuid: fromUserUuid, OperationType: opType, ExtExtraData: extExtraData, AppId: appId} };
 
             var jsonStr = JSON.stringify(jsonObj);
 

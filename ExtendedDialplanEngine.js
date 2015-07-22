@@ -1368,12 +1368,13 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                         }
                         else
                         {
-                            logger.debug('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extension not found', reqId);
+                            logger.debug('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Out call DNIS is not an extension', reqId);
 
                             extApi.RemoteGetDialplanConfig(reqId, ani, dnis, context, direction, undefined, fromUserUuid, undefined, undefined, url, securityToken, function(err, pbxDetails)
                             {
-                                if(err || !pbxDetails)
+                                if(err)
                                 {
+                                    logger.error('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extended App Returned Error', reqId, err);
                                     callback(err, xmlBuilder.createNotFoundResponse());
                                 }
                                 else
@@ -1382,6 +1383,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                     if(pbxObj)
                                     {
+                                        logger.debug('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extended App Returned : ', reqId, pbxObj);
                                         var operationType = pbxObj.OperationType;
                                         var voicemailEnabled = pbxObj.VoicemailEnabled;
                                         var bypassMedia = pbxObj.BypassMedia;
@@ -1392,7 +1394,6 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         var grp = '';
 
                                         var domain = '';
-
 
                                         if(operationType === 'GATEWAY')
                                         {
@@ -1546,13 +1547,15 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         }
                                         else
                                         {
-                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                            logger.error('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Unsupported Operation Type Returned From Extended App', reqId);
+                                            callback(new Error('Unsupported Operation Type Returned From Extended App'), xmlBuilder.createNotFoundResponse());
                                         }
 
                                     }
                                     else
                                     {
-                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                        logger.error('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extended App Returned Empty Result', reqId);
+                                        callback(undefined, xmlBuilder.createNotFoundResponse());
                                     }
                                 }
                             })

@@ -499,7 +499,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         Profile: profile,
                                                         Type: 'USER',
                                                         LegStartDelay: 0,
-                                                        BypassMedia: bypassMedia,
+                                                        BypassMedia: false,
                                                         LegTimeout: 60,
                                                         Origination: callerIdName,
                                                         OriginationCallerIdNumber: callerIdNum,
@@ -560,7 +560,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             Profile: profile,
                                                             Type: 'USER',
                                                             LegStartDelay: 0,
-                                                            BypassMedia: bypassMedia,
+                                                            BypassMedia: false,
                                                             LegTimeout: 60,
                                                             Origination: callerIdName,
                                                             OriginationCallerIdNumber: callerIdNum,
@@ -639,7 +639,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         Profile: '',
                                                                         Type: 'USER',
                                                                         LegStartDelay: 0,
-                                                                        BypassMedia: pbxObj.Endpoints.BypassMedia,
+                                                                        BypassMedia: false,
                                                                         LegTimeout: 60,
                                                                         Origination: callerIdName,
                                                                         OriginationCallerIdNumber: callerIdNum,
@@ -686,7 +686,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         Profile: profile,
                                                         Type: 'USER',
                                                         LegStartDelay: 0,
-                                                        BypassMedia: bypassMedia,
+                                                        BypassMedia: false,
                                                         LegTimeout: 60,
                                                         Origination: callerIdName,
                                                         OriginationCallerIdNumber: callerIdNum,
@@ -1430,6 +1430,11 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         CompanyId: rule.CompanyId,
                                                         TenantId: rule.TenantId
                                                     };
+
+                                                    if(dodActive && dodNumber)
+                                                    {
+                                                        ep.TrunkNumber = dodNumber;
+                                                    }
 
                                                     if(toFaxType)
                                                     {

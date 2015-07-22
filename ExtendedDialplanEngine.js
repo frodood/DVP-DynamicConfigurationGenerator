@@ -424,7 +424,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                     if(url)
                                     {
-                                        extApi.RemoteGetDialplanConfig(reqId, ani, dnis, context, direction, extDetails.SipUACEndpoint.SipUserUuid, undefined, extDetails.ObjCategory, undefined, url, securityToken, function(err, pbxDetails)
+                                        extApi.RemoteGetDialplanConfig(reqId, aniNum, dnisNum, context, direction, extDetails.SipUACEndpoint.SipUserUuid, undefined, extDetails.ObjCategory, undefined, url, securityToken, function(err, pbxDetails)
                                         {
                                             if(err)
                                             {
@@ -925,7 +925,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             if(url)
                                             {
                                                 //Check extension type and handle accordingly
-                                                extApi.RemoteGetDialplanConfig(reqId, ani, dnis, context, direction, extDetails.SipUACEndpoint.SipUserUuid, fromUserUuid, extDetails.ObjCategory, undefined, url, securityToken, function(err, pbxDetails)
+                                                extApi.RemoteGetDialplanConfig(reqId, aniNum, dnisNum, context, direction, extDetails.SipUACEndpoint.SipUserUuid, fromUserUuid, extDetails.ObjCategory, undefined, url, securityToken, function(err, pbxDetails)
                                                 {
                                                     if(err)
                                                     {
@@ -1332,7 +1332,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                     }
                                     else if(extDetails.ObjCategory === 'VOICE_PORTAL')
                                     {
-                                        extApi.RemoteGetDialplanConfig(reqId, ani, dnis, context, direction, undefined, fromUserUuid, extDetails.ObjCategory, extDetails.ExtraData, url, securityToken, function(err, pbxDetails)
+                                        extApi.RemoteGetDialplanConfig(reqId, aniNum, dnisNum, context, direction, undefined, fromUserUuid, extDetails.ObjCategory, extDetails.ExtraData, url, securityToken, function(err, pbxDetails)
                                         {
                                             if(err)
                                             {
@@ -1370,7 +1370,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                         {
                             logger.debug('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Out call DNIS is not an extension', reqId);
 
-                            extApi.RemoteGetDialplanConfig(reqId, ani, dnis, context, direction, undefined, fromUserUuid, undefined, undefined, url, securityToken, function(err, pbxDetails)
+                            extApi.RemoteGetDialplanConfig(reqId, aniNum, dnisNum, context, direction, undefined, fromUserUuid, undefined, undefined, url, securityToken, function(err, pbxDetails)
                             {
                                 if(err)
                                 {

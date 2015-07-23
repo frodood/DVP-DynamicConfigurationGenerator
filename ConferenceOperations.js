@@ -184,7 +184,7 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                     else
                     {
                         logger.debug('[DVP-DynamicConfigurationGenerator.ConferenceHandlerOperation] - [%s] - Conference Direction OUT', reqId);
-                        if(ext.Conference.ConferenceUser && ext.ConferenceUser.length > 0)
+                        if(ext.Conference.ConferenceUser && ext.Conference.ConferenceUser.length > 0)
                         {
                             var usr = underscore.find(ext.Conference.ConferenceUser, function(confUser){return confUser.SipUACEndpoint.UserUuid === fromUserUuid});
 
@@ -192,7 +192,7 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                             {
                                 //allowed user
 
-                                var dialOutUsers = underscore.filter(ext.Conference.ConferenceUser, function(usr){return usr.JoinType === 'Out' && usr.UserStatus != 'JOINED'});
+                                var dialOutUsers = underscore.filter(ext.Conference.ConferenceUser, function(usr){return usr.JoinType === 'OUT' && usr.UserStatus != 'JOINED'});
 
                                 var epList = CreateConferenceEndpointList(reqId, context, companyId, tenantId, dialOutUsers, ext.Extension);
 

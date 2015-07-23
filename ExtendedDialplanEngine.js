@@ -891,8 +891,13 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                         fromFaxType = fromUserData.Extension.ExtraData;
                     }
 
-                    var dodNumber = fromUserData.Extension.DodNumber;
-                    var dodActive = fromUserData.Extension.DodActive;
+                    var dodNumber = undefined;
+                    var dodActive = undefined;
+                    if(fromUserData.Extension)
+                    {
+                        dodNumber = fromUserData.Extension.DodNumber;
+                        dodActive = fromUserData.Extension.DodActive;
+                    }
 
                     //Get to user
                     backendHandler.GetExtensionDB(reqId, dnisNum, tenantId, function(err, extInfo)
@@ -1597,7 +1602,6 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
     }
 }
-
 
 module.exports.ProcessExtendedDialplan = ProcessExtendedDialplan;
 module.exports.ProcessCallForwarding = ProcessCallForwarding;

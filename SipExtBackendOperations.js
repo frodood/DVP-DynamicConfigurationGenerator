@@ -160,6 +160,7 @@ var GetAllDataForExt = function(reqId, extension, tenantId, extType, callback)
         }
         else if(extType === 'CONFERENCE')
         {
+            logger.debug('----------------------------------------------------' + extType);
             dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}], include: [{model: dbModel.Conference, as:'Conference', include : [{model: dbModel.ConferenceUser, as : 'ConferenceUser', include:[{model: dbModel.SipUACEndpoint, as: 'SipUACEndpoint'}]},{model: dbModel.CloudEndUser, as: 'CloudEndUser'}]}]})
                 .complete(function (err, extData)
                 {
@@ -657,6 +658,7 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
 
 
 };
+
 
 module.exports.GetUserBy_Name_Domain = GetUserBy_Name_Domain;
 module.exports.GetUserBy_Ext_Domain = GetUserBy_Ext_Domain;

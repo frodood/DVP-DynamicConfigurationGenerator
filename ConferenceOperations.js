@@ -1,6 +1,7 @@
 var underscore = require('underscore');
 var xmlBuilder = require('./XmlExtendedDialplanBuilder.js');
 var xBuilder = require('./XmlResponseGenerator.js');
+var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 var CreateConferenceEndpointList = function(reqId, context, companyId, tenantId, dialOutUsers, confExt, callback)
 {
@@ -108,7 +109,7 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
             logger.debug('[DVP-DynamicConfigurationGenerator.ConferenceHandlerOperation] - [%s] - Checking Conference Time', reqId);
             var curTime = new Date();
 
-            if(ext.Conference.StartDate <= curTime && ext.Conference.EndDate >= curTime)
+            if(ext.Conference.StartTime <= curTime && ext.Conference.EndTime >= curTime)
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.ConferenceHandlerOperation] - [%s] - Checking Conference Time OK', reqId);
                 var maxUsers = 0;

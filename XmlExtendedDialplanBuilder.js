@@ -122,68 +122,71 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
         cond.ele('action').att('application', 'set').att('data', 'ringback=${us-ring}')
             .up()
 
-        epList.forEach(function(ep)
+        if(epList)
         {
-            var option = '';
-            var destinationGroup = '';
-            var bypassMed = 'bypass_media=false';
-
-
-            if(ep.Type === 'GATEWAY')
+            epList.forEach(function(ep)
             {
-                destinationGroup = util.format('gateway/%s', ep.Profile);
+                var option = '';
+                var destinationGroup = '';
+                var bypassMed = 'bypass_media=false';
 
-                if (ep.LegStartDelay > 0)
-                    option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
-                else
-                    option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
 
-                bypassMed = 'bypass_media=false';
-            }
-            else
-            {
-                destinationGroup = 'user';
-
-                if (ep.LegStartDelay > 0)
-                    option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
-                else
-                    option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
-
-                if(ep.BypassMedia)
+                if(ep.Type === 'GATEWAY')
                 {
-                    bypassMed = 'bypass_media=true';
-                }
-                else
-                {
+                    destinationGroup = util.format('gateway/%s', ep.Profile);
+
+                    if (ep.LegStartDelay > 0)
+                        option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
+                    else
+                        option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
+
                     bypassMed = 'bypass_media=false';
                 }
+                else
+                {
+                    destinationGroup = 'user';
 
-            }
+                    if (ep.LegStartDelay > 0)
+                        option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
+                    else
+                        option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
 
-            var dnis = '';
+                    if(ep.BypassMedia)
+                    {
+                        bypassMed = 'bypass_media=true';
+                    }
+                    else
+                    {
+                        bypassMed = 'bypass_media=false';
+                    }
 
-            if (domain)
-            {
-                dnis = util.format('%s@%s', ep.Destination, ep.Domain);
-            }
+                }
 
-            var protocol = 'sofia';
-            var calling = '';
+                var dnis = '';
 
-            if(ep.Type === 'GATEWAY')
-            {
-                calling = util.format('%s%s/%s/%s', option, protocol, destinationGroup, dnis);
-            }
-            else
-            {
-                calling = util.format('%s%s/%s', option, destinationGroup, dnis);
-            }
+                if (domain)
+                {
+                    dnis = util.format('%s@%s', ep.Destination, ep.Domain);
+                }
+
+                var protocol = 'sofia';
+                var calling = '';
+
+                if(ep.Type === 'GATEWAY')
+                {
+                    calling = util.format('%s%s/%s/%s', option, protocol, destinationGroup, dnis);
+                }
+                else
+                {
+                    calling = util.format('%s%s/%s', option, destinationGroup, dnis);
+                }
 
 
-            cond.ele('action').att('application', 'conference_set_auto_outcall').att('data', calling)
-                .up()
+                cond.ele('action').att('application', 'conference_set_auto_outcall').att('data', calling)
+                    .up()
 
-        });
+            });
+        }
 
         if(mode)
         {

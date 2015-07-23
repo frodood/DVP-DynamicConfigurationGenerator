@@ -2,6 +2,7 @@ var underscore = require('underscore');
 var xmlBuilder = require('./XmlExtendedDialplanBuilder.js');
 var xBuilder = require('./XmlResponseGenerator.js');
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
+var ruleBackendHandler = require('DVP-RuleService/CallRuleBackendOperations.js');
 
 var CreateConferenceEndpointList = function(reqId, context, companyId, tenantId, dialOutUsers, confExt, callback)
 {
@@ -11,16 +12,16 @@ var CreateConferenceEndpointList = function(reqId, context, companyId, tenantId,
         var len = dialOutUsers.length;
         var count = 0;
 
-        if(dialOutUsers)
+        if(dialOutUsers && dialOutUsers.length > 0)
         {
             dialOutUsers.forEach(function(dOutUsr)
             {
                 if(count < len)
                 {
-                    if (dOutUsr.ObjCategory === 'External')
+                    if (dOutUsr.ObjCategory === 'EXTERNAL')
                     {
                         //pick outbound rule with destination as dnis
-                        ruleBackendHandler.PickCallRuleOutboundComplete('', dOutUsr.Destination, '', context, companyId, tenantId, false, function (err, rule) {
+                        ruleBackendHandler.PickCallRuleOutboundComplete(reqId, '', dOutUsr.Destination, '', context, companyId, tenantId, false, function (err, rule) {
                             if (!err && rule)
                             {
                                 var ep =
@@ -39,6 +40,15 @@ var CreateConferenceEndpointList = function(reqId, context, companyId, tenantId,
 
                                 epList.push(ep);
 
+                                count++;
+
+                                if (count >= len)
+                                {
+                                    callback(undefined, epList);
+                                }
+                            }
+                            else
+                            {
                                 count++;
 
                                 if (count >= len)
@@ -70,6 +80,15 @@ var CreateConferenceEndpointList = function(reqId, context, companyId, tenantId,
 
                             epList.push(ep);
 
+                            count++;
+
+                            if (count >= len)
+                            {
+                                callback(undefined, epList);
+                            }
+                        }
+                        else
+                        {
                             count++;
 
                             if (count >= len)
@@ -186,7 +205,7 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                         logger.debug('[DVP-DynamicConfigurationGenerator.ConferenceHandlerOperation] - [%s] - Conference Direction OUT', reqId);
                         if(ext.Conference.ConferenceUser && ext.Conference.ConferenceUser.length > 0)
                         {
-                            var usr = underscore.find(ext.Conference.ConferenceUser, function(confUser){return confUser.SipUACEndpoint.UserUuid === fromUserUuid});
+                            var usr = underscore.find(ext.Conference.ConferenceUser, function(confUser){return confUser.SipUACEndpoint.SipUserUuid === fromUserUuid});
 
                             if(usr)
                             {
@@ -194,44 +213,43 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
 
                                 var dialOutUsers = underscore.filter(ext.Conference.ConferenceUser, function(usr){return usr.JoinType === 'OUT' && usr.UserStatus != 'JOINED'});
 
-                                var epList = CreateConferenceEndpointList(reqId, context, companyId, tenantId, dialOutUsers, ext.Extension);
-
-                                var mode = '';
-                                var isFirst = true;
-
-                                if (usr.Def)
+                                CreateConferenceEndpointList(reqId, context, companyId, tenantId, dialOutUsers, ext.Extension, function(err, epList)
                                 {
-                                    mode = mode + 'deaf';
-                                    isFirst = false;
-                                }
-                                if (usr.Mod)
-                                {
-                                    if(isFirst)
-                                    {
-                                        mode = mode + 'moderator';
-                                    }
-                                    else
-                                    {
-                                        mode = mode + '|moderator';
-                                    }
-                                }
-                                if (usr.Mute)
-                                {
-                                    if(isFirst)
-                                    {
-                                        mode = mode + 'mute';
-                                    }
-                                    else
-                                    {
-                                        mode = mode + '|mute';
-                                    }
-                                }
+                                    var mode = '';
+                                    var isFirst = true;
 
-                                var xml = xmlBuilder.CreateConferenceDialplan(reqId, epList, context, '[^\\s]*', false, conferenceName, conferenceDomain, pin, mode);
+                                    if (usr.Def)
+                                    {
+                                        mode = mode + 'deaf';
+                                        isFirst = false;
+                                    }
+                                    if (usr.Mod)
+                                    {
+                                        if(isFirst)
+                                        {
+                                            mode = mode + 'moderator';
+                                        }
+                                        else
+                                        {
+                                            mode = mode + '|moderator';
+                                        }
+                                    }
+                                    if (usr.Mute)
+                                    {
+                                        if(isFirst)
+                                        {
+                                            mode = mode + 'mute';
+                                        }
+                                        else
+                                        {
+                                            mode = mode + '|mute';
+                                        }
+                                    }
 
-                                callback(undefined, xml);
+                                    var xml = xmlBuilder.CreateConferenceDialplan(reqId, epList, context, '[^\\s]*', false, conferenceName, conferenceDomain, pin, mode);
 
-
+                                    callback(undefined, xml);
+                                });
 
                             }
                             else

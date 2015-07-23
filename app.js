@@ -339,6 +339,10 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                             data.AppId = masterApp.id;
                                                             extDialplanEngine.ProcessExtendedDialplan(reqId, decodedSipFromUri, decodedSipToUri, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, 'test', NumLimitInfo, function(err, extDialplan)
                                                             {
+                                                                if(err)
+                                                                {
+                                                                    logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan Error', reqId, err);
+                                                                }
                                                                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan created - Response Sent : ', reqId, extDialplan);
                                                                 res.end(extDialplan);
                                                             })
@@ -382,6 +386,10 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                             data.AppId = app.id;
                                                             extDialplanEngine.ProcessExtendedDialplan(reqId, decodedSipFromUri, decodedSipToUri, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, 'test', NumLimitInfo, function(err, extDialplan)
                                                             {
+                                                                if(err)
+                                                                {
+                                                                    logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan Error', reqId, err);
+                                                                }
                                                                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan created - Response Sent : : %s', reqId, extDialplan);
                                                                 res.end(extDialplan);
                                                             })
@@ -625,6 +633,10 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                             data.AppId = masterApp.id;
                                                             extDialplanEngine.ProcessExtendedDialplan(reqId, decodedSipFromUri, decodedSipToUri, callerContext, direction, data, fromUsr, rule.CompanyId, rule.TenantId, 'test', undefined, function(err, extDialplan)
                                                             {
+                                                                if(err)
+                                                                {
+                                                                    logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan Error', reqId, err);
+                                                                }
                                                                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan created - Response Sent : : %s', reqId, extDialplan);
                                                                 res.end(extDialplan);
                                                             })
@@ -666,6 +678,10 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                             data.AppId = app.id;
                                                             extDialplanEngine.ProcessExtendedDialplan(reqId, decodedSipFromUri, decodedSipToUri, callerContext, direction, data, fromUsr, rule.CompanyId, rule.TenantId, 'test', undefined, function(err, extDialplan)
                                                             {
+                                                                if(err)
+                                                                {
+                                                                    logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan Error', reqId, err);
+                                                                }
                                                                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan created - Response Sent : : %s', reqId, extDialplan);
                                                                 res.end(extDialplan);
                                                             })

@@ -385,6 +385,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
         //Check for DID
         if(direction === 'IN')
         {
+            logger.debug('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Checking for DID', reqId);
             backendHandler.GetExtensionForDid(reqId, dnisNum, companyId, tenantId, function(err, didRes)
             {
                 if(err)
@@ -393,18 +394,22 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                 }
                 else if(didRes && didRes.Extension)
                 {
-                    logger.info('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - DID FOUND', reqId);
+                    logger.debug('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - DID FOUND - Mapped to extension : %s', reqId, didRes.Extension.Extension);
+
+                    logger.debug('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Trying to get full extension details - Extension : %s, Category : %s', reqId, didRes.Extension.Extension, didRes.Extension.ObjCategory);
 
                     backendHandler.GetAllDataForExt(reqId, didRes.Extension.Extension, tenantId, didRes.Extension.ObjCategory, function(err, extDetails)
                     {
                         if(err)
                         {
                             //return default xml
+                            logger.error('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Error occurred getting AllDataForExt', reqId, err);
+
                             callback(err, xmlBuilder.createNotFoundResponse());
                         }
                         else if(extDetails)
                         {
-                            logger.info('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - TO EXTENSION FOUND - TYPE : %s', reqId, extDetails.ObjCategory);
+                            logger.debug('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - TO EXTENSION FOUND - TYPE : %s', reqId, extDetails.ObjCategory);
                             toFaxType = extDetails.ExtraData;
                             if(extDetails.ObjCategory === 'USER')
                             {
@@ -836,7 +841,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                 }
                                 else
                                 {
-                                    callback(err, xmlBuilder.createNotFoundResponse());
+                                    callback(new Error('Group not found'), xmlBuilder.createNotFoundResponse());
                                 }
 
 
@@ -857,6 +862,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                         }
                         else
                         {
+                            logger.info('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - All Data For Extension Returned Empty Object - TYPE : %s', reqId, didRes.Extension.ObjCategory);
 
                             callback(new Error('Extension not found'), xmlBuilder.createNotFoundResponse());
 
@@ -865,7 +871,9 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                 }
                 else
                 {
+
                     //Check for fax passthru
+                    logger.info('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - DID Not Found Or Not Mapped To an Extension - TYPE : %s', reqId);
                     callback(err, xmlBuilder.createNotFoundResponse());
                 }
             })
@@ -1430,7 +1438,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                                     if(dodActive && dodNumber)
                                                     {
-                                                        ep.TrunkNumber = dodNumber;
+                                                        ep.Origination = dodNumber;
+                                                        ep.OriginationCallerIdNumber = dodNumber;
                                                     }
 
                                                     if(toFaxType)

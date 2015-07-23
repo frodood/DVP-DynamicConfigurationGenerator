@@ -176,12 +176,14 @@ var GetAllDataForExt = function(reqId, extension, tenantId, extType, callback)
         }
         else
         {
+            logger.error('[DVP-DynamicConfigurationGenerator.GetAllDataForExt] - [%s] - Unsupported extension type', reqId);
             callback(new Error('Unsupported extension type'), undefined);
         }
 
     }
     catch(ex)
     {
+        logger.error('[DVP-DynamicConfigurationGenerator.GetAllDataForExt] - [%s] - Exception occurred', reqId, ex);
         callback(ex, false);
     }
 

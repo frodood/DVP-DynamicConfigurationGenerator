@@ -122,12 +122,12 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
 
                 if(ext.Conference.MaxUser)
                 {
-                    maxUsers = ext.ConferenceName.MaxUser;
+                    maxUsers = ext.Conference.MaxUser;
                 }
 
                 if(ext.Conference.CurrentUsers)
                 {
-                    currUsers = ext.ConferenceName.CurrentUsers;
+                    currUsers = ext.Conference.CurrentUsers;
                 }
 
                 var allowedCount = maxUsers - currUsers;

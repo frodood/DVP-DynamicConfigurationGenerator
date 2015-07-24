@@ -9,6 +9,9 @@ var transHandler = require('DVP-RuleService/TranslationHandler.js');
 var redisHandler = require('./RedisHandler.js');
 var ruleHandler = require('DVP-RuleService/CallRuleBackendOperations.js');
 var conferenceHandler = require('./ConferenceOperations.js');
+var util = require('util');
+var stringify = require('stringify');
+var underscore = require('underscore');
 
 var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId, fmList, dodNum, dodActive, callerIdNum, callerIdName, callback)
 {
@@ -147,7 +150,7 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
     }
 };
 
-var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, context, direction, extraData, companyId, tenantId, disconReason, fwdId, dodNumber, securityToken, callback)
+var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, context, direction, extraData, companyId, tenantId, disconReason, fwdId, dodNumber, securityToken, origName, origNum, callback)
 {
     try
     {
@@ -174,10 +177,12 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
 
             if(err)
             {
+                logger.error('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Error occurred while getting fwd obj from redis', reqId, err);
                 callback(err, xmlBuilder.createNotFoundResponse());
             }
             else if(redisObj)
             {
+                logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Redis object found : ', reqId, redisObj);
                 var fwdList = JSON.parse(redisObj);
 
                 if(fwdList && fwdList.length > 0)
@@ -188,22 +193,25 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                     {
                         if(fwdRule.ObjCategory === 'GATEWAY')
                         {
+                            logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Gateway Forward', reqId);
                             //pick outbound rule
-                            ruleHandler.PickCallRuleOutboundComplete(reqId, aniNum, fwdRule.Destination, '', context, companyId, tenantId, false, function(err, rule)
+                            ruleHandler.PickCallRuleOutboundComplete(reqId, origNum, fwdRule.DestinationNumber, '', context, companyId, tenantId, false, function(err, rule)
                             {
                                 if(err)
                                 {
+                                    logger.error('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Outbound rule for gateway forward not found', reqId, err);
                                     callback(err, xmlBuilder.createNotFoundResponse());
                                 }
                                 else if(rule)
                                 {
+                                    logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Outbound rule for gateway forward found', reqId);
                                     var ep =
                                     {
                                         Profile: rule.GatewayCode,
                                         Type: 'GATEWAY',
                                         LegStartDelay: 0,
+                                        LegTimeout:60,
                                         BypassMedia: false,
-                                        LegTimeout: rule.Timeout,
                                         Origination: rule.ANI,
                                         OriginationCallerIdNumber: rule.ANI,
                                         Destination: rule.DNIS,
@@ -228,6 +236,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                 }
                                 else
                                 {
+                                    logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Outbound rule for gateway forward not found', reqId);
                                     callback(undefined, xmlBuilder.createNotFoundResponse());
                                 }
                             })
@@ -235,17 +244,20 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                         else
                         {
                             //pick extension
-                            backendHandler.GetAllDataForExt(reqId, fwdRule.Destination, tenantId, 'USER', function(err, extDetails)
+                            logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Extension Forward', reqId);
+                            backendHandler.GetAllDataForExt(reqId, fwdRule.DestinationNumber, tenantId, 'USER', function(err, extDetails)
                             {
                                 if(err)
                                 {
+                                    logger.error('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Error occurred while getting all data for ext for forward', reqId, err);
                                     callback(err, xmlBuilder.createNotFoundResponse());
                                 }
                                 else if(extDetails)
                                 {
+                                    logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Extension details found for extension Forward', reqId);
                                     if (extDetails.SipUACEndpoint && extDetails.SipUACEndpoint.CloudEndUser)
                                     {
-                                        var bypassMedia = pbxObj.BypassMedia;
+                                        var bypassMedia = false;
 
                                         var grp = '';
 
@@ -268,9 +280,9 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                             LegStartDelay: 0,
                                             BypassMedia: bypassMedia,
                                             LegTimeout: 60,
-                                            Origination: callerIdName,
-                                            OriginationCallerIdNumber: callerIdNum,
-                                            Destination: fwdRule.Destination,
+                                            Origination: origName,
+                                            OriginationCallerIdNumber: origNum,
+                                            Destination: fwdRule.DestinationNumber,
                                             Domain: domain,
                                             Group: grp,
                                             CompanyId: companyId,
@@ -308,7 +320,22 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
 
                         }
                     }
+                    else
+                    {
+                        logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - No objects in forwarding rule not found', reqId);
+                        callback(undefined, xmlBuilder.createNotFoundResponse());
+                    }
                 }
+                else
+                {
+                    logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - No objects in forwarding list', reqId);
+                    callback(undefined, xmlBuilder.createNotFoundResponse());
+                }
+            }
+            else
+            {
+                logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Redis object not found : ', reqId);
+                callback(undefined, xmlBuilder.createNotFoundResponse());
             }
         })
 
@@ -319,6 +346,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
     }
     catch(ex)
     {
+        callback(ex, xmlBuilder.createNotFoundResponse());
 
     }
 }
@@ -576,10 +604,15 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             TenantId: tenantId
                                                         };
 
-                                                        var pbxFwdKey = util.format('DVPFORWARDING_%d_%d_%s', companyId, tenantId, pbxDetails.UserUuid);
+                                                        if(dodActive && dodNumber)
+                                                        {
+                                                            ep.DodNumber = dodNumber;
+                                                        }
+
+                                                        var pbxFwdKey = util.format('DVPFORWARDING_%d_%d_%s', companyId, tenantId, pbxDetails.UserRefId);
                                                         var forwardingInfo = JSON.stringify(pbxDetails.Endpoints);
 
-                                                        redisHandler.SetObjectWithExpire(pbxFwdKey, forwardingInfo, 200000, function(err, redisResp)
+                                                        redisHandler.SetObjectWithExpire(pbxFwdKey, forwardingInfo, 360, function(err, redisResp)
                                                         {
                                                             if(err)
                                                             {
@@ -1082,10 +1115,15 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         TenantId: tenantId
                                                                     };
 
-                                                                    var pbxFwdKey = util.format('DVPFORWARDING_%d_%d_%s', companyId, tenantId, pbxDetails.UserUuid);
+                                                                    if(dodActive && dodNumber)
+                                                                    {
+                                                                        ep.DodNumber = dodNumber;
+                                                                    }
+
+                                                                    var pbxFwdKey = util.format('DVPFORWARDING_%d_%d_%s', companyId, tenantId, pbxDetails.UserRefId);
                                                                     var forwardingInfo = JSON.stringify(pbxDetails.Endpoints);
 
-                                                                    redisHandler.SetObjectWithExpire(pbxFwdKey, forwardingInfo, 200000, function(err, redisResp)
+                                                                    redisHandler.SetObjectWithExpire(pbxFwdKey, forwardingInfo, 360, function(err, redisResp)
                                                                     {
                                                                         if(err)
                                                                         {
@@ -1116,7 +1154,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                                 Type: 'GATEWAY',
                                                                                 LegStartDelay: 0,
                                                                                 BypassMedia: false,
-                                                                                LegTimeout: rule.Timeout,
+                                                                                LegTimeout: 60,
                                                                                 Destination: rule.DNIS,
                                                                                 Domain: rule.IpUrl,
                                                                                 OutLimit: rule.OutLimit,
@@ -1428,7 +1466,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         Type: 'GATEWAY',
                                                         LegStartDelay: 0,
                                                         BypassMedia: false,
-                                                        LegTimeout: rule.Timeout,
+                                                        LegTimeout: 60,
                                                         Origination: rule.ANI,
                                                         OriginationCallerIdNumber: rule.ANI,
                                                         Destination: rule.DNIS,

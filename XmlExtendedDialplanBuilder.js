@@ -940,7 +940,12 @@ var CreateForwardingDialplan = function(reqId, endpoint, context, profile, desti
             calling = util.format("%s,pickup/%s", calling, endpoint.Group);
         }
 
-        var luaParams = util.format('CF.lua ${{originate_disposition}} \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\'', endpoint.CompanyId, endpoint.TenantId, context, endpoint.Domain, endpoint.Origination, endpoint.OriginationCallerIdNumber, fwdKey, endpoint.DodNumber, endpoint.DodActive);
+        if(!endpoint.DodNumber)
+        {
+            endpoint.DodNumber = '';
+        }
+
+        var luaParams = util.format('CF.lua ${{originate_disposition}} \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\'', endpoint.CompanyId, endpoint.TenantId, context, endpoint.Domain, endpoint.Origination, endpoint.OriginationCallerIdNumber, fwdKey, endpoint.DodNumber);
 
 
             var doc = xmlBuilder.create('document');

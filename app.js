@@ -144,14 +144,16 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                         var tenantId = dnisSplitArr[3];
                         var disconReason = dnisSplitArr[4];
                         var dodNumber = dnisSplitArr[5];
-                        var dodActive = dnisSplitArr[6];
+                        var context = dnisSplitArr[6];
+                        var origination = dnisSplitArr[7];
+                        var origCallerIdNum = dnisSplitArr[8];
 
-                        if(!dodActive || !dodNumber)
+                        if(!dodNumber)
                         {
                             dodNumber = '';
                         }
 
-                        extDialplanEngine.ProcessCallForwarding(reqId, aniNum, dnisNum, domain, callerContext, direction, data, companyId, tenantId, disconReason, fwdId, dodNumber, '', function(err, xml)
+                        extDialplanEngine.ProcessCallForwarding(reqId, aniNum, dnisNum, domain, context, direction, data, companyId, tenantId, disconReason, fwdId, dodNumber, '', origination, origCallerIdNum, function(err, xml)
                         {
                             if(err)
                             {
@@ -512,7 +514,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                             Type: 'GATEWAY',
                                                             LegStartDelay: 0,
                                                             BypassMedia: false,
-                                                            LegTimeout: rule.Timeout,
+                                                            LegTimeout: 60,
                                                             Destination: rule.DNIS,
                                                             Domain: rule.IpUrl
                                                         };

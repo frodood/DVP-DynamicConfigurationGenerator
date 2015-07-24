@@ -244,7 +244,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                         else
                         {
                             //pick extension
-                            logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Extension Forward', reqId);
+                            logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Extension Forward - DestNum : %s, tenantId : %d', reqId, fwdRule.DestinationNumber, tenantId);
                             backendHandler.GetAllDataForExt(reqId, fwdRule.DestinationNumber, tenantId, 'USER', function(err, extDetails)
                             {
                                 if(err)
@@ -257,6 +257,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                     logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Extension details found for extension Forward', reqId);
                                     if (extDetails.SipUACEndpoint && extDetails.SipUACEndpoint.CloudEndUser)
                                     {
+                                        logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Cloud enduser is set', reqId);
                                         var bypassMedia = false;
 
                                         var grp = '';
@@ -295,12 +296,14 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                         {
                                             if(!err && redisResult)
                                             {
+                                                logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Redis set object success', reqId);
                                                 var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false);
 
                                                 callback(undefined, xml);
                                             }
                                             else
                                             {
+                                                logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Redis set object failed', reqId);
                                                 callback(undefined, xmlBuilder.createNotFoundResponse());
                                             }
                                         })
@@ -309,11 +312,13 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                     }
                                     else
                                     {
+                                        logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Cloud enduser not set', reqId);
                                         callback(undefined, xmlBuilder.createNotFoundResponse());
                                     }
                                 }
                                 else
                                 {
+                                    logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Extension details not found', reqId, err);
                                     callback(undefined, xmlBuilder.createNotFoundResponse());
                                 }
                             });

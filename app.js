@@ -135,10 +135,10 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
 
 
                     var dnisRegExPattern = new RegExp('^(CF/)[^\s]*');
-                    if(dnisRegExPattern.test(dnisNum))
+                    if(dnisRegExPattern.test(destNum))
                     {
                         //Call Forwarding
-                        var dnisSplitArr = dnisNum.split('/');
+                        var dnisSplitArr = destNum.split('/');
                         var fwdId = dnisSplitArr[1];
                         var companyId = dnisSplitArr[2];
                         var tenantId = dnisSplitArr[3];
@@ -153,7 +153,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                             dodNumber = '';
                         }
 
-                        extDialplanEngine.ProcessCallForwarding(reqId, aniNum, dnisNum, domain, context, direction, data, companyId, tenantId, disconReason, fwdId, dodNumber, '', origination, origCallerIdNum, function(err, xml)
+                        extDialplanEngine.ProcessCallForwarding(reqId, aniNum, destNum, domain, context, direction, data, companyId, tenantId, disconReason, fwdId, dodNumber, '', origination, origCallerIdNum, function(err, xml)
                         {
                             if(err)
                             {

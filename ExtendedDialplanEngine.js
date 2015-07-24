@@ -586,7 +586,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 }
                                                 else if(pbxObj.OperationType === 'FORWARD')
                                                 {
-                                                    if(pbxDetails.Forwarding)
+                                                    if(pbxDetails.Endpoints)
                                                     {
                                                         var ep =
                                                         {
@@ -625,6 +625,10 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 callback(undefined, xml);
                                                             }
                                                         });
+                                                    }
+                                                    else
+                                                    {
+
                                                     }
 
                                                 }

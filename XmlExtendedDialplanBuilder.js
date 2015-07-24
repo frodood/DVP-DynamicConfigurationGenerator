@@ -945,7 +945,7 @@ var CreateForwardingDialplan = function(reqId, endpoint, context, profile, desti
             endpoint.DodNumber = '';
         }
 
-        var luaParams = util.format('CF.lua ${{originate_disposition}} \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\'', endpoint.CompanyId, endpoint.TenantId, context, endpoint.Domain, endpoint.Origination, endpoint.OriginationCallerIdNumber, fwdKey, endpoint.DodNumber);
+        var luaParams = util.format('CF.lua ${originate_disposition} \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\'', endpoint.CompanyId, endpoint.TenantId, context, endpoint.Domain, endpoint.Origination, endpoint.OriginationCallerIdNumber, fwdKey, endpoint.DodNumber);
 
 
             var doc = xmlBuilder.create('document');

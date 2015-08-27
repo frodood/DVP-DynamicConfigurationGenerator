@@ -13,7 +13,7 @@ var util = require('util');
 var stringify = require('stringify');
 var underscore = require('underscore');
 
-var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId, fmList, dodNum, dodActive, callerIdNum, callerIdName, callback)
+var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId, fmList, dodNum, dodActive, callerIdNum, callerIdName, csId, callback)
 {
     var epList = [];
     try
@@ -76,7 +76,7 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
                 }
                 else if(fm.ObjCategory === 'PBXUSER' || fm.ObjCategory === 'USER')
                 {
-                    backendHandler.GetAllDataForExt(reqId, fm.DestinationNumber, tenantId, 'USER', function (err, extDetails)
+                    backendHandler.GetAllDataForExt(reqId, fm.DestinationNumber, tenantId, 'USER', csId, function (err, extDetails)
                     {
 
                         if (!err && extDetails)
@@ -95,6 +95,15 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
                                     Destination: fm.DestinationNumber,
                                     Domain: extDetails.SipUACEndpoint.CloudEndUser.Domain
                                 };
+
+
+                                if(extDetails.SipUACEndpoint.UsePublic)
+                                {
+                                    ep.Profile = 'external';
+                                    ep.Type = 'PUBLIC_USER';
+                                    ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                    ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                }
 
                                 epList.push(ep);
 
@@ -150,7 +159,69 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
     }
 };
 
-var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, context, direction, extraData, companyId, tenantId, disconReason, fwdId, dodNumber, securityToken, origName, origNum, callback)
+var AttendantTransferLegInfoHandler = function(reqId, fromUser, toUser)
+{
+    try
+    {
+        var AttTransLegInfo = {};
+        if(fromUser)
+        {
+            //a leg processing
+            AttTransLegInfo.TransferCode = fromUser.TransferCode;
+            if(fromUser.TransInternalEnable)
+            {
+                AttTransLegInfo.InternalLegs = 'a';
+            }
+            if(fromUser.TransExternalEnable)
+            {
+                AttTransLegInfo.ExternalLegs = 'a';
+            }
+            if(fromUser.TransGroupEnable)
+            {
+                AttTransLegInfo.GroupLegs = 'a';
+            }
+            if(fromUser.TransConferenceEnable)
+            {
+                AttTransLegInfo.ConferenceLegs = 'a';
+            }
+
+        }
+
+        if(toUser)
+        {
+            //b leg processing
+            AttTransLegInfo.TransferCode = toUser.TransferCode;
+            if(toUser.TransInternalEnable)
+            {
+                AttTransLegInfo.InternalLegs = AttTransLegInfo.InternalLegs + 'b';
+            }
+            if(toUser.TransExternalEnable)
+            {
+                AttTransLegInfo.ExternalLegs = AttTransLegInfo.InternalLegs + 'b';
+            }
+            if(toUser.TransGroupEnable)
+            {
+                AttTransLegInfo.GroupLegs = AttTransLegInfo.InternalLegs + 'b';
+            }
+            if(toUser.TransConferenceEnable)
+            {
+                AttTransLegInfo.ConferenceLegs = AttTransLegInfo.InternalLegs + 'b';
+            }
+        }
+
+        logger.debug('DVP-DynamicConfigurationGenerator.AttendantTransferLegInfoHandler] - [%s] - Attendant Transfer Details : ', reqId, JSON.stringify(AttTransLegInfo));
+
+        return AttTransLegInfo;
+    }
+    catch(ex)
+    {
+        logger.error('DVP-DynamicConfigurationGenerator.AttendantTransferLegInfoHandler] - [%s] - Error occurred', reqId, ex);
+        return null;
+    }
+}
+
+
+var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, context, direction, extraData, companyId, tenantId, disconReason, fwdId, dodNumber, securityToken, origName, origNum, csId, callback)
 {
     try
     {
@@ -159,8 +230,10 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
         var uuid = '';
         var variableUserId = '';
         var huntDestinationNumber = '';
+        var switchname = '';
         var callerIdNum = '';
         var callerIdName = '';
+        var csId = -1;
 
 
         if(extraData)
@@ -169,6 +242,8 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
             variableUserId = extraData['variable_user_id'];
             huntDestinationNumber = extraData['Hunt-Destination-Number'];
             uuid = extraData['variable_uuid'];
+            switchname = extraData['hostname'];
+            csId = parseInt(extraData['hostname']);
         }
 
         redisHandler.GetObject(reqId, fwdId, function(err, redisObj)
@@ -245,7 +320,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                         {
                             //pick extension
                             logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Extension Forward - DestNum : %s, tenantId : %d', reqId, fwdRule.DestinationNumber, tenantId);
-                            backendHandler.GetAllDataForExt(reqId, fwdRule.DestinationNumber, tenantId, 'USER', function(err, extDetails)
+                            backendHandler.GetAllDataForExt(reqId, fwdRule.DestinationNumber, tenantId, 'USER', csId, function(err, extDetails)
                             {
                                 if(err)
                                 {
@@ -297,7 +372,9 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                             if(!err && redisResult)
                                             {
                                                 logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Redis set object success', reqId);
-                                                var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false);
+
+                                                var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
+                                                var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined, attTransInfo);
 
                                                 callback(undefined, xml);
                                             }
@@ -371,6 +448,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
         var fromFaxType = undefined;
         var url = '';
         var appId = '';
+        var csId = -1;
 
         if(extraData)
         {
@@ -383,6 +461,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
             fromFaxType = extraData['TrunkFaxType'];
             url = extraData['DVPAppUrl'];
             appId = extraData['AppId'];
+            csId = parseInt(extraData['hostname']);
         }
 
         var fromSplitArr = ani.split("@");
@@ -431,7 +510,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                     logger.debug('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Trying to get full extension details - Extension : %s, Category : %s', reqId, didRes.Extension.Extension, didRes.Extension.ObjCategory);
 
-                    backendHandler.GetAllDataForExt(reqId, didRes.Extension.Extension, tenantId, didRes.Extension.ObjCategory, function(err, extDetails)
+                    backendHandler.GetAllDataForExt(reqId, didRes.Extension.Extension, tenantId, didRes.Extension.ObjCategory, csId, function(err, extDetails)
                     {
                         if(err)
                         {
@@ -499,7 +578,17 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     if(!err && redisResult)
                                                     {
                                                         logger.info('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - NORMAL USER DIAL', reqId);
-                                                        var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo);
+                                                        var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
+
+                                                        if(extDetails.SipUACEndpoint.UsePublic)
+                                                        {
+                                                            ep.Profile = 'external';
+                                                            ep.Type = 'PUBLIC_USER';
+                                                            ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                            ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                        }
+
+                                                        var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo, attTransInfo);
 
                                                         callback(undefined, xml);
                                                     }
@@ -556,7 +645,17 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     {
                                                         if(!err && redisResult)
                                                         {
-                                                            var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo);
+                                                            var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
+
+                                                            if(extDetails.SipUACEndpoint.UsePublic)
+                                                            {
+                                                                ep.Profile = 'external';
+                                                                ep.Type = 'PUBLIC_USER';
+                                                                ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                            }
+
+                                                            var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo, attTransInfo);
 
                                                             callback(undefined, xml);
                                                         }
@@ -570,7 +669,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 {
                                                     if(pbxDetails.Endpoints && pbxDetails.Endpoints.length > 0)
                                                     {
-                                                        CreateFMEndpointList(reqId, aniNum, context, companyId, tenantId, pbxDetails.Endpoints, '', false, callerIdNum, callerIdName, function(err, epList)
+                                                        CreateFMEndpointList(reqId, aniNum, context, companyId, tenantId, pbxDetails.Endpoints, '', false, callerIdNum, callerIdName, csId, function(err, epList)
                                                         {
                                                             if(err)
                                                             {
@@ -625,6 +724,15 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             }
                                                             else
                                                             {
+                                                                if(extDetails.SipUACEndpoint.UsePublic)
+                                                                {
+                                                                    ep.Profile = 'external';
+                                                                    ep.Type = 'PUBLIC_USER';
+                                                                    ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                    ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                                    ep.BypassMedia = false;
+                                                                }
+
                                                                 var xml = xmlBuilder.CreateForwardingDialplan(reqId, ep, context, profile, '[^\\s]*', false, pbxFwdKey, numLimitInfo);
 
                                                                 callback(undefined, xml);
@@ -633,6 +741,49 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     }
                                                     else
                                                     {
+                                                        var ep =
+                                                        {
+                                                            Profile: profile,
+                                                            Type: 'USER',
+                                                            LegStartDelay: 0,
+                                                            BypassMedia: false,
+                                                            LegTimeout: 60,
+                                                            Origination: callerIdName,
+                                                            OriginationCallerIdNumber: callerIdNum,
+                                                            Destination: extDetails.Extension,
+                                                            Domain: toUsrDomain,
+                                                            Group: grp,
+                                                            IsVoicemailEnabled: voicemailEnabled,
+                                                            PersonalGreeting: personalGreeting,
+                                                            CompanyId: companyId,
+                                                            TenantId: tenantId
+                                                        };
+
+                                                        var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
+
+                                                        redisHandler.SetObjectWithExpire(customStr, uuid, 60, function(err, redisResult)
+                                                        {
+                                                            if(!err && redisResult)
+                                                            {
+                                                                var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
+
+                                                                if(extDetails.SipUACEndpoint.UsePublic)
+                                                                {
+                                                                    ep.Profile = 'external';
+                                                                    ep.Type = 'PUBLIC_USER';
+                                                                    ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                    ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                                }
+
+                                                                var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo, attTransInfo);
+
+                                                                callback(undefined, xml);
+                                                            }
+                                                            else
+                                                            {
+                                                                callback(err, xmlBuilder.createNotFoundResponse());
+                                                            }
+                                                        });
 
                                                     }
 
@@ -675,7 +826,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     }
                                                     else if(pbxObj.Endpoints && (pbxObj.Endpoints.ObjCategory === 'PBXUSER' || fm.ObjCategory === 'USER'))
                                                     {
-                                                        backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, tenantId, 'USER', function (err, extDetails)
+                                                        backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, tenantId, 'USER', csId, function (err, extDetails)
                                                         {
                                                             if (!err && extDetails)
                                                             {
@@ -694,7 +845,17 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         Domain: extDetails.SipUACEndpoint.CloudEndUser.Domain
                                                                     };
 
-                                                                    var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo);
+                                                                    var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
+
+                                                                    if(extDetails.SipUACEndpoint.UsePublic)
+                                                                    {
+                                                                        ep.Profile = 'external';
+                                                                        ep.Type = 'PUBLIC_USER';
+                                                                        ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                        ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                                    }
+
+                                                                    var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo, attTransInfo);
                                                                     callback(undefined, xml);
 
                                                                 }
@@ -752,7 +913,17 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     {
                                                         if(!err && redisResult)
                                                         {
-                                                            var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo);
+                                                            var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
+
+                                                            if(extDetails.SipUACEndpoint.UsePublic)
+                                                            {
+                                                                ep.Profile = 'external';
+                                                                ep.Type = 'PUBLIC_USER';
+                                                                ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                            }
+
+                                                            var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo, attTransInfo);
 
                                                             callback(undefined, xml);
                                                         }
@@ -793,7 +964,17 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         {
                                             if(!err && redisResult)
                                             {
-                                                var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo);
+                                                var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
+
+                                                if(extDetails.SipUACEndpoint.UsePublic)
+                                                {
+                                                    ep.Profile = 'external';
+                                                    ep.Type = 'PUBLIC_USER';
+                                                    ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                    ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                }
+
+                                                var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo, attTransInfo);
 
                                                 callback(undefined, xml);
                                             }
@@ -870,7 +1051,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                     {
                                         if (!err && redisResult)
                                         {
-                                            var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo);
+                                            var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
+                                            var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo, attTransInfo);
                                             callback(undefined, xml);
                                         }
                                         else
@@ -951,7 +1133,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                         else if(extInfo)
                         {
                             logger.debug('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extension found', reqId);
-                            backendHandler.GetAllDataForExt(reqId, dnisNum, tenantId, extInfo.ObjCategory, function(err, extDetails)
+                            backendHandler.GetAllDataForExt(reqId, dnisNum, tenantId, extInfo.ObjCategory, csId, function(err, extDetails)
                             {
                                 if(err)
                                 {
@@ -968,6 +1150,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         {
                                             var grp = '';
                                             var toUsrDomain = '';
+
 
                                             if(extDetails.SipUACEndpoint && extDetails.SipUACEndpoint.CloudEndUser)
                                             {
@@ -990,7 +1173,6 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     }
                                                     else if(!pbxDetails)
                                                     {
-
                                                         var ep =
                                                         {
                                                             Profile: profile,
@@ -1015,7 +1197,17 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         {
                                                             if(!err && redisResult)
                                                             {
-                                                                var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined);
+                                                                var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, extDetails.SipUACEndpoint);
+
+                                                                if(extDetails.SipUACEndpoint.UsePublic)
+                                                                {
+                                                                    ep.Profile = 'external';
+                                                                    ep.Type = 'PUBLIC_USER';
+                                                                    ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                    ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                                }
+
+                                                                var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined, attTransInfo);
 
                                                                 callback(undefined, xml);
                                                             }
@@ -1071,7 +1263,17 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 {
                                                                     if(!err && redisResult)
                                                                     {
-                                                                        var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined);
+                                                                        var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, extDetails.SipUACEndpoint);
+
+                                                                        if(extDetails.SipUACEndpoint.UsePublic)
+                                                                        {
+                                                                            ep.Profile = 'external';
+                                                                            ep.Type = 'PUBLIC_USER';
+                                                                            ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                            ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                                        }
+
+                                                                        var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined, attTransInfo);
 
                                                                         callback(undefined, xml);
                                                                     }
@@ -1085,7 +1287,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             {
                                                                 if(pbxDetails.Endpoints && pbxDetails.Endpoints.length > 0)
                                                                 {
-                                                                    CreateFMEndpointList(reqId, aniNum, context, companyId, tenantId, pbxDetails.Endpoints, '', false, callerIdNum, callerIdName, function(err, epList)
+                                                                    CreateFMEndpointList(reqId, aniNum, context, companyId, tenantId, pbxDetails.Endpoints, '', false, callerIdNum, callerIdName, csId, function(err, epList)
                                                                     {
                                                                         if(err)
                                                                         {
@@ -1118,7 +1320,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         Origination: callerIdName,
                                                                         OriginationCallerIdNumber: callerIdNum,
                                                                         Destination: dnisNum,
-                                                                        Domain: domain,
+                                                                        Domain: toUsrDomain,
                                                                         Group: grp,
                                                                         CompanyId: companyId,
                                                                         TenantId: tenantId
@@ -1140,9 +1342,68 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         }
                                                                         else
                                                                         {
+
+                                                                            if(extDetails.SipUACEndpoint.UsePublic)
+                                                                            {
+                                                                                ep.Profile = 'external';
+                                                                                ep.Type = 'PUBLIC_USER';
+                                                                                ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                                ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                                                ep.BypassMedia = false;
+                                                                            }
+
+
                                                                             var xml = xmlBuilder.CreateForwardingDialplan(reqId, ep, context, profile, '[^\\s]*', false, pbxFwdKey, undefined);
 
+
                                                                             callback(undefined, xml);
+                                                                        }
+                                                                    });
+                                                                }
+                                                                else
+                                                                {
+                                                                    //Do Normal User Dial
+                                                                    var ep =
+                                                                    {
+                                                                        Profile: profile,
+                                                                        Type: 'USER',
+                                                                        LegStartDelay: 0,
+                                                                        BypassMedia: bypassMedia,
+                                                                        LegTimeout: 60,
+                                                                        Origination: callerIdName,
+                                                                        OriginationCallerIdNumber: callerIdNum,
+                                                                        Destination: extDetails.Extension,
+                                                                        Domain: toUsrDomain,
+                                                                        Group: grp,
+                                                                        IsVoicemailEnabled: voicemailEnabled,
+                                                                        PersonalGreeting: personalGreeting,
+                                                                        CompanyId: companyId,
+                                                                        TenantId: tenantId
+                                                                    };
+
+                                                                    var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
+
+                                                                    redisHandler.SetObjectWithExpire(customStr, uuid, 60, function(err, redisResult)
+                                                                    {
+                                                                        if(!err && redisResult)
+                                                                        {
+                                                                            var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, extDetails.SipUACEndpoint);
+
+                                                                            if(extDetails.SipUACEndpoint.UsePublic)
+                                                                            {
+                                                                                ep.Profile = 'external';
+                                                                                ep.Type = 'PUBLIC_USER';
+                                                                                ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                                ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                                            }
+
+                                                                            var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined, attTransInfo);
+
+                                                                            callback(undefined, xml);
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            callback(err, xmlBuilder.createNotFoundResponse());
                                                                         }
                                                                     });
                                                                 }
@@ -1198,7 +1459,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 }
                                                                 else if(pbxObj.Endpoints && (pbxObj.Endpoints.ObjCategory === 'PBXUSER' || fm.ObjCategory === 'USER'))
                                                                 {
-                                                                    backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, tenantId, 'USER', function (err, extDetails)
+                                                                    backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, tenantId, 'USER', csId, function (err, extDetails)
                                                                     {
 
                                                                         if (!err && extDetails)
@@ -1218,7 +1479,18 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                                     Domain: extDetails.SipUACEndpoint.CloudEndUser.Domain
                                                                                 };
 
-                                                                                var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo);
+                                                                                var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, extDetails.SipUACEndpoint);
+
+                                                                                if(extDetails.SipUACEndpoint.UsePublic)
+                                                                                {
+                                                                                    ep.Profile = 'external';
+                                                                                    ep.Type = 'PUBLIC_USER';
+                                                                                    ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                                    ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                                                }
+
+                                                                                var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo, attTransInfo);
+
                                                                                 callback(undefined, xml);
 
                                                                             }
@@ -1266,7 +1538,17 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 {
                                                                     if(!err && redisResult)
                                                                     {
-                                                                        var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined);
+                                                                        var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, extDetails.SipUACEndpoint);
+
+                                                                        if(extDetails.SipUACEndpoint.UsePublic)
+                                                                        {
+                                                                            ep.Profile = 'external';
+                                                                            ep.Type = 'PUBLIC_USER';
+                                                                            ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                            ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                                        }
+
+                                                                        var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined, attTransInfo);
 
                                                                         callback(undefined, xml);
                                                                     }
@@ -1312,7 +1594,17 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 {
                                                     if(!err && redisResult)
                                                     {
-                                                        var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined);
+                                                        var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
+
+                                                        if(extDetails.SipUACEndpoint.UsePublic)
+                                                        {
+                                                            ep.Profile = 'external';
+                                                            ep.Type = 'PUBLIC_USER';
+                                                            ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                            ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                        }
+
+                                                        var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined, attTransInfo);
 
                                                         callback(undefined, xml);
                                                     }
@@ -1367,7 +1659,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             {
                                                 if (!err && redisResult)
                                                 {
-                                                    var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined);
+                                                    var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
+                                                    var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined, attTransInfo);
                                                     callback(undefined, xml);
                                                 }
                                                 else
@@ -1590,7 +1883,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                             if(extraData)
                                             {
-                                                backendHandler.GetAllDataForExt(reqId, extraData, tenantId, 'USER', function(err, extDetails)
+                                                backendHandler.GetAllDataForExt(reqId, extraData, tenantId, 'USER', csId, function(err, extDetails)
                                                 {
                                                     if(err || !extDetails || !extDetails.SipUACEndpoint || !extDetails.SipUACEndpoint.CloudEndUser)
                                                     {

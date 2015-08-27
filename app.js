@@ -58,6 +58,8 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
         var varUsrContext = data["variable_user_context"];
         var varFromNumber = data["variable_FromNumber"];
         var callerIdNum = data["Caller-Caller-ID-Number"];
+        var dvpOriginationType = data["DVP-ORIGINATION-TYPE"];
+        var csId = parseInt(hostname);
 
         if (cdnum && callerContext && hostname)
         {
@@ -96,6 +98,12 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                     else
                     {
                         logger.info('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - context found category PUBLIC', reqId);
+
+                        if(dvpOriginationType && dvpOriginationType === 'PUBLIC_USER')
+                        {
+                            //Don't Check Phone number
+                            direction = 'OUT';
+                        }
                     }
 
 
@@ -154,7 +162,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                             dodNumber = '';
                         }
 
-                        extDialplanEngine.ProcessCallForwarding(reqId, callerIdNum, destNum, domain, context, direction, data, companyId, tenantId, disconReason, fwdId, dodNumber, '', origination, origCallerIdNum, function(err, xml)
+                        extDialplanEngine.ProcessCallForwarding(reqId, callerIdNum, destNum, domain, context, direction, data, companyId, tenantId, disconReason, fwdId, dodNumber, '', origination, origCallerIdNum, csId, function(err, xml)
                         {
                             if(err)
                             {
@@ -178,9 +186,9 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                         {
                             logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call Direction IN', reqId);
 
-                            logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Validating trunk number for inbound call - TrunkNumber : %s', reqId, dnisNum);
+                            logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Validating trunk number for inbound call - TrunkNumber : %s', reqId, destNum);
 
-                            backendHandler.GetPhoneNumberDetails(dnisNum, function(err, num)
+                            backendHandler.GetPhoneNumberDetails(destNum, function(err, num)
                             {
                                 if(err)
                                 {
@@ -232,7 +240,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
 
                                         //logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - GetPhoneNumberDetails returned num obj : %j', reqId, JSON.stringify(num));
 
-                                        logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, dnisNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, aniNum, dnisNum, domain, num.CompanyId, num.TenantId);
+                                        logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, destNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, aniNum, destNum, domain, num.CompanyId, num.TenantId);
                                         ruleHandler.PickCallRuleInbound(reqId, callerIdNum, destNum, domain, callerContext, num.CompanyId, num.TenantId, function(err, rule)
                                         {
                                             if(err)
@@ -427,7 +435,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                                         EventCategory: "INBOUND_RULE",
                                                         EventTime : new Date(),
                                                         EventName : "Call Rule Picked",
-                                                        EventData : dnisNum,
+                                                        EventData : destNum,
                                                         EventParams : rule
                                                     };
 
@@ -490,14 +498,23 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                             logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call Direction OUT', reqId);
                             //Get from user
 
+                            var ignoreTenant = false;
+
+                            if(dvpOriginationType && dvpOriginationType === 'PUBLIC_USER')
+                            {
+                                ignoreTenant = true;
+                            }
+
                             logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to find from user for outbound call', reqId);
-                            backendHandler.GetUserByNameTenantDB(reqId, callerIdNum, contextTenant, function(err, fromUsr)
+                            backendHandler.GatherFromUserDetails(reqId, callerIdNum, contextTenant, ignoreTenant, function(err, fromUsr)
                             {
                                 var dodActive = false;
                                 var dodNumber = '';
                                 var fromUserUuid = '';
                                 if(fromUsr && fromUsr.Extension)
                                 {
+                                    //Check transfer capability and get transfer details
+
                                     if(fromUsr.Extension.DodActive)
                                     {
                                         dodActive = true;
@@ -510,8 +527,18 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
                                     }
                                 }
 
-                                logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, dnisNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, aniNum, dnisNum, domain, contextCompany, contextTenant);
-                                ruleHandler.PickCallRuleInbound(reqId, callerIdNum, destNum, domain, callerContext, contextCompany, contextTenant, function(err, rule)
+                                var tempCallerContext = callerContext;
+
+                                if(dvpOriginationType && dvpOriginationType === 'PUBLIC_USER')
+                                {
+
+                                    tempCallerContext = fromUsr.ContextId;
+                                    contextCompany = fromUsr.CompanyId;
+                                    contextTenant = fromUsr.TenantId;
+                                }
+
+                                logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, destNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, aniNum, destNum, domain, contextCompany, contextTenant);
+                                ruleHandler.PickCallRuleInbound(reqId, callerIdNum, destNum, domain, tempCallerContext, contextCompany, contextTenant, function(err, rule)
                                 {
                                     if(err)
                                     {

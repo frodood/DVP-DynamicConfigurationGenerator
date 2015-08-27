@@ -55,21 +55,21 @@ var GetUserBy_Name_Domain = function(extName, domain, callback)
 
 };
 
-var GetUserByNameTenantDB = function(reqId, extName, tenantId, callback)
+var GetUserDetailsByUsername = function(reqId, username, callback)
 {
     try
     {
         dbModel.SipUACEndpoint
-            .find({where: [{SipUsername: extName},{TenantId: tenantId}], include:[{model: dbModel.Extension, as: 'Extension'}]})
+            .find({where: [{SipUsername: username}]})
             .complete(function (err, usr)
             {
                 if(err)
                 {
-                    logger.error('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query failed', err);
+                    logger.error('[DVP-DynamicConfigurationGenerator.GetUserDetailsByUsername] PGSQL Get sip endpoint for username query failed', err);
                 }
                 else
                 {
-                    logger.debug('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query success');
+                    logger.debug('[DVP-DynamicConfigurationGenerator.GetUserDetailsByUsername] PGSQL Get sip endpoint for username query success');
                 }
 
                 callback(err, usr);
@@ -78,6 +78,107 @@ var GetUserByNameTenantDB = function(reqId, extName, tenantId, callback)
     }
     catch(ex)
     {
+        callback(ex, undefined);
+    }
+}
+
+var GatherFromUserDetails = function(reqId, usrName, tenantId, ignoreTenant, callback)
+{
+    GetUserByNameTenantDB(reqId, usrName, tenantId, ignoreTenant, function(err, res)
+    {
+        if(res)
+        {
+            GetTransferCodesForTenantDB(reqId, res.TenantId, function(err, resTrans)
+            {
+                if(resTrans)
+                {
+                    res.TransferCode = resTrans;
+                }
+
+                callback(err, res);
+
+            })
+        }
+        else
+        {
+            callback(err, res);
+        }
+    })
+};
+
+var GetUserByNameTenantDB = function(reqId, extName, tenantId, ignoreTenant, callback)
+{
+    try
+    {
+        if(!ignoreTenant)
+        {
+            dbModel.SipUACEndpoint
+                .find({where: [{SipUsername: extName},{TenantId: tenantId}], include:[{model: dbModel.Extension, as: 'Extension'}]})
+                .complete(function (err, usr)
+                {
+                    if(err)
+                    {
+                        logger.error('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query failed', err);
+                    }
+                    else
+                    {
+                        logger.debug('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query success');
+                    }
+
+                    callback(err, usr);
+                })
+        }
+        else
+        {
+            dbModel.SipUACEndpoint
+                .find({where: [{SipUsername: extName}], include:[{model: dbModel.Extension, as: 'Extension'}]})
+                .complete(function (err, usr)
+                {
+                    if(err)
+                    {
+                        logger.error('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query failed', err);
+                    }
+                    else
+                    {
+                        logger.debug('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query success');
+                    }
+
+                    callback(err, usr);
+                })
+        }
+
+
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+    }
+
+
+};
+
+var GetTransferCodesForTenantDB = function(reqId, tenantId, callback)
+{
+    try
+    {
+        dbModel.TransferCode
+            .find({where: [{TenantId: tenantId}]})
+            .then(function (transCode)
+            {
+                logger.debug('[DVP-DynamicConfigurationGenerator.GetTransferCodesForTenantDB] - [%s] - PGSQL get transfer codes for tenant success', reqId);
+                callback(undefined, transCode);
+            })
+            .catch(function(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.GetTransferCodesForTenantDB] - [%s] - PGSQL get transfer codes for tenant failed', reqId, err);
+
+                callback(err, undefined);
+            })
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.GetTransferCodesForTenantDB] - [%s] - PGSQL get transfer codes for tenant failed', reqId, ex);
         callback(ex, undefined);
     }
 
@@ -138,7 +239,31 @@ var GetExtensionDB = function(reqId, ext, tenantId, callback)
 
 };
 
-var GetAllDataForExt = function(reqId, extension, tenantId, extType, callback)
+var GetPresenceDB = function(reqId, username, callback)
+{
+    try
+    {
+        dbModel.SipPresence.find({where: [{SipUsername: username}]})
+            .then(function (presInfo)
+            {
+                logger.debug('[DVP-DynamicConfigurationGenerator.GetPresenceDB] - [%s] - PGSQL get presence details query success', reqId);
+                callback(undefined, presInfo);
+            })
+            .catch(function(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.GetPresenceDB] - [%s] - PGSQL get presence details query failed', reqId, err);
+                callback(err, undefined);
+            });
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.GetPresenceDB] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, undefined);
+    }
+
+};
+
+var GetAllDataForExt = function(reqId, extension, tenantId, extType, callServerId, callback)
 {
     try
     {
@@ -147,7 +272,58 @@ var GetAllDataForExt = function(reqId, extension, tenantId, extType, callback)
             dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}], include: [{model: dbModel.SipUACEndpoint, as:'SipUACEndpoint', include: [{model: dbModel.CloudEndUser, as:'CloudEndUser'},{model: dbModel.UserGroup, as:'UserGroup', include: [{model: dbModel.Extension, as:'Extension'}]}]}]})
                 .complete(function (err, extData)
                 {
-                    callback(err, extData);
+                    if(extData && extData.SipUACEndpoint)
+                    {
+                        GetTransferCodesForTenantDB(reqId, extData.SipUACEndpoint.TenantId, function(err, resTrans)
+                        {
+                            if(resTrans)
+                            {
+                                extData.SipUACEndpoint.TransferCode = resTrans;
+                            }
+
+                            GetPresenceDB(reqId, extData.SipUACEndpoint.SipUsername, function(err, presInf)
+                            {
+                                if(presInf && presInf.Status === 'Available')
+                                {
+                                    extData.SipUACEndpoint.UsePublic = false;
+                                    callback(err, extData);
+                                }
+                                else
+                                {
+                                    if(extData.SipUACEndpoint.ObjType === 'PUBLIC')
+                                    {
+                                        GetCallServerClusterDetailsDB(callServerId, function(err, cloudInfo)
+                                        {
+                                            if(cloudInfo && cloudInfo.Cloud && cloudInfo.Cloud.LoadBalancer)
+                                            {
+                                                extData.SipUACEndpoint.Domain = cloudInfo.Cloud.LoadBalancer.MainIP;
+                                                extData.SipUACEndpoint.UsePublic = true;
+                                            }
+
+                                            callback(err, extData);
+
+                                        })
+                                    }
+                                    else
+                                    {
+                                        extData.SipUACEndpoint.UsePublic = false;
+                                        callback(err, extData);
+                                    }
+                                }
+
+                            })
+
+
+
+
+                        })
+
+                    }
+                    else
+                    {
+                        callback(err, extData);
+                    }
+
                 });
         }
         else if(extType === 'GROUP')
@@ -658,6 +834,27 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
 
 };
 
+var GetCallServerClusterDetailsDB = function(csId, callback)
+{
+    try
+    {
+        dbModel.CallServer
+            .find({where :[{id: csId}], include: [{model: dbModel.Cloud, as: 'Cloud', include: [{model: dbModel.LoadBalancer, as: 'LoadBalancer'}]}]})
+            .then(function (cloudInfo)
+            {
+                callback(undefined, cloudInfo);
+            })
+            .catch(function(err)
+            {
+                callback(err, undefined);
+            })
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+    }
+}
+
 
 module.exports.GetUserBy_Name_Domain = GetUserBy_Name_Domain;
 module.exports.GetUserBy_Ext_Domain = GetUserBy_Ext_Domain;
@@ -672,4 +869,8 @@ module.exports.GetExtensionForDid = GetExtensionForDid;
 module.exports.GetExtensionDB = GetExtensionDB;
 module.exports.GetEmergencyNumber = GetEmergencyNumber;
 module.exports.GetUserByNameTenantDB = GetUserByNameTenantDB;
+module.exports.GetTransferCodesForTenantDB = GetTransferCodesForTenantDB;
+module.exports.GatherFromUserDetails = GatherFromUserDetails;
+module.exports.GetCallServerClusterDetailsDB = GetCallServerClusterDetailsDB;
+module.exports.GetUserDetailsByUsername = GetUserDetailsByUsername;
 

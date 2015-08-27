@@ -227,7 +227,7 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
 
 };
 
-var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia, numLimitInfo)
+var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia, numLimitInfo, transferLegInfo)
 {
     try
     {
@@ -273,6 +273,10 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
         {
             destinationGroup = 'group';
         }
+        else if(ep.Type === 'PUBLIC_USER')
+        {
+            destinationGroup = protocol + '/' + ep.Profile;
+        }
 
         var calling = util.format('%s%s/%s', option, destinationGroup, dnis);
 
@@ -302,14 +306,34 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
             .up()
             .ele('action').att('application', 'set').att('data', bypassMedia)
             .up()
-            .ele('action').att('application', 'bind_meta_app').att('data', '3 ab s execute_extension::att_xfer XML PBXFeatures')
-            .up()
-            .ele('action').att('application', 'bind_meta_app').att('data', '4 ab s execute_extension::att_xfer_group XML PBXFeatures')
-            .up()
-            .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
-            .up()
-            .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
-            .up()
+
+
+            if(transferLegInfo && transferLegInfo.TransferCode)
+            {
+                if(transferLegInfo.InternalLegs && transferLegInfo.TransferCode.InternalTransfer)
+                {
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.InternalTransfer + ' ' + transferLegInfo.InternalLegs + ' s execute_extension::att_xfer XML PBXFeatures')
+                    .up()
+                }
+
+                if(transferLegInfo.ExternalLegs && transferLegInfo.TransferCode.ExternalTransfer)
+                {
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.ExternalTransfer + ' ' + transferLegInfo.ExternalLegs + ' s execute_extension::att_xfer_outbound XML PBXFeatures')
+                        .up()
+                }
+
+                if(transferLegInfo.GroupLegs && transferLegInfo.TransferCode.GroupTransfer)
+                {
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.GroupTransfer + ' ' + transferLegInfo.GroupLegs + ' s execute_extension::att_xfer_group XML PBXFeatures')
+                        .up()
+                }
+
+                if(transferLegInfo.ConferenceLegs && transferLegInfo.TransferCode.ConferenceTransfer)
+                {
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.ConferenceTransfer + ' ' + transferLegInfo.ConferenceLegs + ' s execute_extension::att_xfer_conference XML PBXFeatures')
+                        .up()
+                }
+            }
 
 
         if(numLimitInfo && numLimitInfo.CheckLimit)
@@ -933,6 +957,11 @@ var CreateForwardingDialplan = function(reqId, endpoint, context, profile, desti
         var protocol = 'sofia';
         var destinationGroup = 'user';
 
+        if(endpoint.Type == 'PUBLIC_USER')
+        {
+            destinationGroup = endpoint.Profile;
+        }
+
         var calling = util.format('%s%s/%s', option, destinationGroup, dnis);
 
         if (endpoint.Group)
@@ -947,8 +976,7 @@ var CreateForwardingDialplan = function(reqId, endpoint, context, profile, desti
 
         var luaParams = util.format('CF.lua ${originate_disposition} \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\' \'%s\'', endpoint.CompanyId, endpoint.TenantId, context, endpoint.Domain, endpoint.Origination, endpoint.OriginationCallerIdNumber, fwdKey, endpoint.DodNumber);
 
-
-            var doc = xmlBuilder.create('document');
+        var doc = xmlBuilder.create('document');
 
         var cond = doc.att('type', 'freeswitch/xml')
                 .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
@@ -1078,6 +1106,11 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
         var option = '';
 
         var destinationGroup = util.format('gateway/%s', ep.Profile);
+
+        if(ep.Type == 'PUBLIC_USER')
+        {
+            destinationGroup = ep.Profile;
+        }
 
         if (ep.LegStartDelay > 0)
             option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain);
@@ -1241,6 +1274,17 @@ var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, dest
             if(ep.Type === 'GATEWAY')
             {
                 destinationGroup = util.format('gateway/%s', ep.Profile);
+
+                if (ep.LegStartDelay > 0)
+                    option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain);
+                else
+                    option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain);
+
+                bypassMed = 'bypass_media=false';
+            }
+            else if(ep.Type === 'PUBLIC_USER')
+            {
+                destinationGroup = ep.Profile;
 
                 if (ep.LegStartDelay > 0)
                     option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain);

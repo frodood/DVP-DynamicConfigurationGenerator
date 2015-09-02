@@ -1053,7 +1053,7 @@ var CreateForwardingDialplan = function(reqId, endpoint, context, profile, desti
 
 };
 
-var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia)
+var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia, transferLegInfo)
 {
     try
     {
@@ -1091,14 +1091,6 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
             .up()
             .ele('action').att('application', 'set').att('data', ignoreEarlyM)
             .up()
-            .ele('action').att('application', 'bind_meta_app').att('data', '3 ab s execute_extension::att_xfer XML PBXFeatures')
-            .up()
-            .ele('action').att('application', 'bind_meta_app').att('data', '4 ab s execute_extension::att_xfer_group XML PBXFeatures')
-            .up()
-            .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
-            .up()
-            .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
-            .up()
             .ele('action').att('application', 'set').att('data', bypassMed)
             .up()
 
@@ -1127,6 +1119,33 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
 
         var protocol = 'sofia';
         var calling = util.format('%s%s/%s/%s', option, protocol, destinationGroup, dnis);
+
+        if(transferLegInfo && transferLegInfo.TransferCode)
+        {
+            if(transferLegInfo.InternalLegs && transferLegInfo.TransferCode.InternalTransfer)
+            {
+                cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.InternalTransfer + ' ' + transferLegInfo.InternalLegs + ' s execute_extension::att_xfer XML PBXFeatures')
+                    .up()
+            }
+
+            if(transferLegInfo.ExternalLegs && transferLegInfo.TransferCode.ExternalTransfer)
+            {
+                cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.ExternalTransfer + ' ' + transferLegInfo.ExternalLegs + ' s execute_extension::att_xfer_outbound XML PBXFeatures')
+                    .up()
+            }
+
+            if(transferLegInfo.GroupLegs && transferLegInfo.TransferCode.GroupTransfer)
+            {
+                cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.GroupTransfer + ' ' + transferLegInfo.GroupLegs + ' s execute_extension::att_xfer_group XML PBXFeatures')
+                    .up()
+            }
+
+            if(transferLegInfo.ConferenceLegs && transferLegInfo.TransferCode.ConferenceTransfer)
+            {
+                cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.ConferenceTransfer + ' ' + transferLegInfo.ConferenceLegs + ' s execute_extension::att_xfer_conference XML PBXFeatures')
+                    .up()
+            }
+        }
 
         if(ep.CheckLimit)
         {

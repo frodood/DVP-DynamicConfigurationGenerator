@@ -10,6 +10,7 @@ var ruleHandler = require('DVP-RuleService/CallRuleBackendOperations.js');
 var redisHandler = require('./RedisHandler.js');
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 var extDialplanEngine = require('./ExtendedDialplanEngine.js');
+var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 
 
 var hostIp = config.Host.Ip;
@@ -939,6 +940,43 @@ server.get('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/LbRequestControl
     {
         logger.error('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - Exception occurred on LbRequestController Api Method - Error : ', reqId, ex);
         res.end(",");
+    }
+
+    return next();
+});
+
+server.get('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallServers/:companyId/:tenantId', function(req,res,next)
+{
+    var reqId = nodeUuid.v1();
+
+    var emptyArr = [];
+
+    try
+    {
+        logger.info('[DVP-DynamicConfigurationGenerator.CallServers] - [%s] - HTTP CS List Request Received [CallServers]', reqId);
+
+        var companyId = req.params.companyId;
+        var tenantId = req.params.tenantId;
+
+        logger.debug('[DVP-DynamicConfigurationGenerator.CallServers] - [%s] - Request Params - companyId : %s, tenantId : %s', reqId, companyId, tenantId);
+
+        backendHandler.GetCallServersForEndUserDB(reqId, companyId, tenantId, function(err, csList)
+        {
+            var state = true;
+            if(err)
+            {
+                state = false;
+            }
+            var jsonString = messageFormatter.FormatMessage(err, "", state, csList);
+            res.end(jsonString);
+        })
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CallServers] - [%s] - Exception occurred on CallServers Api Method - Error : ', reqId, ex);
+        var jsonString = messageFormatter.FormatMessage(ex, "", false, emptyArr);
+        res.end(jsonString);
     }
 
     return next();

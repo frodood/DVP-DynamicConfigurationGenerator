@@ -305,7 +305,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                         ep.OriginationCallerIdNumber = dodNumber;
                                     }
 
-                                    var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false);
+                                    var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, null);
 
                                     callback(undefined, xml);
                                 }
@@ -814,7 +814,9 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     ep.Origination = rule.ANI;
                                                                     ep.OriginationCallerIdNumber = rule.ANI;
 
-                                                                var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false);
+                                                                var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
+
+                                                                var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo);
 
                                                                 callback(undefined, xml);
                                                             }
@@ -1447,7 +1449,9 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                                 ep.OriginationCallerIdNumber = rule.ANI;
                                                                             }
 
-                                                                            var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false);
+                                                                            var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
+
+                                                                            var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo);
 
                                                                             callback(undefined, xml);
                                                                         }
@@ -1795,7 +1799,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     }
                                                     else
                                                     {
-                                                        var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false);
+                                                        var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
+                                                        var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo);
 
                                                         callback(undefined, xml);
                                                     }

@@ -1097,10 +1097,18 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                 }
                 else
                 {
+                    //Check for phone number is fax
+                    if(numLimitInfo.CallType === 'FAX')
+                    {
+                        var xml = xmlBuilder.CreateReceiveFaxDialplan(reqId, context, profile, '[^\\s]*', 'AUDIO', 'T38', numLimitInfo, uuid);
+                        callback(undefined, xml);
+                    }
+                    else
+                    {
+                        logger.info('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - DID Not Found Or Not Mapped To an Extension - TYPE : %s', reqId);
+                        callback(err, xmlBuilder.createNotFoundResponse());
+                    }
 
-                    //Check for fax passthru
-                    logger.info('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - DID Not Found Or Not Mapped To an Extension - TYPE : %s', reqId);
-                    callback(err, xmlBuilder.createNotFoundResponse());
                 }
             })
         }

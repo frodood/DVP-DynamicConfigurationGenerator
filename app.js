@@ -218,6 +218,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
 
                                         var NumLimitInfo =
                                         {
+                                            CallType : num.ObjType,
                                             NumType : num.ObjCategory,
                                             TrunkNumber : num.PhoneNumber,
                                             InboundLimit : inbLim,

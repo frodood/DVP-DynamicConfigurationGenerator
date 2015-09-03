@@ -2,6 +2,7 @@ var xmlBuilder = require('xmlbuilder');
 var config = require('config');
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 var util = require('util');
+var sf = require('stringformat');
 
 var createNotFoundResponse = function()
 {
@@ -673,6 +674,131 @@ var CreateRouteFaxUserDialplan = function(reqId, ep, context, profile, destinati
 
 
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
+var CreateReceiveFaxDialplan = function(reqId, context, profile, destinationPattern, fromFaxType, toFaxType, numLimitInfo, callId)
+{
+    try
+    {
+        var fileServiceHost = config.Services.fileServiceHost;
+        var fileServicePort = config.Services.fileServicePort;
+        var fileServiceVersion = config.Services.fileServiceVersion;
+
+        if(fileServiceHost && fileServicePort && fileServiceVersion)
+        {
+            if (!destinationPattern) {
+                destinationPattern = "";
+            }
+
+            if (!context) {
+                context = "";
+            }
+
+            var doc = xmlBuilder.create('document');
+
+            var cond = doc.att('type', 'freeswitch/xml')
+                .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+                .ele('context').att('name', context)
+                .ele('extension').att('name', 'test')
+                .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+
+            if(fromFaxType === 'AUDIO' && toFaxType === 'T38')
+            {
+                cond.ele('action').att('application', 'set').att('data', 'fax_enable_t38=true')
+                    .up()
+            }
+            else if(fromFaxType === 'T38' && toFaxType === 'AUDIO')
+            {
+                cond.ele('action').att('application', 'set').att('data', 'sip_execute_on_image=t38_gateway self nocng')
+                    .up()
+                    .ele('action').att('application', 'export').att('data', 'refuse_t38=true')
+                    .up()
+            }
+            else if(fromFaxType === 'T38' && toFaxType === 'T30AUDIO')
+            {
+                cond.ele('action').att('application', 'set').att('data', 'fax_enable_t38=true')
+                    .up()
+                    .ele('action').att('application', 'export').att('data', 'sip_execute_on_image=t38_gateway peer nocng')
+                    .up()
+            }
+            else if(fromFaxType === 'T38' && toFaxType === 'T38')
+            {
+                cond.ele('action').att('application', 'set').att('data', 't38_passthru=true')
+                    .up()
+                    .ele('action').att('application', 'export').att('data', 'refuse_t38=true')
+                    .up()
+            }
+            else if(fromFaxType === 'T38PASSTHRU' && toFaxType === 'T38PASSTHRU')
+            {
+                cond.ele('action').att('application', 'set').att('data', 't38_passthru=true')
+                    .up()
+                    .ele('action').att('application', 'export').att('data', 'refuse_t38=true')
+                    .up()
+            }
+            else
+            {
+                cond.ele('action').att('application', 'set').att('data', 'fax_enable_t38=true')
+                    .up()
+                    .ele('action').att('application', 'export').att('data', 'sip_execute_on_image=t38_gateway self nocng')
+                    .up()
+            }
+
+            if(numLimitInfo && numLimitInfo.CheckLimit)
+            {
+                if(numLimitInfo.NumType === 'INBOUND')
+                {
+                    var limitStr = util.format('hash %d_%d_inbound %s %d !USER_BUSY', numLimitInfo.TenantId, numLimitInfo.CompanyId, numLimitInfo.TrunkNumber, numLimitInfo.InboundLimit);
+                    cond.ele('action').att('application', 'limit').att('data', limitStr)
+                        .up()
+                }
+                else if(numLimitInfo.NumType === 'BOTH')
+                {
+                    if(numLimitInfo.InboundLimit)
+                    {
+                        var limitStr = util.format('hash %d_%d_inbound %s %d !USER_BUSY', numLimitInfo.TenantId, numLimitInfo.CompanyId, numLimitInfo.TrunkNumber, numLimitInfo.InboundLimit);
+                        cond.ele('action').att('application', 'limit').att('data', limitStr)
+                            .up()
+                    }
+
+                    if(numLimitInfo.BothLimit)
+                    {
+                        var limitStr = util.format('hash %d_%d_both %s %d !USER_BUSY', numLimitInfo.TenantId, numLimitInfo.CompanyId, numLimitInfo.TrunkNumber, numLimitInfo.BothLimit);
+                        cond.ele('action').att('application', 'limit').att('data', limitStr)
+                            .up()
+                    }
+                }
+
+            }
+
+            var localFilePath = util.format('$${base_dir}/fax/inbox/%s_FAX.tif', callId);
+
+            //sf.format()
+            var execFaxSuccessData = sf('execute_on_fax_success=curl_sendfile:http://{0}:{1}/DVP/API/{2}/FilService/File/Upload?class=CALLSERVER&type=CALL&category=FAX&reference={3} file={4}', fileServiceHost, fileServicePort, fileServiceVersion, callId, localFilePath);
+            cond.ele('action').att('application', 'set_zombie_exec')
+                .up()
+                .ele('action').att('application', 'set').att('data', execFaxSuccessData)
+                .up()
+                .ele('action').att('application', 'rxfax').att('data', localFilePath)
+                .up()
+
+            cond.end({pretty: true});
+
+
+            return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+        }
+        else
+        {
+            return createNotFoundResponse();
+        }
+
 
     }
     catch(ex)
@@ -1393,3 +1519,4 @@ module.exports.CreateParkDialplan = CreateParkDialplan;
 module.exports.CreateRouteFaxUserDialplan = CreateRouteFaxUserDialplan;
 module.exports.CreateRouteFaxGatewayDialplan = CreateRouteFaxGatewayDialplan;
 module.exports.CreateConferenceDialplan = CreateConferenceDialplan;
+module.exports.CreateReceiveFaxDialplan = CreateReceiveFaxDialplan;

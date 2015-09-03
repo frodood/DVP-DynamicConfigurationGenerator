@@ -32,6 +32,9 @@ module.exports = {
             "Ip":"SYS_SERVICE_SIPUACENDPOINT_IP",
             "Port":"SYS_SERVICE_SIPUACENDPOINT_PORT",
             "Version":"SYS_SERVICE_SIPUACENDPOINT_VERSION"
-        }
+        },
+        "fileServiceHost": "SYS_FILESERVICE_HOST",
+        "fileServicePort": "SYS_FILESERVICE_PORT",
+        "fileServiceVersion":"SYS_FILESERVICE_VERSION"
     }
 };

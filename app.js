@@ -1132,7 +1132,7 @@ server.get('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/LbRequestControl
                 }
                 else
                 {
-                    var returnMessage = cb.LimitId + "," + cb.LoadBalanceType + "," + cb.IpCode;
+                    var returnMessage = cb.InboundLimit + "," + cb.BothLimit + "," + cb.LoadBalanceType + "," + cb.IpCode;
 
                     logger.debug('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - GetCloudForIncomingRequest object found - Returning LB Details : %s', reqId, returnMessage);
 
@@ -1161,7 +1161,7 @@ server.get('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/LbRequestControl
                 }
                 else
                 {
-                    var returnMessage = cb.LimitId + "," + cb.GwIpUrl;
+                    var returnMessage = cb.InboundLimit + "," + cb.BothLimit + "," + cb.GwIpUrl;
 
                     logger.debug('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - GetGatewayForOutgoingRequest object found - Returning Gateway Details : %s', reqId, returnMessage);
 

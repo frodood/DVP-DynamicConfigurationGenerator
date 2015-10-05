@@ -735,11 +735,13 @@ var GetGatewayForOutgoingRequest = function(fromNumber, lbId, callback)
 {
     var outgoingRequest = {
         LimitId: "",
-        GwIpUrl: ""
+        GwIpUrl: "",
+        OutboundLimit: "",
+        BothLimit: ""
     };
 
     dbModel.TrunkPhoneNumber
-        .find({where :[{PhoneNumber: fromNumber}], include : [{model: dbModel.Trunk, as: "Trunk"}]})
+        .find({where :[{PhoneNumber: fromNumber}], include : [{model: dbModel.Trunk, as: "Trunk"},{model: dbModel.LimitInfo, as : 'LimitInfoInbound'}, {model: dbModel.LimitInfo, as : 'LimitInfoBoth'}]})
         .then(function (result)
         {
             if(result)
@@ -747,9 +749,14 @@ var GetGatewayForOutgoingRequest = function(fromNumber, lbId, callback)
                 logger.debug('[DVP-DynamicConfigurationGenerator.GetGatewayForOutgoingRequest] PGSQL Get trunk number query success');
                 if(result.Trunk)
                 {
-                    if(result.LimitId)
+                    if(result.LimitInfoOutbound && result.LimitInfoOutbound.MaxCount != null)
                     {
-                        outgoingRequest.LimitId = result.LimitId;
+                        outgoingRequest.OutboundLimit = result.LimitInfoOutbound.MaxCount.toString();
+                    }
+
+                    if(result.LimitInfoBoth && result.LimitInfoBoth.MaxCount != null)
+                    {
+                        outgoingRequest.BothLimit = result.LimitInfoBoth.MaxCount.toString();
                     }
 
                     outgoingRequest.GwIpUrl = result.Trunk.IpUrl;
@@ -778,23 +785,34 @@ var GetGatewayForOutgoingRequest = function(fromNumber, lbId, callback)
 var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
 {
     var incomingRequest = {
-        LimitId: "",
+        InboundLimit: "",
+        BothLimit: "",
         IpCode: "",
         LoadBalanceType: ""
     };
 
     dbModel.TrunkPhoneNumber
-        .find({where :[{PhoneNumber: toNumber}]})
+        .find({where :[{PhoneNumber: toNumber}], include : [{model: dbModel.LimitInfo, as : 'LimitInfoInbound'}, {model: dbModel.LimitInfo, as : 'LimitInfoBoth'}]})
         .then(function (phn)
         {
             try
             {
-                if(phn && phn.CompanyId && phn.TenantId)
+                if(phn && phn.CompanyId && phn.TenantId && (phn.ObjCategory === 'INBOUND' || phn.ObjCategory === 'BOTH'))
                 {
                     logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get trunk number query success');
                     //record found
                     var companyId = phn.CompanyId;
                     var tenantId = phn.TenantId;
+
+                    if(phn.LimitInfoInbound && phn.LimitInfoInbound.MaxCount != null)
+                    {
+                        incomingRequest.InboundLimit = phn.LimitInfoInbound.MaxCount.toString();
+                    }
+
+                    if(phn.LimitInfoBoth && phn.LimitInfoBoth.MaxCount != null)
+                    {
+                        incomingRequest.BothLimit = phn.LimitInfoBoth.MaxCount.toString();
+                    }
 
                     dbModel.CloudEndUser
                         .find({where :[{CompanyId: companyId}, {TenantId: tenantId}]})
@@ -818,7 +836,6 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
                                                 {
                                                     logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get call server query success');
                                                     //call server found
-                                                    incomingRequest.LimitId = phn.LimitId;
                                                     incomingRequest.IpCode = cs.InternalMainIP;
                                                     incomingRequest.LoadBalanceType = "cs";
 
@@ -850,7 +867,6 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
                                                     logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get sip profile query success');
                                                     if(res.CallServer)
                                                     {
-                                                        incomingRequest.LimitId = phn.LimitId;
                                                         incomingRequest.IpCode = res.CallServer.InternalMainIP;
                                                         incomingRequest.LoadBalanceType = "cs";
 
@@ -890,7 +906,7 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
                                                     if(clusterInfo)
                                                     {
                                                         logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get cloud query success');
-                                                        incomingRequest.LimitId = phn.LimitId;
+
                                                         incomingRequest.IpCode = clusterInfo.Code;
                                                         incomingRequest.LoadBalanceType = "cluster";
 

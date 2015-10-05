@@ -1,5 +1,5 @@
-var dbModel = require('dvp-dbmodels');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
+var dbModel = require('dvp-dbmodels');
 
 var GetUserBy_Ext_Domain = function(extension, domain, callback)
 {

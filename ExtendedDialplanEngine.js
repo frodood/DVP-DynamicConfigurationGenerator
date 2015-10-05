@@ -1,13 +1,13 @@
 var nodeUuid = require('node-uuid');
-var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
-var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
+var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var config = require('config');
 var extApi = require('./ExternalApiAccess.js');
 var backendHandler = require('./SipExtBackendOperations.js');
 var xmlBuilder = require('./XmlExtendedDialplanBuilder.js');
-var transHandler = require('DVP-RuleService/TranslationHandler.js');
+var transHandler = require('dvp-ruleservice/TranslationHandler.js');
 var redisHandler = require('./RedisHandler.js');
-var ruleHandler = require('DVP-RuleService/CallRuleBackendOperations.js');
+var ruleHandler = require('dvp-ruleservice/CallRuleBackendOperations.js');
 var conferenceHandler = require('./ConferenceOperations.js');
 var util = require('util');
 var stringify = require('stringify');
@@ -1098,7 +1098,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                 else
                 {
                     //Check for phone number is fax
-                    if(numLimitInfo.CallType === 'FAX')
+                    if(numLimitInfo && numLimitInfo.CallType === 'FAX')
                     {
                         var xml = xmlBuilder.CreateReceiveFaxDialplan(reqId, context, profile, '[^\\s]*', 'AUDIO', 'T38', numLimitInfo, uuid);
                         callback(undefined, xml);

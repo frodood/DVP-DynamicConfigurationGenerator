@@ -1,6 +1,6 @@
 var xmlBuilder = require('xmlbuilder');
 var Config = require('config');
-var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
+var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var util = require('util');
 
 var createNotFoundResponse = function()

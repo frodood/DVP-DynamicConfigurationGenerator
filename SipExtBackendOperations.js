@@ -1,5 +1,5 @@
-var dbModel = require('DVP-DBModels');
-var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
+var dbModel = require('dvp-dbmodels');
+var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 
 var GetUserBy_Ext_Domain = function(extension, domain, callback)
 {
@@ -7,17 +7,17 @@ var GetUserBy_Ext_Domain = function(extension, domain, callback)
     {
         dbModel.SipUACEndpoint
             .find({where: {SipExtension: extension}, include: [{model: dbModel.CloudEndUser, as: "CloudEndUser", where: {Domain: domain}}]})
-            .complete(function (err, ext)
+            .then(function (ext)
             {
-                if(err)
-                {
-                    logger.error('[DVP-DynamicConfigurationGenerator.GetUserBy_Ext_Domain] PGSQL Get sip endpoint for ext domain query failed', err);
-                }
-                else
-                {
-                    logger.debug('[DVP-DynamicConfigurationGenerator.GetUserBy_Ext_Domain] PGSQL Get sip endpoint for ext domain query success');
-                }
-                callback(err, ext);
+                logger.debug('[DVP-DynamicConfigurationGenerator.GetUserBy_Ext_Domain] PGSQL Get sip endpoint for ext domain query success');
+
+                callback(undefined, ext);
+
+            }).catch(function(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.GetUserBy_Ext_Domain] PGSQL Get sip endpoint for ext domain query failed', err);
+
+                callback(err, undefined);
             })
     }
     catch(ex)
@@ -32,18 +32,16 @@ var GetUserBy_Name_Domain = function(extName, domain, callback)
     {
         dbModel.SipUACEndpoint
             .find({where: {SipUsername: extName}, include: [{model: dbModel.CloudEndUser, as: "CloudEndUser", where: {Domain : domain}}]})
-            .complete(function (err, ext)
+            .then(function (ext)
             {
-                if(err)
-                {
-                    logger.error('[DVP-DynamicConfigurationGenerator.GetUserBy_Name_Domain] PGSQL Get sip endpoint for username domain query failed', err);
-                }
-                else
-                {
-                    logger.debug('[DVP-DynamicConfigurationGenerator.GetUserBy_Name_Domain] PGSQL Get sip endpoint for username domain query success');
-                }
+                logger.debug('[DVP-DynamicConfigurationGenerator.GetUserBy_Name_Domain] PGSQL Get sip endpoint for username domain query success');
 
-                callback(err, ext);
+                callback(undefined, ext);
+
+            }).catch(function(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.GetUserBy_Name_Domain] PGSQL Get sip endpoint for username domain query failed', err);
+                callback(err, undefined);
             })
 
         }
@@ -61,18 +59,16 @@ var GetUserDetailsByUsername = function(reqId, username, callback)
     {
         dbModel.SipUACEndpoint
             .find({where: [{SipUsername: username}]})
-            .complete(function (err, usr)
+            .then(function (usr)
             {
-                if(err)
-                {
-                    logger.error('[DVP-DynamicConfigurationGenerator.GetUserDetailsByUsername] PGSQL Get sip endpoint for username query failed', err);
-                }
-                else
-                {
-                    logger.debug('[DVP-DynamicConfigurationGenerator.GetUserDetailsByUsername] PGSQL Get sip endpoint for username query success');
-                }
+                logger.debug('[DVP-DynamicConfigurationGenerator.GetUserDetailsByUsername] PGSQL Get sip endpoint for username query success');
 
-                callback(err, usr);
+                callback(undefined, usr);
+
+            }).catch(function(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.GetUserDetailsByUsername] PGSQL Get sip endpoint for username query failed', err);
+                callback(err, undefined);
             })
 
     }
@@ -80,7 +76,7 @@ var GetUserDetailsByUsername = function(reqId, username, callback)
     {
         callback(ex, undefined);
     }
-}
+};
 
 var GatherFromUserDetails = function(reqId, usrName, tenantId, ignoreTenant, callback)
 {
@@ -114,36 +110,32 @@ var GetUserByNameTenantDB = function(reqId, extName, tenantId, ignoreTenant, cal
         {
             dbModel.SipUACEndpoint
                 .find({where: [{SipUsername: extName},{TenantId: tenantId}], include:[{model: dbModel.Extension, as: 'Extension'}]})
-                .complete(function (err, usr)
+                .then(function (usr)
                 {
-                    if(err)
-                    {
-                        logger.error('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query failed', err);
-                    }
-                    else
-                    {
-                        logger.debug('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query success');
-                    }
+                    logger.debug('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query success');
 
-                    callback(err, usr);
+                    callback(undefined, usr);
+
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query failed', err);
+                    callback(err, undefined);
                 })
         }
         else
         {
             dbModel.SipUACEndpoint
                 .find({where: [{SipUsername: extName}], include:[{model: dbModel.Extension, as: 'Extension'}]})
-                .complete(function (err, usr)
+                .then(function (usr)
                 {
-                    if(err)
-                    {
-                        logger.error('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query failed', err);
-                    }
-                    else
-                    {
-                        logger.debug('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query success');
-                    }
+                    logger.debug('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query success');
 
-                    callback(err, usr);
+                    callback(undefined, usr);
+
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query failed', err);
+                    callback(err, undefined);
                 })
         }
 
@@ -190,18 +182,15 @@ var GetExtensionForDid = function(reqId, didNumber, companyId, tenantId, callbac
     try
     {
         dbModel.DidNumber.find({where: [{DidNumber: didNumber},{TenantId: tenantId}], include : [{model: dbModel.Extension, as: 'Extension'}]})
-            .complete(function (err, didNumDetails)
+            .then(function (didNumDetails)
             {
-                if (err)
-                {
-                    logger.error('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query failed', reqId, err);
-                    callback(err, undefined);
-                }
-                else
-                {
-                    logger.debug('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query success', reqId);
-                    callback(err, didNumDetails);
-                }
+                logger.debug('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query success', reqId);
+                callback(undefined, didNumDetails);
+
+            }).catch(function(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query failed', reqId, err);
+                callback(err, undefined);
             });
     }
     catch(ex)
@@ -217,18 +206,15 @@ var GetExtensionDB = function(reqId, ext, tenantId, callback)
     try
     {
         dbModel.Extension.find({where: [{Extension: ext},{TenantId: tenantId}]})
-            .complete(function (err, extDetails)
+            .then(function (extDetails)
             {
-                if (err)
-                {
-                    logger.error('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query failed', reqId, err);
-                    callback(err, undefined);
-                }
-                else
-                {
-                    logger.debug('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query success', reqId);
-                    callback(err, extDetails);
-                }
+                logger.debug('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query success', reqId);
+                callback(err, extDetails);
+
+            }).catch(function(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query failed', reqId, err);
+                callback(err, undefined);
             });
     }
     catch(ex)
@@ -270,7 +256,7 @@ var GetAllDataForExt = function(reqId, extension, tenantId, extType, callServerI
         if(extType === 'USER')
         {
             dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}], include: [{model: dbModel.SipUACEndpoint, as:'SipUACEndpoint', include: [{model: dbModel.CloudEndUser, as:'CloudEndUser'},{model: dbModel.UserGroup, as:'UserGroup', include: [{model: dbModel.Extension, as:'Extension'}]}]}]})
-                .complete(function (err, extData)
+                .then(function (extData)
                 {
                     if(extData && extData.SipUACEndpoint)
                     {
@@ -321,33 +307,45 @@ var GetAllDataForExt = function(reqId, extension, tenantId, extType, callServerI
                     }
                     else
                     {
-                        callback(err, extData);
+                        callback(undefined, extData);
                     }
 
+                }).catch(function(err)
+                {
+                    callback(err, undefined);
                 });
         }
         else if(extType === 'GROUP')
         {
             dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}], include: [{model: dbModel.UserGroup, as:'UserGroup'}]})
-                .complete(function (err, extData)
+                .then(function (extData)
                 {
-                    callback(err, extData);
+                    callback(undefined, extData);
+                }).catch(function(err)
+                {
+                    callback(err, undefined);
                 });
         }
         else if(extType === 'CONFERENCE')
         {
             dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}], include: [{model: dbModel.Conference, as:'Conference', include : [{model: dbModel.ConferenceUser, as : 'ConferenceUser', include:[{model: dbModel.SipUACEndpoint, as: 'SipUACEndpoint', include:[{model: dbModel.CloudEndUser, as: 'CloudEndUser'}]}]},{model: dbModel.CloudEndUser, as: 'CloudEndUser'}]}]})
-                .complete(function (err, extData)
+                .then(function (extData)
                 {
-                    callback(err, extData);
+                    callback(undefined, extData);
+                }).catch(function(err)
+                {
+                    callback(err, undefined);
                 });
         }
         else if(extType === 'VOICE_PORTAL')
         {
             dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}]})
-                .complete(function (err, extData)
+                .then(function (extData)
                 {
-                    callback(err, extData);
+                    callback(undefined, extData);
+                }).catch(function(err)
+                {
+                    callback(err, undefined);
                 });
         }
         else
@@ -371,19 +369,17 @@ var GetGroupBy_Name_Domain = function(grpName, domain, callback)
     {
         dbModel.UserGroup
             .find({where: [{Domain: domain},{GroupName: grpName}], include: [{model: dbModel.SipUACEndpoint, as: "SipUACEndpoint", include:[{model: dbModel.CloudEndUser, as : "CloudEndUser"}]}, {model: dbModel.Extension, as: "Extension"}]})
-            .complete(function (err, grpData)
+            .then(function (grpData)
             {
-                if(err)
-                {
-                    logger.error('[DVP-DynamicConfigurationGenerator.GetGroupBy_Name_Domain] PGSQL Get user group query failed', err);
-                }
-                else
-                {
-                    logger.debug('[DVP-DynamicConfigurationGenerator.GetGroupBy_Name_Domain] PGSQL Get user group query success');
-                }
 
-                callback(err, grpData);
+                logger.debug('[DVP-DynamicConfigurationGenerator.GetGroupBy_Name_Domain] PGSQL Get user group query success');
 
+                callback(undefined, grpData);
+            }).catch(function(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.GetGroupBy_Name_Domain] PGSQL Get user group query failed', err);
+
+                callback(err, undefined);
             })
     }
     catch(ex)
@@ -401,14 +397,9 @@ var GetCallServersForEndUserDB = function(reqId, companyId, tenantId, callback)
 
         dbModel.CloudEndUser
             .find({where :[{CompanyId: companyId}, {TenantId: tenantId}]})
-            .complete(function (err, endUser)
+            .then(function (endUser)
             {
-                if(err)
-                {
-                    logger.error('[DVP-DynamicConfigurationGenerator.GetCallServersForEndUserDB] - [%s] - PGSQL Get cloud end user query failed', reqId, err);
-                    callback(err, csList);
-                }
-                else if(endUser && endUser.SIPConnectivityProvision)
+                if(endUser && endUser.SIPConnectivityProvision)
                 {
                     logger.debug('[DVP-DynamicConfigurationGenerator.GetCallServersForEndUserDB] - [%s] - PGSQL Get cloud end user query success', reqId);
                     var provisionMechanism = endUser.SIPConnectivityProvision;
@@ -420,14 +411,9 @@ var GetCallServersForEndUserDB = function(reqId, companyId, tenantId, callback)
                             //find call server
                             dbModel.CallServer
                                 .find({where :[{CompanyId: companyId}, {TenantId: tenantId}]})
-                                .complete(function (err, cs)
+                                .then(function (cs)
                                 {
-                                    if(err)
-                                    {
-                                        logger.error('[DVP-DynamicConfigurationGenerator.GetCallServersForEndUserDB] - [%s] - PGSQL Get call server query failed', reqId, err);
-                                        callback(err, csList);
-                                    }
-                                    else if(cs)
+                                    if(cs)
                                     {
                                         logger.debug('[DVP-DynamicConfigurationGenerator.GetCallServersForEndUserDB] - [%s] - PGSQL Get call server query success', reqId);
                                         //call server found
@@ -441,6 +427,10 @@ var GetCallServersForEndUserDB = function(reqId, companyId, tenantId, callback)
                                         callback(new Error('Cannot find a call server dedicated to company number'), csList);
                                     }
 
+                                }).catch(function(err)
+                                {
+                                    logger.error('[DVP-DynamicConfigurationGenerator.GetCallServersForEndUserDB] - [%s] - PGSQL Get call server query failed', reqId, err);
+                                    callback(err, csList);
                                 });
                         }
                             break;
@@ -449,14 +439,9 @@ var GetCallServersForEndUserDB = function(reqId, companyId, tenantId, callback)
                             //find call server that matches profile
                             dbModel.SipNetworkProfile
                                 .find({where :[{CompanyId: companyId}, {TenantId: tenantId}, {ObjType: "INTERNAL"}], include : [{model: dbModel.CallServer, as: "CallServer"}]})
-                                .complete(function (err, res)
+                                .then(function (res)
                                 {
-                                    if(err)
-                                    {
-                                        logger.error('[DVP-DynamicConfigurationGenerator.GetCallServersForEndUserDB] - [%s] - PGSQL Get sip profile query failed', reqId, err);
-                                        callback(err, csList);
-                                    }
-                                    else if(res)
+                                    if(res)
                                     {
                                         logger.debug('[DVP-DynamicConfigurationGenerator.GetCallServersForEndUserDB] - [%s] - PGSQL Get sip profile query success', reqId);
                                         if(res.CallServer)
@@ -478,6 +463,10 @@ var GetCallServersForEndUserDB = function(reqId, companyId, tenantId, callback)
                                     }
 
 
+                                }).catch(function(err)
+                                {
+                                    logger.error('[DVP-DynamicConfigurationGenerator.GetCallServersForEndUserDB] - [%s] - PGSQL Get sip profile query failed', reqId, err);
+                                    callback(err, csList);
                                 });
                             break;
                         }
@@ -491,14 +480,9 @@ var GetCallServersForEndUserDB = function(reqId, companyId, tenantId, callback)
 
                                 dbModel.Cloud
                                     .find({where :[{id: clusId}], include:[{model: dbModel.CallServer, as:"CallServer"}]})
-                                    .complete(function (err, clusterInfo)
+                                    .then(function (clusterInfo)
                                     {
-                                        if(err)
-                                        {
-                                            logger.error('[DVP-DynamicConfigurationGenerator.GetCallServersForEndUserDB] - [%s] - PGSQL Get cloud query failed', reqId, err);
-                                            callback(err, csList);
-                                        }
-                                        else if(clusterInfo)
+                                        if(clusterInfo)
                                         {
                                             logger.debug('[DVP-DynamicConfigurationGenerator.GetCallServersForEndUserDB] - [%s] - PGSQL Get cloud query success', reqId);
 
@@ -510,6 +494,10 @@ var GetCallServersForEndUserDB = function(reqId, companyId, tenantId, callback)
                                             callback(new Error('Cannot find a cloud for end user'), csList);
                                         }
 
+                                    }).catch(function(err)
+                                    {
+                                        logger.error('[DVP-DynamicConfigurationGenerator.GetCallServersForEndUserDB] - [%s] - PGSQL Get cloud query failed', reqId, err);
+                                        callback(err, csList);
                                     });
 
                             }
@@ -533,6 +521,10 @@ var GetCallServersForEndUserDB = function(reqId, companyId, tenantId, callback)
                     callback(new Error('Cloud Enduser not found'), csList);
                 }
 
+            }).catch(function(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.GetCallServersForEndUserDB] - [%s] - PGSQL Get cloud end user query failed', reqId, err);
+                callback(err, csList);
             });
     }
     catch(ex)
@@ -540,7 +532,7 @@ var GetCallServersForEndUserDB = function(reqId, companyId, tenantId, callback)
         callback(ex, csList);
 
     }
-}
+};
 
 var GetContext = function(context, callback)
 {
@@ -548,19 +540,16 @@ var GetContext = function(context, callback)
     {
         dbModel.Context
             .find({where :[{Context: context}]})
-            .complete(function (err, ctxt)
+            .then(function (ctxt)
             {
-                if(err)
-                {
-                    logger.error('[DVP-DynamicConfigurationGenerator.GetContext] PGSQL Get context query failed', err);
-                }
-                else
-                {
-                    logger.debug('[DVP-DynamicConfigurationGenerator.GetContext] PGSQL Get context query success');
-                }
+                logger.debug('[DVP-DynamicConfigurationGenerator.GetContext] PGSQL Get context query success');
 
-                callback(err, ctxt);
+                callback(undefined, ctxt);
 
+            }).catch(function(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.GetContext] PGSQL Get context query failed', err);
+                callback(err, undefined);
             });
 
     }
@@ -576,19 +565,16 @@ var GetEmergencyNumber = function(numb, tenantId, callback)
     {
         dbModel.EmergencyNumber
             .find({where :[{EmergencyNum: numb},{TenantId: tenantId}]})
-            .complete(function (err, eNum)
+            .then(function (eNum)
             {
-                if(err)
-                {
-                    logger.error('[DVP-DynamicConfigurationGenerator.GetContext] PGSQL Get emergency number query failed', err);
-                }
-                else
-                {
-                    logger.debug('[DVP-DynamicConfigurationGenerator.GetContext] PGSQL Get emergency number query success');
-                }
+                logger.debug('[DVP-DynamicConfigurationGenerator.GetContext] PGSQL Get emergency number query success');
 
-                callback(err, eNum);
+                callback(undefined, eNum);
 
+            }).catch(function(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.GetContext] PGSQL Get emergency number query failed', err);
+                callback(err, undefined);
             });
 
     }
@@ -596,7 +582,7 @@ var GetEmergencyNumber = function(numb, tenantId, callback)
     {
         callback(ex, undefined);
     }
-}
+};
 
 var GetPhoneNumberDetails = function(phnNum, callback)
 {
@@ -604,18 +590,16 @@ var GetPhoneNumberDetails = function(phnNum, callback)
     {
         dbModel.TrunkPhoneNumber
             .find({where :[{PhoneNumber: phnNum},{Enable: true}], include: [{model: dbModel.LimitInfo, as: 'LimitInfoInbound'},{model: dbModel.LimitInfo, as: 'LimitInfoBoth'},{model:dbModel.Trunk, as : 'Trunk'}]})
-            .complete(function (err, phnInfo)
+            .then(function (phnInfo)
             {
-                if(err)
-                {
-                    logger.error('[DVP-DynamicConfigurationGenerator.GetPhoneNumberDetails] PGSQL Get phone num details query failed', err);
-                }
-                else
-                {
-                    logger.debug('[DVP-DynamicConfigurationGenerator.GetPhoneNumberDetails] PGSQL Get phone num details query success');
-                }
+                logger.debug('[DVP-DynamicConfigurationGenerator.GetPhoneNumberDetails] PGSQL Get phone num details query success');
 
-                callback(err, phnInfo);
+                callback(undefined, phnInfo);
+
+            }).catch(function(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.GetPhoneNumberDetails] PGSQL Get phone num details query failed', err);
+                callback(err, undefined);
             })
     }
     catch(ex)
@@ -632,16 +616,11 @@ var GetGatewayListForCallServerProfile = function(profile, csId, reqId, callback
 
         dbModel.SipNetworkProfile
             .find({where :[{ProfileName: profile},{ObjType: 'EXTERNAL'}], include: [{model: dbModel.CallServer, as: "CallServer", where:[{id: csId}]},{model: dbModel.Trunk, as: "Trunk"}]})
-            .complete(function (err, result)
+            .then(function (result)
             {
                 try
                 {
-                    if(err)
-                    {
-                        logger.error('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] PGSQL Get SipNetworkProfile query failed', err);
-                        callback(err, undefined);
-                    }
-                    else if(result)
+                    if(result)
                     {
                         logger.debug('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] PGSQL Get SipNetworkProfile query success');
                         //check profile contains direct trunk map
@@ -653,7 +632,8 @@ var GetGatewayListForCallServerProfile = function(profile, csId, reqId, callback
 
                                 trunkList.forEach(function(trunk)
                                 {
-                                    var gw = {
+                                    var gw =
+                                    {
                                         IpUrl : trunk.IpUrl,
                                         Domain : result.InternalIp,
                                         TrunkCode: trunk.TrunkCode,
@@ -667,70 +647,64 @@ var GetGatewayListForCallServerProfile = function(profile, csId, reqId, callback
                             {
                                 try
                                 {
-                                    dbModel.Cloud
-                                        .find({where :[{id: result.CallServer.ClusterId}], include: [{model: dbModel.LoadBalancer, as: "LoadBalancer", include: [{model: dbModel.Trunk, as: "Trunk"}]}]})
-                                        .complete(function (err, result)
+                                    dbModel.Cloud.find({where: [{id: result.CallServer.ClusterId}], include: [{ model: dbModel.LoadBalancer, as: "LoadBalancer", include: [{model: dbModel.Trunk, as: "Trunk"}]}]})
+                                        .then(function (result)
                                         {
-                                            if(err)
-                                            {
-                                                logger.error('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] - [%s] - PGSQL Get Cloud - LoadBalancer - Trunk query failed', reqId, err);
 
-                                                callback(undefined, gatewayList);
-                                            }
-                                            else
-                                            {
-                                                logger.debug('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] PGSQL Get Cloud - LoadBalancer - Trunk query success');
+                                            logger.debug('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] PGSQL Get Cloud - LoadBalancer - Trunk query success');
 
-                                                if(result)
+                                            if (result)
+                                            {
+                                                if (result.LoadBalancer && result.LoadBalancer.Trunk)
                                                 {
-                                                    if(result.LoadBalancer && result.LoadBalancer.Trunk)
-                                                    {
-                                                        var trunkList = result.LoadBalancer.Trunk;
+                                                    var trunkList = result.LoadBalancer.Trunk;
 
-                                                        trunkList.forEach(function(trunk)
+                                                    trunkList.forEach(function (trunk)
+                                                    {
+                                                        var gw =
                                                         {
-                                                            var gw = {
-                                                                IpUrl : trunk.IpUrl,
-                                                                Domain : result.InternalIp,
-                                                                TrunkCode: trunk.TrunkCode,
-                                                                Proxy: result.LoadBalancer.MainIp
-                                                            };
-                                                            gatewayList.push(gw);
-                                                        })
+                                                            IpUrl: trunk.IpUrl,
+                                                            Domain: result.InternalIp,
+                                                            TrunkCode: trunk.TrunkCode,
+                                                            Proxy: result.LoadBalancer.MainIp
+                                                        };
+                                                        gatewayList.push(gw);
+                                                    });
 
-                                                        callback(undefined, gatewayList);
-                                                    }
-                                                    else
-                                                    {
-                                                        logger.warn('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] - [%s] - load balancer not found', reqId);
-                                                        callback(undefined, gatewayList);
-                                                    }
+                                                    callback(undefined, gatewayList);
                                                 }
                                                 else
                                                 {
-                                                    logger.warn('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] - [%s] - cluster query returned empty', reqId);
+                                                    logger.warn('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] - [%s] - load balancer not found', reqId);
                                                     callback(undefined, gatewayList);
                                                 }
                                             }
+                                            else
+                                            {
+                                                logger.warn('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] - [%s] - cluster query returned empty', reqId);
+                                                callback(undefined, gatewayList);
+                                            }
 
 
+                                        }).catch(function (err)
+                                        {
+                                            logger.error('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] - [%s] - PGSQL Get Cloud - LoadBalancer - Trunk query failed', reqId, err);
+
+                                            callback(err, gatewayList);
                                         });
                                 }
-                                catch(ex)
+                                catch (ex)
                                 {
                                     callback(ex, undefined);
                                 }
 
                             }
-                        else
+                            else
                             {
                                 logger.warn('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] - [%s] - Sip network profile not connected to call server or call server connected is not in cluster', reqId);
 
                                 callback(undefined, gatewayList);
                             }
-
-
-
 
                     }
                     else
@@ -744,6 +718,10 @@ var GetGatewayListForCallServerProfile = function(profile, csId, reqId, callback
                     callback(ex, undefined);
                 }
 
+            }).catch(function(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] PGSQL Get SipNetworkProfile query failed', err);
+                callback(err, undefined);
             });
 
     }
@@ -762,14 +740,9 @@ var GetGatewayForOutgoingRequest = function(fromNumber, lbId, callback)
 
     dbModel.TrunkPhoneNumber
         .find({where :[{PhoneNumber: fromNumber}], include : [{model: dbModel.Trunk, as: "Trunk"}]})
-        .complete(function (err, result)
+        .then(function (result)
         {
-            if(err)
-            {
-                logger.error('[DVP-DynamicConfigurationGenerator.GetGatewayForOutgoingRequest] PGSQL Get trunk number query failed', err);
-                callback(err, undefined);
-            }
-            else if(result)
+            if(result)
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.GetGatewayForOutgoingRequest] PGSQL Get trunk number query success');
                 if(result.Trunk)
@@ -795,8 +768,12 @@ var GetGatewayForOutgoingRequest = function(fromNumber, lbId, callback)
                 callback(new Error('Number not found'), undefined);
             }
 
+        }).catch(function(err)
+        {
+            logger.error('[DVP-DynamicConfigurationGenerator.GetGatewayForOutgoingRequest] PGSQL Get trunk number query failed', err);
+            callback(err, undefined);
         });
-}
+};
 
 var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
 {
@@ -808,16 +785,11 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
 
     dbModel.TrunkPhoneNumber
         .find({where :[{PhoneNumber: toNumber}]})
-        .complete(function (err, phn)
+        .then(function (phn)
         {
             try
             {
-                if(err)
-                {
-                    logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get trunk number query failed', err);
-                    callback(err, undefined);
-                }
-                else if(phn && phn.CompanyId && phn.TenantId)
+                if(phn && phn.CompanyId && phn.TenantId)
                 {
                     logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get trunk number query success');
                     //record found
@@ -826,14 +798,9 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
 
                     dbModel.CloudEndUser
                         .find({where :[{CompanyId: companyId}, {TenantId: tenantId}]})
-                        .complete(function (err, endUser)
+                        .then(function (endUser)
                         {
-                            if(err)
-                            {
-                                logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get cloud end user query failed', err);
-                                callback(err, undefined);
-                            }
-                            else if(endUser && endUser.SIPConnectivityProvision)
+                            if(endUser && endUser.SIPConnectivityProvision)
                             {
                                 logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get cloud end user query success');
                                 var provisionMechanism = endUser.SIPConnectivityProvision;
@@ -845,14 +812,9 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
                                         //find call server
                                         dbModel.CallServer
                                             .find({where :[{CompanyId: companyId}, {TenantId: tenantId}]})
-                                            .complete(function (err, cs)
+                                            .then(function (cs)
                                             {
-                                                if(err)
-                                                {
-                                                    logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get call server query failed', err);
-                                                    callback(err, undefined);
-                                                }
-                                                else if(cs)
+                                                if(cs)
                                                 {
                                                     logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get call server query success');
                                                     //call server found
@@ -869,6 +831,10 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
                                                     callback(new Error('Cannot find a call server dedicated to company number'), undefined);
                                                 }
 
+                                            }).catch(function(err)
+                                            {
+                                                logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get call server query failed', err);
+                                                callback(err, undefined);
                                             });
                                     }
                                         break;
@@ -877,14 +843,9 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
                                         //find call server that matches profile
                                         dbModel.SipNetworkProfile
                                             .find({where :[{CompanyId: companyId}, {TenantId: tenantId}, {ObjType: "INTERNAL"}], include : [{model: dbModel.CallServer, as: "CallServer"}]})
-                                            .complete(function (err, res)
+                                            .then(function (res)
                                             {
-                                                if(err)
-                                                {
-                                                    logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get sip profile query failed', err);
-                                                    callback(err, undefined);
-                                                }
-                                                else if(res)
+                                                if(res)
                                                 {
                                                     logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get sip profile query success');
                                                     if(res.CallServer)
@@ -907,6 +868,10 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
                                                 }
 
 
+                                            }).catch(function(err)
+                                            {
+                                                logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get sip profile query failed', err);
+                                                callback(err, undefined);
                                             });
                                         break;
                                     }
@@ -920,14 +885,9 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
 
                                             dbModel.Cloud
                                                 .find({where :[{id: clusId}]})
-                                                .complete(function (err, clusterInfo)
+                                                .then(function (clusterInfo)
                                                 {
-                                                    if(err)
-                                                    {
-                                                        logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get cloud query failed', err);
-                                                        callback(err, undefined);
-                                                    }
-                                                    else if(clusterInfo)
+                                                    if(clusterInfo)
                                                     {
                                                         logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get cloud query success');
                                                         incomingRequest.LimitId = phn.LimitId;
@@ -942,6 +902,10 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
                                                         callback(new Error('Cannot find a cloud for end user'), undefined);
                                                     }
 
+                                                }).catch(function(err)
+                                                {
+                                                    logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get cloud query failed', err);
+                                                    callback(err, undefined);
                                                 });
 
                                         }
@@ -965,6 +929,10 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
                                 callback(new Error('Cloud Enduser not found'), undefined);
                             }
 
+                        }).catch(function(err)
+                        {
+                            logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get cloud end user query failed', err);
+                            callback(err, undefined);
                         });
 
                 }
@@ -979,6 +947,10 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, callback)
                 callback(ex, undefined);
             }
 
+        }).catch(function(err)
+        {
+            logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get trunk number query failed', err);
+            callback(err, undefined);
         });
 
 
@@ -1003,7 +975,7 @@ var GetCallServerClusterDetailsDB = function(csId, callback)
     {
         callback(ex, undefined);
     }
-}
+};
 
 
 module.exports.GetUserBy_Name_Domain = GetUserBy_Name_Domain;

@@ -32,7 +32,7 @@ server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
 
-server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', function(req,res,next)
+server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res,next)
 {
 
     var reqId = nodeUuid.v1();
@@ -1100,7 +1100,7 @@ server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallApp', funct
 });
 
 
-server.get('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/LbRequestController/:direction/:number/:ip', function(req,res,next)
+server.get('/DVP/API/:version/DynamicConfigGenerator/LbRequestController/:direction/:number/:ip', function(req,res,next)
 {
     var reqId = nodeUuid.v1();
 
@@ -1187,7 +1187,7 @@ server.get('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/LbRequestControl
     return next();
 });
 
-server.get('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallServers/:companyId/:tenantId', function(req,res,next)
+server.get('/DVP/API/:version/DynamicConfigGenerator/CallServers/:companyId/:tenantId', function(req,res,next)
 {
     var reqId = nodeUuid.v1();
 
@@ -1225,7 +1225,7 @@ server.get('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/CallServers/:com
 });
 
 
-server.post('/DVP/API/' + hostVersion + '/DynamicConfigGenerator/DirectoryProfile', function(req, res, next)
+server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', function(req, res, next)
 {
     var reqId = nodeUuid.v1();
 

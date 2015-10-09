@@ -7,7 +7,7 @@
     "config": "^1.15.0",
     "dvp-common": "^0.0.2",
     "node-uuid": "^1.4.3",
-    "dvp-dbmodels": "^0.0.14",
+    "dvp-dbmodels": "^0.0.16",
     "request": "^2.60.0",
     "restify": "^2.8.5",
     "redis": "^0.12.1",

@@ -464,41 +464,13 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
             csId = parseInt(extraData['hostname']);
         }
 
-        var fromSplitArr = ani.split("@");
-
-        var toSplitArr = dnis.split("@");
-
-        var aniNum = ani;
-        var dnisNum = dnis;
-        var domain = "";
-
-        if(fromSplitArr.length == 2)
-        {
-            var domainS = fromSplitArr[1];
-
-            var domainAndPort = domainS.split(":");
-
-            if(domainAndPort.length == 2)
-            {
-                domain = domainAndPort[0];
-            }
-
-            aniNum = fromSplitArr[0];
-
-        }
-
-        if(toSplitArr.length == 2)
-        {
-            dnisNum = toSplitArr[0];
-        }
-
         //Get ANI DNIS Context
 
         //Check for DID
         if(direction === 'IN')
         {
             logger.debug('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Checking for DID', reqId);
-            backendHandler.GetExtensionForDid(reqId, dnisNum, companyId, tenantId, function(err, didRes)
+            backendHandler.GetExtensionForDid(reqId, dnis, companyId, tenantId, function(err, didRes)
             {
                 if(err)
                 {
@@ -543,7 +515,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                     if(url)
                                     {
-                                        extApi.RemoteGetDialplanConfig(reqId, aniNum, dnisNum, context, direction, extDetails.SipUACEndpoint.SipUserUuid, undefined, extDetails.ObjCategory, undefined, appId, url, securityToken, function(err, pbxDetails)
+                                        extApi.RemoteGetDialplanConfig(reqId, ani, dnis, context, direction, extDetails.SipUACEndpoint.SipUserUuid, undefined, extDetails.ObjCategory, undefined, appId, url, securityToken, function(err, pbxDetails)
                                         {
                                             if(err)
                                             {
@@ -669,7 +641,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 {
                                                     if(pbxDetails.Endpoints && pbxDetails.Endpoints.length > 0)
                                                     {
-                                                        CreateFMEndpointList(reqId, aniNum, context, companyId, tenantId, pbxDetails.Endpoints, '', false, callerIdNum, callerIdName, csId, function(err, epList)
+                                                        CreateFMEndpointList(reqId, ani, context, companyId, tenantId, pbxDetails.Endpoints, '', false, callerIdNum, callerIdName, csId, function(err, epList)
                                                         {
                                                             if(err)
                                                             {
@@ -702,7 +674,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             Origination: callerIdName,
                                                             OriginationCallerIdNumber: callerIdNum,
                                                             Destination: extDetails.Extension,
-                                                            Domain: domain,
+                                                            Domain: '',
                                                             Group: grp,
                                                             CompanyId: companyId,
                                                             TenantId: tenantId
@@ -795,7 +767,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     if (pbxObj.Endpoints && pbxObj.Endpoints.ObjCategory === 'GATEWAY')
                                                     {
                                                         //pick outbound rule
-                                                        ruleHandler.PickCallRuleOutboundComplete(reqId, aniNum, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, function (err, rule)
+                                                        ruleHandler.PickCallRuleOutboundComplete(reqId, ani, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, function (err, rule)
                                                         {
                                                             if (!err && rule)
                                                             {
@@ -1009,8 +981,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         LegTimeout: 60,
                                         Origination: callerIdName,
                                         OriginationCallerIdNumber: callerIdNum,
-                                        Destination: dnisNum,
-                                        Domain: domain,
+                                        Destination: dnis,
+                                        Domain: '',
                                         CompanyId: companyId,
                                         TenantId: tenantId
                                     };
@@ -1134,7 +1106,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                     }
 
                     //Get to user
-                    backendHandler.GetExtensionDB(reqId, dnisNum, tenantId, function(err, extInfo)
+                    backendHandler.GetExtensionDB(reqId, dnis, tenantId, function(err, extInfo)
                     {
                         if(err)
                         {
@@ -1143,7 +1115,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                         else if(extInfo)
                         {
                             logger.debug('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extension found', reqId);
-                            backendHandler.GetAllDataForExt(reqId, dnisNum, tenantId, extInfo.ObjCategory, csId, function(err, extDetails)
+                            backendHandler.GetAllDataForExt(reqId, dnis, tenantId, extInfo.ObjCategory, csId, function(err, extDetails)
                             {
                                 if(err)
                                 {
@@ -1175,7 +1147,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             if(url)
                                             {
                                                 //Check extension type and handle accordingly
-                                                extApi.RemoteGetDialplanConfig(reqId, aniNum, dnisNum, context, direction, extDetails.SipUACEndpoint.SipUserUuid, fromUserUuid, extDetails.ObjCategory, undefined, appId, url, securityToken, function(err, pbxDetails)
+                                                extApi.RemoteGetDialplanConfig(reqId, ani, dnis, context, direction, extDetails.SipUACEndpoint.SipUserUuid, fromUserUuid, extDetails.ObjCategory, undefined, appId, url, securityToken, function(err, pbxDetails)
                                                 {
                                                     if(err)
                                                     {
@@ -1297,7 +1269,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             {
                                                                 if(pbxDetails.Endpoints && pbxDetails.Endpoints.length > 0)
                                                                 {
-                                                                    CreateFMEndpointList(reqId, aniNum, context, companyId, tenantId, pbxDetails.Endpoints, '', false, callerIdNum, callerIdName, csId, function(err, epList)
+                                                                    CreateFMEndpointList(reqId, ani, context, companyId, tenantId, pbxDetails.Endpoints, '', false, callerIdNum, callerIdName, csId, function(err, epList)
                                                                     {
                                                                         if(err)
                                                                         {
@@ -1424,7 +1396,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 if (pbxObj.Endpoints && pbxObj.Endpoints.ObjCategory === 'GATEWAY')
                                                                 {
                                                                     //pick outbound rule
-                                                                    ruleHandler.PickCallRuleOutboundComplete(reqId, aniNum, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, function (err, rule)
+                                                                    ruleHandler.PickCallRuleOutboundComplete(reqId, ani, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, function (err, rule)
                                                                     {
                                                                         if (!err && rule)
                                                                         {
@@ -1699,7 +1671,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                     }
                                     else if(extDetails.ObjCategory === 'VOICE_PORTAL')
                                     {
-                                        extApi.RemoteGetDialplanConfig(reqId, aniNum, dnisNum, context, direction, undefined, fromUserUuid, extDetails.ObjCategory, extDetails.ExtraData, appId, url, securityToken, function(err, pbxDetails)
+                                        extApi.RemoteGetDialplanConfig(reqId, ani, dnis, context, direction, undefined, fromUserUuid, extDetails.ObjCategory, extDetails.ExtraData, appId, url, securityToken, function(err, pbxDetails)
                                         {
                                             if(err)
                                             {
@@ -1737,7 +1709,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                         {
                             logger.debug('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Out call DNIS is not an extension', reqId);
 
-                            extApi.RemoteGetDialplanConfig(reqId, aniNum, dnisNum, context, direction, undefined, fromUserUuid, undefined, undefined, appId, url, securityToken, function(err, pbxDetails)
+                            extApi.RemoteGetDialplanConfig(reqId, ani, dnis, context, direction, undefined, fromUserUuid, undefined, undefined, appId, url, securityToken, function(err, pbxDetails)
                             {
                                 if(err)
                                 {
@@ -1762,7 +1734,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         if(operationType === 'GATEWAY')
                                         {
                                             //xml DND response
-                                            ruleHandler.PickCallRuleOutboundComplete(reqId, aniNum, dnisNum, '', context, companyId, tenantId, true, function(err, rule)
+                                            ruleHandler.PickCallRuleOutboundComplete(reqId, ani, dnis, '', context, companyId, tenantId, true, function(err, rule)
                                             {
                                                 if(err)
                                                 {

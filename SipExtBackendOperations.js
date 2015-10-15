@@ -78,6 +78,28 @@ var GetUserDetailsByUsername = function(reqId, username, callback)
     }
 };
 
+var GetPublicClusterDetailsDB = function(reqId, callback)
+{
+    try
+    {
+        dbModel.Cloud.find({where :[{Type: 'PUBLIC'}], include: [{model: dbModel.LoadBalancer, as: "LoadBalancer"}]})
+        .then(function(resCloud)
+        {
+            logger.debug('[DVP-DynamicConfigurationGenerator.GetPublicClusterDetailsDB] - [%s] - Public CloudEndUser details found',reqId);
+            callback(undefined, resCloud);
+
+        }).catch(function(errCloud)
+        {
+            logger.error('[DVP-DynamicConfigurationGenerator.GetPublicClusterDetailsDB] - [%s] - Public CloudEndUser details searching error',reqId, errCloud);
+            callback(errCloud, undefined);
+        });
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+    }
+}
+
 var GatherFromUserDetails = function(reqId, usrName, tenantId, ignoreTenant, callback)
 {
     GetUserByNameTenantDB(reqId, usrName, tenantId, ignoreTenant, function(err, res)
@@ -1012,4 +1034,5 @@ module.exports.GatherFromUserDetails = GatherFromUserDetails;
 module.exports.GetCallServerClusterDetailsDB = GetCallServerClusterDetailsDB;
 module.exports.GetUserDetailsByUsername = GetUserDetailsByUsername;
 module.exports.GetCallServersForEndUserDB = GetCallServersForEndUserDB;
+module.exports.GetPublicClusterDetailsDB = GetPublicClusterDetailsDB;
 

@@ -16,13 +16,5 @@ module.exports = {
     "Ip":"0.0.0.0",
     "Port":9098,
     "Version":"1.0.0.0"
-  },
-
-  "Services": {
-
-    "fileServiceHost": "192.168.0.54",
-    "fileServicePort": 8081,
-    "fileServiceVersion":"6.0"
-
   }
 };

@@ -23,12 +23,5 @@ module.exports = {
         "IpAddress": "SYS_REDIS_HOST",
         "Port": "SYS_REDIS_PORT"
 
-    },
-
-    "Services": {
-
-        "fileServiceHost": "SYS_FILESERVICE_HOST",
-        "fileServicePort": "SYS_FILESERVICE_PORT",
-        "fileServiceVersion":"SYS_FILESERVICE_VERSION"
     }
 };

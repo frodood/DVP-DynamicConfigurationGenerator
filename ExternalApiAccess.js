@@ -1,7 +1,4 @@
 var httpReq = require('request');
-var config = require('config');
-var util = require('util');
-var stringify = require('stringify');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 
 var RemoteGetDialplanConfig = function(reqId, ani, dnis, context, direction, userUuid, fromUserUuid, opType, extExtraData, appId, url, securityToken, callback)
@@ -54,6 +51,4 @@ var RemoteGetDialplanConfig = function(reqId, ani, dnis, context, direction, use
     }
 };
 
-module.exports.RemoteGetSipUserDetailsForUuid = RemoteGetSipUserDetailsForUuid;
-module.exports.RemoteGetSipUserDetailsForExtension =RemoteGetSipUserDetailsForExtension;
 module.exports.RemoteGetDialplanConfig = RemoteGetDialplanConfig;

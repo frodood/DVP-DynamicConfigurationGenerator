@@ -14,7 +14,7 @@ module.exports = {
 
   "Host":{
     "Ip":"0.0.0.0",
-    "Port":9098,
+    "Port":8816,
     "Version":"1.0.0.0"
   }
 };

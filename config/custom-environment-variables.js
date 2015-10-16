@@ -14,8 +14,8 @@ module.exports = {
     },
 
     "Host":{
-        "Port":"HOST_DYNAMICCONFIGURATIONGENERATOR_PORT",
-        "Version":"HOST_DYNAMICCONFIGURATIONGENERATOR_VERSION"
+        "Port":"HOST_DYNAMICCONFIGGEN_PORT",
+        "Version":"HOST_VERSION"
     },
 
     "Redis":

@@ -347,7 +347,7 @@ var HandleOutRequest = function(reqId, callerIdNum, contextTenant, ignoreTenant,
             }
         })
     })
-}
+};
 
 
 server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res,next)
@@ -1164,6 +1164,53 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
 });
 
+server.get('/DVP/API/:version/DynamicConfigGenerator/PublicUserRequestController/:username', function(req,res,next)
+{
+    var reqId = nodeUuid.v1();
+
+    try
+    {
+        logger.info('[DVP-DynamicConfigurationGenerator.PublicUserRequestController] - [%s] - HTTP SIPLB Request Received', reqId);
+
+        var username = req.params.username;
+
+        logger.debug('[DVP-DynamicConfigurationGenerator.PublicUserRequestController] - [%s] - Request Params - username : %s', reqId, username);
+
+        logger.info('[DVP-DynamicConfigurationGenerator.PublicUserRequestController] - [%s] - call direction is IN', reqId);
+        backendHandler.GetCloudForUser(username, function(err, cb)
+        {
+            if(err || !cb)
+            {
+                if(err)
+                {
+                    logger.error('[DVP-DynamicConfigurationGenerator.PublicUserRequestController] - [%s] - Exception occurred while executing GetCloudForIncomingRequest', reqId, err);
+                }
+                else
+                {
+                    logger.error('[DVP-DynamicConfigurationGenerator.PublicUserRequestController] - [%s] - GetCloudForIncomingRequest returned empty object', reqId);
+                }
+                res.end(",");
+            }
+            else
+            {
+                var returnMessage = cb.LoadBalanceType + "," + cb.IpCode;
+
+                logger.debug('[DVP-DynamicConfigurationGenerator.PublicUserRequestController] - [%s] - GetCloudForIncomingRequest object found - Returning LB Details : %s', reqId, returnMessage);
+
+                res.end(returnMessage);
+            }
+
+        });
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - Exception occurred on LbRequestController Api Method - Error : ', reqId, ex);
+        res.end(",");
+    }
+
+    return next();
+});
 
 server.get('/DVP/API/:version/DynamicConfigGenerator/LbRequestController/:direction/:number/:ip', function(req,res,next)
 {
@@ -1193,7 +1240,7 @@ server.get('/DVP/API/:version/DynamicConfigGenerator/LbRequestController/:direct
                     {
                         logger.error('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - GetCloudForIncomingRequest returned empty object', reqId);
                     }
-                    res.end(",,");
+                    res.end(",,,");
                 }
                 else
                 {
@@ -1222,7 +1269,7 @@ server.get('/DVP/API/:version/DynamicConfigGenerator/LbRequestController/:direct
                         logger.error('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - GetGatewayForOutgoingRequest returned empty object', reqId);
                     }
 
-                    res.end(",");
+                    res.end(",,,");
                 }
                 else
                 {
@@ -1239,14 +1286,14 @@ server.get('/DVP/API/:version/DynamicConfigGenerator/LbRequestController/:direct
         {
             logger.error('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - call direction is NOT DEFINED - Terminating', reqId);
 
-            res.end(",");
+            res.end(",,,");
         }
 
     }
     catch(ex)
     {
         logger.error('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - Exception occurred on LbRequestController Api Method - Error : ', reqId, ex);
-        res.end(",");
+        res.end(",,,");
     }
 
     return next();
@@ -1288,7 +1335,6 @@ server.get('/DVP/API/:version/DynamicConfigGenerator/CallServers/:companyId/:ten
 
     return next();
 });
-
 
 server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', function(req, res, next)
 {

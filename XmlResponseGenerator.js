@@ -19,7 +19,7 @@ var createNotFoundResponse = function()
     }
     catch(ex)
     {
-        return createNotFoundResponse();
+        return '';
     }
 
 }

@@ -11,6 +11,8 @@ var redisHandler = require('./RedisHandler.js');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var extDialplanEngine = require('./ExtendedDialplanEngine.js');
 var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var Buffer = require('buffer');
+var util = require('util');
 
 
 var hostIp = config.Host.Ip;
@@ -20,9 +22,16 @@ var hostVersion = config.Host.Version;
 var server = restify.createServer({
     name: 'DVP-DynamicConfigurationGenerator',
     formatters : {
-        'application/x-www-form-urlencoded' : function(req, res, body)
+        'application/x-www-form-urlencoded' : function(req, res, body, cb)
         {
-            return body;
+            if (body instanceof Error)
+                return body.stack;
+
+            if (Buffer.isBuffer(body))
+                return cb(null, body.toString('base64'));
+
+            return cb(null, util.inspect(body));
+            //return body;
         }
     }
 });

@@ -298,7 +298,7 @@ var GetAllDataForExt = function(reqId, extension, tenantId, extType, callServerI
                                 }
                                 else
                                 {
-                                    if(extData.SipUACEndpoint.ObjType === 'PUBLIC')
+                                    if(extData.SipUACEndpoint.UsePublic)
                                     {
                                         GetCallServerClusterDetailsDB(callServerId, function(err, cloudInfo)
                                         {

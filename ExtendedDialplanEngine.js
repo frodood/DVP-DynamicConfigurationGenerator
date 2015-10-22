@@ -554,6 +554,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                                         if(extDetails.SipUACEndpoint.UsePublic)
                                                         {
+                                                            logger.info('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - PUBLIC ENABLED', reqId);
                                                             ep.Profile = 'external';
                                                             ep.Type = 'PUBLIC_USER';
                                                             ep.Destination = extDetails.SipUACEndpoint.SipUsername;

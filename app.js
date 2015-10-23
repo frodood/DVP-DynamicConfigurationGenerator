@@ -1107,7 +1107,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                     TenantId: tenantId
                                                 };
                                                 //route to public user
-                                                var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined, undefined);
+                                                var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, callerContext, profile, '[^\\s]*', false, undefined, undefined);
 
                                                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 

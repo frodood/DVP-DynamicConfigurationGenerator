@@ -13,6 +13,7 @@ var extDialplanEngine = require('./ExtendedDialplanEngine.js');
 var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var Buffer = require('buffer');
 var util = require('util');
+var xmlBuilder = require('./XmlExtendedDialplanBuilder.js');
 
 
 var hostIp = config.Host.Ip;
@@ -1080,9 +1081,9 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                             if(dvpDestinationType && dvpDestinationType === 'PUBLIC_USER')
                             {
                                 //do stuff
-                                backendHandler.GetUserByNameTenantDB(reqId, destNum, -1, true, function(err, res)
+                                backendHandler.GetUserByNameTenantDB(reqId, destNum, -1, true, function(err, resUsr)
                                 {
-                                    if(res && res.UsePublic)
+                                    if(resUsr && resUsr.UsePublic)
                                     {
                                         backendHandler.GetPublicClusterDetailsDB(reqId, function(err, rslt)
                                         {
@@ -1097,7 +1098,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                     LegTimeout: 60,
                                                     Origination: callerIdNum,
                                                     OriginationCallerIdNumber: callerIdNum,
-                                                    Destination: res.SipUsername,
+                                                    Destination: resUsr.SipUsername,
                                                     Domain: rslt.LoadBalancer.MainIP,
                                                     Group: undefined,
                                                     IsVoicemailEnabled: false,

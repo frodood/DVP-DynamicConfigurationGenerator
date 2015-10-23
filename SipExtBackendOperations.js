@@ -78,7 +78,7 @@ var GetUserDetailsByUsername = function(reqId, username, callback)
     }
 };
 
-var GetPublicClusterDetailsDB = function(reqId, callback)
+var GetPublicClusterDetailsDB = function(reqId, cb)
 {
     try
     {
@@ -86,17 +86,18 @@ var GetPublicClusterDetailsDB = function(reqId, callback)
         .then(function(resCloud)
         {
             logger.debug('[DVP-DynamicConfigurationGenerator.GetPublicClusterDetailsDB] - [%s] - Public CloudEndUser details found',reqId);
-            callback(undefined, resCloud);
+
+            cb(undefined, resCloud);
 
         }).catch(function(errCloud)
         {
             logger.error('[DVP-DynamicConfigurationGenerator.GetPublicClusterDetailsDB] - [%s] - Public CloudEndUser details searching error',reqId, errCloud);
-            callback(errCloud, undefined);
+            cb(errCloud, undefined);
         });
     }
     catch(ex)
     {
-        callback(ex, undefined);
+        cb(ex, undefined);
     }
 }
 
@@ -106,7 +107,7 @@ var GatherFromUserDetails = function(reqId, usrName, tenantId, ignoreTenant, cal
     {
         if(res)
         {
-            GetTransferCodesForTenantDB(reqId, tenantId, function(err, resTrans)
+            GetTransferCodesForTenantDB(reqId, res.TenantId, function(err, resTrans)
             {
                 if(resTrans)
                 {

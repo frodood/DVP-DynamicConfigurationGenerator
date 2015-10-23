@@ -308,6 +308,12 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
             .ele('action').att('application', 'set').att('data', bypassMedia)
             .up()
 
+        if(ep.Type === 'PUBLIC_USER')
+        {
+            cond.ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=PUBLIC_USER')
+                .up()
+        }
+
 
             if(transferLegInfo && transferLegInfo.TransferCode)
             {

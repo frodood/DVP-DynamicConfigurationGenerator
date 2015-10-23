@@ -391,7 +391,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
         var csId = parseInt(hostname);
 
-        if (cdnum && callerContext && hostname)
+        if (csId && cdnum && callerContext && hostname)
         {
             //Dialplan
 

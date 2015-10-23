@@ -386,8 +386,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
         var varUsrContext = data["variable_user_context"];
         var varFromNumber = data["variable_FromNumber"];
         var callerIdNum = data["Caller-Caller-ID-Number"];
-        var dvpOriginationType = data["DVP-ORIGINATION-TYPE"];
-        var dvpDestinationType = data["DVP-DESTINATION-TYPE"];
+        var dvpOriginationType = data["variable_sip_h_X-DVP-ORIGINATION-TYPE"];
+        var dvpDestinationType = data["variable_sip_h_X-DVP-DESTINATION-TYPE"];
 
         var csId = parseInt(hostname);
 

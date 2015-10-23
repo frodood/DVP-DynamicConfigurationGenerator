@@ -106,7 +106,7 @@ var GatherFromUserDetails = function(reqId, usrName, tenantId, ignoreTenant, cal
     {
         if(res)
         {
-            GetTransferCodesForTenantDB(reqId, res.TenantId, function(err, resTrans)
+            GetTransferCodesForTenantDB(reqId, tenantId, function(err, resTrans)
             {
                 if(resTrans)
                 {

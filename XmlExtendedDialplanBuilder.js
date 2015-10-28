@@ -312,8 +312,6 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
         {
             cond.ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=PUBLIC_USER')
                 .up()
-                .ele('action').att('application', 'export').att('data', 'sip_secure_media=true')
-                .up()
         }
 
 
@@ -1248,7 +1246,8 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
 
         if (ep.Domain)
         {
-            dnis = util.format('%s@%s', ep.Destination, ep.Domain);
+            //dnis = util.format('%s@%s', ep.Destination, ep.Domain);
+            dnis = util.format('%s', ep.Destination);
         }
 
         var protocol = 'sofia';

@@ -41,7 +41,7 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
-var HandleOutRequest = function(reqId, callerIdNum, contextTenant, ignoreTenant, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, res)
+var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreTenant, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, res)
 {
     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to find from user for outbound call', reqId);
     backendHandler.GatherFromUserDetails(reqId, callerIdNum, contextTenant, ignoreTenant, function(err, fromUsr)
@@ -244,7 +244,7 @@ var HandleOutRequest = function(reqId, callerIdNum, contextTenant, ignoreTenant,
                                 {
                                     data.DVPAppUrl = masterApp.Url;
                                     data.AppId = masterApp.id;
-                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, fromUsr, rule.CompanyId, rule.TenantId, 'test', undefined, function(err, extDialplan)
+                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, fromUsr, rule.CompanyId, rule.TenantId, 'test', undefined, function(err, extDialplan)
                                     {
                                         if(err)
                                         {
@@ -292,7 +292,7 @@ var HandleOutRequest = function(reqId, callerIdNum, contextTenant, ignoreTenant,
                                 {
                                     data.DVPAppUrl = app.Url;
                                     data.AppId = app.id;
-                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, fromUsr, rule.CompanyId, rule.TenantId, 'test', undefined, function(err, extDialplan)
+                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, fromUsr, rule.CompanyId, rule.TenantId, 'test', undefined, function(err, extDialplan)
                                     {
                                         if(err)
                                         {
@@ -1128,7 +1128,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                     }
                                     else
                                     {
-                                        HandleOutRequest(reqId, callerIdNum, contextTenant, ignoreTenant, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, res);
+                                        HandleOutRequest(reqId, data, callerIdNum, contextTenant, ignoreTenant, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, res);
                                     }
 
                                 });
@@ -1136,7 +1136,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                             }
                             else
                             {
-                                HandleOutRequest(reqId, callerIdNum, contextTenant, ignoreTenant, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, res);
+                                HandleOutRequest(reqId, data, callerIdNum, contextTenant, ignoreTenant, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, res);
 
                             }
                         }

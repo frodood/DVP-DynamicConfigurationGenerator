@@ -232,7 +232,7 @@ var GetExtensionDB = function(reqId, ext, tenantId, callback)
             .then(function (extDetails)
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query success', reqId);
-                callback(err, extDetails);
+                callback(undefined, extDetails);
 
             }).catch(function(err)
             {

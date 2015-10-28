@@ -671,16 +671,16 @@ var GetGatewayListForCallServerProfile = function(profile, csId, reqId, callback
                                 try
                                 {
                                     dbModel.Cloud.find({where: [{id: result.CallServer.ClusterId}], include: [{ model: dbModel.LoadBalancer, as: "LoadBalancer", include: [{model: dbModel.Trunk, as: "Trunk"}]}]})
-                                        .then(function (result)
+                                        .then(function (rslt)
                                         {
 
                                             logger.debug('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] PGSQL Get Cloud - LoadBalancer - Trunk query success');
 
-                                            if (result)
+                                            if (rslt)
                                             {
-                                                if (result.LoadBalancer && result.LoadBalancer.Trunk)
+                                                if (rslt.LoadBalancer && rslt.LoadBalancer.Trunk)
                                                 {
-                                                    var trunkList = result.LoadBalancer.Trunk;
+                                                    var trunkList = rslt.LoadBalancer.Trunk;
 
                                                     trunkList.forEach(function (trunk)
                                                     {
@@ -689,7 +689,7 @@ var GetGatewayListForCallServerProfile = function(profile, csId, reqId, callback
                                                             IpUrl: trunk.IpUrl,
                                                             Domain: result.InternalIp,
                                                             TrunkCode: trunk.TrunkCode,
-                                                            Proxy: result.LoadBalancer.MainIp
+                                                            Proxy: rslt.LoadBalancer.MainIP
                                                         };
                                                         gatewayList.push(gw);
                                                     });

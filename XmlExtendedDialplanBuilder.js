@@ -1225,6 +1225,8 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
             .up()
             .ele('action').att('application', 'set').att('data', bypassMed)
             .up()
+            .ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=GATEWAY')
+            .up()
 
 
         var option = '';

@@ -1254,7 +1254,7 @@ server.get('/DVP/API/:version/DynamicConfigGenerator/LbRequestController/:direct
                 }
                 else
                 {
-                    var returnMessage = cb.InboundLimit + "," + cb.BothLimit + "," + cb.LoadBalanceType + "," + cb.IpCode;
+                    var returnMessage = cb.OutboundLimit + "," + cb.BothLimit + "," + cb.LoadBalanceType + "," + cb.IpCode;
 
                     logger.debug('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - GetCloudForIncomingRequest object found - Returning LB Details : %s', reqId, returnMessage);
 

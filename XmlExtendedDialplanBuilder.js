@@ -1248,8 +1248,8 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
 
         if (ep.Domain)
         {
-            dnis = util.format('%s@%s', ep.Destination, ep.Domain);
-            //dnis = util.format('%s', ep.Destination);
+            //dnis = util.format('%s@%s', ep.Destination, ep.Domain);
+            dnis = util.format('%s', ep.Destination);
         }
 
         var protocol = 'sofia';

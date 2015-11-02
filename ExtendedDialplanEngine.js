@@ -163,7 +163,13 @@ var AttendantTransferLegInfoHandler = function(reqId, fromUser, toUser)
 {
     try
     {
-        var AttTransLegInfo = {};
+        var AttTransLegInfo =
+        {
+            InternalLegs: '',
+            ExternalLegs: '',
+            GroupLegs: '',
+            ConferenceLegs: ''
+        };
         if(fromUser)
         {
             //a leg processing
@@ -197,15 +203,15 @@ var AttendantTransferLegInfoHandler = function(reqId, fromUser, toUser)
             }
             if(toUser.TransExternalEnable)
             {
-                AttTransLegInfo.ExternalLegs = AttTransLegInfo.InternalLegs + 'b';
+                AttTransLegInfo.ExternalLegs = AttTransLegInfo.ExternalLegs + 'b';
             }
             if(toUser.TransGroupEnable)
             {
-                AttTransLegInfo.GroupLegs = AttTransLegInfo.InternalLegs + 'b';
+                AttTransLegInfo.GroupLegs = AttTransLegInfo.GroupLegs + 'b';
             }
             if(toUser.TransConferenceEnable)
             {
-                AttTransLegInfo.ConferenceLegs = AttTransLegInfo.InternalLegs + 'b';
+                AttTransLegInfo.ConferenceLegs = AttTransLegInfo.ConferenceLegs + 'b';
             }
         }
 
@@ -1579,7 +1585,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 {
                                                     if(!err && redisResult)
                                                     {
-                                                        var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
+                                                        var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, extDetails.SipUACEndpoint);
 
                                                         if(extDetails.SipUACEndpoint.UsePublic)
                                                         {

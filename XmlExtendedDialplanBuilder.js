@@ -60,6 +60,8 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
                 .up()
                 .ele('action').att('application', 'set').att('data', 'transfer_ringback=$${us-ring}')
                 .up()
+                .ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=GATEWAY')
+                .up()
                 .ele('action').att('application', 'att_xfer').att('data', '{{origination_caller_id_number=' + trunkNumber + '}}sofia/gateway/' + trunkCode + '/${digits}')
                 .up()
                 .end({pretty: true});

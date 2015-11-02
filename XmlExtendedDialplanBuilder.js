@@ -64,6 +64,8 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
                 .up()
                 .ele('action').att('application', 'set').att('data', 'origination_caller_id_number=' + trunkNumber)
                 .up()
+                .ele('action').att('application', 'set').att('data', 'origination_caller_id_name=' + trunkNumber)
+                .up()
                 .ele('action').att('application', 'att_xfer').att('data', 'sofia/gateway/' + trunkCode + '/${digits}')
                 .up()
                 .end({pretty: true});

@@ -418,7 +418,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                 {
                     if(ctxt)
                     {
-                        ruleBackendHandler.PickCallRuleOutboundComplete(callerIdNum, destNum, '', callerContext, ctxt.CompanyId, ctxt.TenantId, true, function (err, outRule)
+                        ruleHandler.PickCallRuleOutboundComplete(callerIdNum, destNum, '', callerContext, ctxt.CompanyId, ctxt.TenantId, true, function (err, outRule)
                         {
                             if(outRule)
                             {

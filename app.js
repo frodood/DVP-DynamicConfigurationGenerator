@@ -414,7 +414,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to get context : %s', reqId, callerContext);
 
-                backendHandler.GetContext(callerContext, function(err, ctxt)
+                backendHandler.GetContext(varUsrContext, function(err, ctxt)
                 {
                     if(ctxt)
                     {

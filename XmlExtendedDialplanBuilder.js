@@ -377,6 +377,13 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
         {
             cond.ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=PUBLIC_USER')
                 .up()
+                .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=PUBLIC_USER')
+                .up()
+        }
+        else
+        {
+            cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=PRIVATE_USER')
+                .up()
         }
 
 

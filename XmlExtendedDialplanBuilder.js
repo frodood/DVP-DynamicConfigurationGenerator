@@ -86,7 +86,9 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
                 .up()
                 .ele('action').att('application', 'set').att('data', 'transfer_ringback=$${us-ring}')
                 .up()
-                .ele('action').att('application', 'att_xfer').att('data', '{DVP_OPERATION_CAT=ATT_XFER_USER,companyid=' + companyId + ',tenantid=' + tenantId + ',dvp_app_id=' + appId + '}' + pbxType + '/${digits}@' + domain)
+                .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=ATT_XFER_USER')
+                .up()
+                .ele('action').att('application', 'att_xfer').att('data', '{companyid=' + companyId + ',tenantid=' + tenantId + ',dvp_app_id=' + appId + '}' + pbxType + '/${digits}@' + domain)
                 .up()
                 .end({pretty: true});
         }

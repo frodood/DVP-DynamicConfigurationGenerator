@@ -405,17 +405,17 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
 
         if(ep.CompanyId)
         {
-            cond.ele('action').att('application', 'set').att('data', 'companyid=' + ep.CompanyId)
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + ep.CompanyId)
                 .up()
         }
         if(ep.TenantId)
         {
-            cond.ele('action').att('application', 'set').att('data', 'tenantid=' + ep.TenantId)
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + ep.TenantId)
                 .up()
         }
         if(ep.AppId)
         {
-            cond.ele('action').att('application', 'set').att('data', 'dvp_app_id=' + ep.AppId)
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + ep.AppId)
                 .up()
         }
 

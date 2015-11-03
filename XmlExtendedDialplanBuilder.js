@@ -394,12 +394,12 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
         }
         else if(ep.Type === 'GROUP')
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=GROUP')
+            cond.ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=GROUP')
                 .up()
         }
         else
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=PRIVATE_USER')
+            cond.ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=PRIVATE_USER')
                 .up()
         }
 

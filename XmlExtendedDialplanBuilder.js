@@ -92,7 +92,7 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
                 .up()
                 .ele('action').att('application', 'att_xfer').att('data', '{companyid=' + companyId + ',tenantid=' + tenantId + ',dvp_app_id=' + appId + '}' + pbxType + '/${digits}@' + domain)
                 .up()
-                .ele('action').att('application', 'set').att('data', 'process_cdr=true')
+                .ele('action').att('application', 'set').att('data', 'process_cdr=a_only')
                 .up()
                 .end({pretty: true});
         }
@@ -390,7 +390,7 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
             .up()
             .ele('action').att('application', 'set').att('data', bypassMedia)
             .up()
-            .ele('action').att('application', 'set').att('data', 'process_cdr=true')
+            .ele('action').att('application', 'set').att('data', 'process_cdr=a_only')
             .up()
 
         if(ep.Type === 'PUBLIC_USER')

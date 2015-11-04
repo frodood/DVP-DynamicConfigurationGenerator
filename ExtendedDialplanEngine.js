@@ -1644,7 +1644,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                     }
                                     else if(extDetails.ObjCategory === 'GROUP')
                                     {
-                                        if(extDetails.Extension.UserGroup)
+                                        if(extDetails.UserGroup)
                                         {
                                             var ep =
                                             {
@@ -1656,7 +1656,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 Origination: callerIdName,
                                                 OriginationCallerIdNumber: callerIdNum,
                                                 Destination: extDetails.Extension,
-                                                Domain: extDetails.Extension.UserGroup.Domain,
+                                                Domain: extDetails.UserGroup.Domain,
                                                 Group: extDetails.Extension,
                                                 CompanyId: companyId,
                                                 TenantId: tenantId,

@@ -92,6 +92,8 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
                 .up()
                 .ele('action').att('application', 'att_xfer').att('data', '{companyid=' + companyId + ',tenantid=' + tenantId + ',dvp_app_id=' + appId + '}' + pbxType + '/${digits}@' + domain)
                 .up()
+                .ele('action').att('application', 'set').att('data', 'process_cdr=true')
+                .up()
                 .end({pretty: true});
         }
 
@@ -387,6 +389,8 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
             .ele('action').att('application', 'set').att('data', ignoreEarlyM)
             .up()
             .ele('action').att('application', 'set').att('data', bypassMedia)
+            .up()
+            .ele('action').att('application', 'set').att('data', 'process_cdr=true')
             .up()
 
         if(ep.Type === 'PUBLIC_USER')
@@ -1336,6 +1340,24 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
             .up()
             .ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=GATEWAY')
             .up()
+            .ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=GATEWAY')
+            .up()
+
+        if(ep.CompanyId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + ep.CompanyId)
+                .up()
+        }
+        if(ep.TenantId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + ep.TenantId)
+                .up()
+        }
+        if(ep.AppId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + ep.AppId)
+                .up()
+        }
 
 
         var option = '';

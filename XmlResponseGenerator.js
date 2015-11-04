@@ -34,39 +34,48 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
             'users': []
         };
 
+
+
         if(grp.SipUACEndpoint)
         {
             grp.SipUACEndpoint.forEach(function(sipUsr)
             {
 
+                var tempParamsArr = [];
+                var tempVarArr = [];
+
                 var sipUsername = sipUsr.SipUsername ? sipUsr.SipUsername : "";
                 var sipExt = sipUsr.SipExtension ? sipUsr.SipExtension : "";
                 var sipPassword = sipUsr.Password ? sipUsr.Password : "";
                 var sipUsrDomain = "";
+                var sipUserContext = "";
 
                 if(sipUsr.CloudEndUser && sipUsr.CloudEndUser.Domain)
                 {
                     sipUsrDomain = sipUsr.CloudEndUser.Domain;
                 }
 
-                var sipUserContext = sipUsr.CountextId ? sipUsr.CountextId : "";
+                if(sipUsr.ContextId)
+                {
+                    sipUserContext = sipUsr.ContextId;
+                }
 
                 var userObj = {
-                    user:
+                    'user':
                     {
                         '@id': sipUsername, '@cacheable': 'false', '@number-alias': sipExt,
-                        params: {
-                            param: {'@name' : 'dial-string', '@value' : '{sip_invite_domain=${domain_name},presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}'},
-                            param: {'@name' : 'password', '@value' : sipPassword}
-                        },
-                        variables: {
-                            variable: {'@name' : 'domain', '@value' : sipUsrDomain},
-                            variable: {'@name' : 'user_context', '@value' : sipUserContext},
-                            variable: {'@name' : 'user_id', '@value' : sipUsername}
-
-                        }
+                        'params': tempParamsArr,
+                        'variables': tempVarArr
                     }
                 };
+
+                tempParamsArr.push({'param': {'@name' : 'dial-string', '@value' : '{sip_invite_domain=${domain_name},presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}'}});
+                tempParamsArr.push({'param': {'@name' : 'password', '@value' : sipPassword}});
+
+                tempVarArr.push({'variable': {'@name' : 'domain', '@value' : sipUsrDomain}});
+                tempVarArr.push({'variable': {'@name' : 'user_context', '@value' : sipUserContext}});
+                tempVarArr.push({'variable': {'@name' : 'user_id', '@value' : sipUsername}});
+
 
                 obj.users.push(userObj);
 

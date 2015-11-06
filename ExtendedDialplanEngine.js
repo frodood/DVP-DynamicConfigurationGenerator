@@ -1228,6 +1228,13 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             var personalGreeting = pbxObj.PersonalGreeting;
                                                             var bypassMedia = pbxObj.BypassMedia;
 
+                                                            var ringTime = 60;
+
+                                                            if(pbxObj.RingTimeout)
+                                                            {
+                                                                ringTime = pbxObj.RingTimeout;
+                                                            }
+
 
                                                             if(pbxObj.OperationType === 'DND')
                                                             {
@@ -1245,7 +1252,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     Type: 'USER',
                                                                     LegStartDelay: 0,
                                                                     BypassMedia: bypassMedia,
-                                                                    LegTimeout: 60,
+                                                                    LegTimeout: ringTime,
                                                                     Origination: callerIdName,
                                                                     OriginationCallerIdNumber: callerIdNum,
                                                                     Destination: extDetails.Extension,
@@ -1317,10 +1324,10 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         Type: 'USER',
                                                                         LegStartDelay: 0,
                                                                         BypassMedia: bypassMedia,
-                                                                        LegTimeout: pbxObj.RingTimeout,
+                                                                        LegTimeout: ringTime,
                                                                         Origination: callerIdName,
                                                                         OriginationCallerIdNumber: callerIdNum,
-                                                                        Destination: dnisNum,
+                                                                        Destination: dnis,
                                                                         Domain: toUsrDomain,
                                                                         Group: grp,
                                                                         CompanyId: companyId,
@@ -1370,7 +1377,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         Type: 'USER',
                                                                         LegStartDelay: 0,
                                                                         BypassMedia: bypassMedia,
-                                                                        LegTimeout: 60,
+                                                                        LegTimeout: ringTime,
                                                                         Origination: callerIdName,
                                                                         OriginationCallerIdNumber: callerIdNum,
                                                                         Destination: extDetails.Extension,
@@ -1527,10 +1534,10 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     Type: 'USER',
                                                                     LegStartDelay: 0,
                                                                     BypassMedia: bypassMedia,
-                                                                    LegTimeout: 60,
+                                                                    LegTimeout: ringTime,
                                                                     Origination: callerIdName,
                                                                     OriginationCallerIdNumber: callerIdNum,
-                                                                    Destination: dnisNum,
+                                                                    Destination: dnis,
                                                                     Domain: toUsrDomain,
                                                                     Group: grp,
                                                                     IsVoicemailEnabled: voicemailEnabled,
@@ -1754,6 +1761,13 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             var operationType = pbxObj.OperationType;
                                             var voicemailEnabled = pbxObj.VoicemailEnabled;
                                             var bypassMedia = pbxObj.BypassMedia;
+
+                                            var ringTime = 60;
+
+                                            if(pbxObj.RingTimeout)
+                                            {
+                                                ringTime = pbxObj.RingTimeout;
+                                            }
 
                                             var grp = '';
 

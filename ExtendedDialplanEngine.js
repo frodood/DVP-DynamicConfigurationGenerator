@@ -590,6 +590,13 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 var personalGreeting = pbxObj.PersonalGreeting;
                                                 var bypassMedia = pbxObj.BypassMedia;
 
+                                                var ringTime = 60;
+
+                                                if(pbxObj.RingTimeout)
+                                                {
+                                                    ringTime = pbxObj.RingTimeout;
+                                                }
+
                                                 logger.info('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - OPERATION TYPE : %s', reqId, pbxObj.OperationType);
 
 
@@ -608,7 +615,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         Type: 'USER',
                                                         LegStartDelay: 0,
                                                         BypassMedia: false,
-                                                        LegTimeout: 60,
+                                                        LegTimeout: ringTime,
                                                         Origination: callerIdName,
                                                         OriginationCallerIdNumber: callerIdNum,
                                                         Destination: extDetails.Extension,
@@ -680,7 +687,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             Type: 'USER',
                                                             LegStartDelay: 0,
                                                             BypassMedia: false,
-                                                            LegTimeout: pbxObj.RingTimeout,
+                                                            LegTimeout: ringTime,
                                                             Origination: callerIdName,
                                                             OriginationCallerIdNumber: callerIdNum,
                                                             Destination: extDetails.Extension,
@@ -729,7 +736,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             Type: 'USER',
                                                             LegStartDelay: 0,
                                                             BypassMedia: false,
-                                                            LegTimeout: 60,
+                                                            LegTimeout: ringTime,
                                                             Origination: callerIdName,
                                                             OriginationCallerIdNumber: callerIdNum,
                                                             Destination: extDetails.Extension,
@@ -883,7 +890,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         Type: 'USER',
                                                         LegStartDelay: 0,
                                                         BypassMedia: false,
-                                                        LegTimeout: 60,
+                                                        LegTimeout: ringTime,
                                                         Origination: callerIdName,
                                                         OriginationCallerIdNumber: callerIdNum,
                                                         Destination: extDetails.Extension,

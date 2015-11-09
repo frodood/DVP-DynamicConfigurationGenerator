@@ -302,7 +302,8 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                         TrunkNumber: rule.TrunkNumber,
                                         NumberType: rule.NumberType,
                                         CompanyId: rule.CompanyId,
-                                        TenantId: rule.TenantId
+                                        TenantId: rule.TenantId,
+                                        Action: 'FORWARDING'
                                     };
 
                                     if(dodNumber)
@@ -369,7 +370,8 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                             Group: grp,
                                             CompanyId: companyId,
                                             TenantId: tenantId,
-                                            AppId: extraData.AppId
+                                            AppId: extraData.AppId,
+                                            Action: 'DEFAULT'
                                         };
 
                                         var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -548,7 +550,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     PersonalGreeting: undefined,
                                                     CompanyId: companyId,
                                                     TenantId: tenantId,
-                                                    AppId: extraData.AppId
+                                                    AppId: extraData.AppId,
+                                                    Action: 'DEFAULT'
                                                 };
 
                                                 var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -625,7 +628,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         PersonalGreeting: personalGreeting,
                                                         CompanyId: companyId,
                                                         TenantId: tenantId,
-                                                        AppId: extraData.AppId
+                                                        AppId: extraData.AppId,
+                                                        Action: 'DEFAULT'
                                                     };
 
                                                     var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -746,7 +750,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             PersonalGreeting: personalGreeting,
                                                             CompanyId: companyId,
                                                             TenantId: tenantId,
-                                                            AppId: extraData.AppId
+                                                            AppId: extraData.AppId,
+                                                            Action: 'DEFAULT'
                                                         };
 
                                                         var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -797,12 +802,18 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     BypassMedia: false,
                                                                     LegTimeout: 60,
                                                                     Destination: rule.DNIS,
-                                                                    Domain: rule.IpUrl
+                                                                    Domain: rule.IpUrl,
+                                                                    CompanyId: companyId,
+                                                                    TenantId: tenantId,
+                                                                    AppId: extraData.AppId,
+                                                                    Action: 'CALL_DIVERT'
                                                                 };
 
 
                                                                     ep.Origination = rule.ANI;
                                                                     ep.OriginationCallerIdNumber = rule.ANI;
+
+
 
                                                                 var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
 
@@ -837,7 +848,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         Domain: extDetails.SipUACEndpoint.CloudEndUser.Domain,
                                                                         CompanyId: companyId,
                                                                         TenantId: tenantId,
-                                                                        AppId: extraData.AppId
+                                                                        AppId: extraData.AppId,
+                                                                        Action: 'DEFAULT'
                                                                     };
 
                                                                     var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
@@ -900,7 +912,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         PersonalGreeting: personalGreeting,
                                                         CompanyId: companyId,
                                                         TenantId: tenantId,
-                                                        AppId: extraData.AppId
+                                                        AppId: extraData.AppId,
+                                                        Action: 'DEFAULT'
                                                     };
 
                                                     var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -952,7 +965,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             PersonalGreeting: false,
                                             CompanyId: companyId,
                                             TenantId: tenantId,
-                                            AppId: extraData.AppId
+                                            AppId: extraData.AppId,
+                                            Action: 'DEFAULT'
                                         };
 
                                         var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -1040,7 +1054,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         Group: extDetails.Extension,
                                         CompanyId: companyId,
                                         TenantId: tenantId,
-                                        AppId: extraData.AppId
+                                        AppId: extraData.AppId,
+                                        Action: 'DEFAULT'
                                     };
 
                                     var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -1195,7 +1210,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             PersonalGreeting: undefined,
                                                             CompanyId: companyId,
                                                             TenantId: tenantId,
-                                                            AppId: extraData.AppId
+                                                            AppId: extraData.AppId,
+                                                            Action: 'DEFAULT'
                                                         };
 
                                                         var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -1269,7 +1285,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     PersonalGreeting: personalGreeting,
                                                                     CompanyId: companyId,
                                                                     TenantId: tenantId,
-                                                                    AppId: extraData.AppId
+                                                                    AppId: extraData.AppId,
+                                                                    Action: 'DEFAULT'
                                                                 };
 
                                                                 var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -1394,7 +1411,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         PersonalGreeting: personalGreeting,
                                                                         CompanyId: companyId,
                                                                         TenantId: tenantId,
-                                                                        AppId: extraData.AppId
+                                                                        AppId: extraData.AppId,
+                                                                        Action: 'DEFAULT'
                                                                     };
 
                                                                     var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -1448,7 +1466,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                                 TrunkNumber: rule.TrunkNumber,
                                                                                 NumberType: rule.NumberType,
                                                                                 CompanyId: rule.CompanyId,
-                                                                                TenantId: rule.TenantId
+                                                                                TenantId: rule.TenantId,
+                                                                                Action: 'CALL_DIVERT'
                                                                             };
 
 
@@ -1497,7 +1516,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                                     Domain: extDetails.SipUACEndpoint.CloudEndUser.Domain,
                                                                                     CompanyId: companyId,
                                                                                     TenantId: tenantId,
-                                                                                    AppId: extraData.AppId
+                                                                                    AppId: extraData.AppId,
+                                                                                    Action: 'DEFAULT'
                                                                                 };
 
                                                                                 var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, extDetails.SipUACEndpoint);
@@ -1551,7 +1571,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     PersonalGreeting: personalGreeting,
                                                                     CompanyId: companyId,
                                                                     TenantId: tenantId,
-                                                                    AppId: extraData.AppId
+                                                                    AppId: extraData.AppId,
+                                                                    Action: 'DEFAULT'
                                                                 };
 
                                                                 var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -1608,7 +1629,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     PersonalGreeting: undefined,
                                                     CompanyId: companyId,
                                                     TenantId: tenantId,
-                                                    AppId: extraData.AppId
+                                                    AppId: extraData.AppId,
+                                                    Action: 'DEFAULT'
                                                 };
 
                                                 var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -1674,7 +1696,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 Group: extDetails.Extension,
                                                 CompanyId: companyId,
                                                 TenantId: tenantId,
-                                                AppId: extraData.AppId
+                                                AppId: extraData.AppId,
+                                                Action: 'DEFAULT'
                                             };
 
                                             var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -1811,7 +1834,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             TrunkNumber: rule.TrunkNumber,
                                                             NumberType: rule.NumberType,
                                                             CompanyId: rule.CompanyId,
-                                                            TenantId: rule.TenantId
+                                                            TenantId: rule.TenantId,
+                                                            Action: 'DEFAULT'
                                                         };
 
                                                         if(dodActive && dodNumber)
@@ -1982,7 +2006,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             TrunkNumber: rule.TrunkNumber,
                                             NumberType: rule.NumberType,
                                             CompanyId: rule.CompanyId,
-                                            TenantId: rule.TenantId
+                                            TenantId: rule.TenantId,
+                                            Action: 'DEFAULT'
                                         };
 
                                         if(dodActive && dodNumber)

@@ -110,7 +110,8 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreT
                                     BypassMedia: false,
                                     LegTimeout: 60,
                                     Destination: rule.DNIS,
-                                    Domain: rule.IpUrl
+                                    Domain: rule.IpUrl,
+                                    Action: 'DEFAULT'
                                 };
 
                                 if(dodActive && dodNumber)
@@ -1161,7 +1162,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                         IsVoicemailEnabled: false,
                                                         PersonalGreeting: undefined,
                                                         CompanyId: companyId,
-                                                        TenantId: tenantId
+                                                        TenantId: tenantId,
+                                                        Action: 'DEFAULT'
                                                     };
                                                     //route to public user
                                                     var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, callerContext, profile, '[^\\s]*', false, undefined, undefined);

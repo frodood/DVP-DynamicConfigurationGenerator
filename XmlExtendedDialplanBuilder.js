@@ -389,6 +389,12 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
             .ele('action').att('application', 'set').att('data', bypassMedia)
             .up()
 
+        if(ep.Action)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=' + ep.Action)
+            .up()
+        }
+
         if(ep.Type === 'PUBLIC_USER')
         {
             cond.ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=PUBLIC_USER')
@@ -1352,6 +1358,12 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
         if(ep.AppId)
         {
             cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + ep.AppId)
+                .up()
+        }
+
+        if(ep.Action)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=' + ep.Action)
                 .up()
         }
 

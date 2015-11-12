@@ -827,7 +827,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             }
                                                         })
                                                     }
-                                                    else if(pbxObj.Endpoints && (pbxObj.Endpoints.ObjCategory === 'PBXUSER' || fm.ObjCategory === 'USER'))
+                                                    else if(pbxObj.Endpoints && (pbxObj.Endpoints.ObjCategory === 'PBXUSER' || pbxObj.Endpoints.ObjCategory === 'USER'))
                                                     {
                                                         backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, tenantId, 'USER', csId, function (err, extDetails)
                                                         {

@@ -286,12 +286,20 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                 else if(rule)
                                 {
                                     logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Outbound rule for gateway forward found', reqId);
+
+                                    var ringTout = 60;
+
+                                    if(fwdRule.RingTimeout)
+                                    {
+                                        ringTout = fwdRule.RingTimeout;
+                                    }
+
                                     var ep =
                                     {
                                         Profile: rule.GatewayCode,
                                         Type: 'GATEWAY',
                                         LegStartDelay: 0,
-                                        LegTimeout:60,
+                                        LegTimeout:ringTout,
                                         BypassMedia: false,
                                         Origination: rule.ANI,
                                         OriginationCallerIdNumber: rule.ANI,
@@ -356,13 +364,20 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                             grp = extDetails.SipUACEndpoint.UserGroup[0].Extension.Extension;
                                         }
 
+                                        var ringTout = 60;
+
+                                        if(fwdRule.RingTimeout)
+                                        {
+                                            ringTout = fwdRule.RingTimeout;
+                                        }
+
                                         var ep =
                                         {
                                             Profile: '',
                                             Type: 'USER',
                                             LegStartDelay: 0,
                                             BypassMedia: bypassMedia,
-                                            LegTimeout: 60,
+                                            LegTimeout: ringTout,
                                             Origination: origName,
                                             OriginationCallerIdNumber: origNum,
                                             Destination: fwdRule.DestinationNumber,
@@ -370,8 +385,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                             Group: grp,
                                             CompanyId: companyId,
                                             TenantId: tenantId,
-                                            AppId: extraData.AppId,
-                                            Action: 'DEFAULT'
+                                            Action: 'FORWARDING'
                                         };
 
                                         var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -628,7 +642,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         PersonalGreeting: personalGreeting,
                                                         CompanyId: companyId,
                                                         TenantId: tenantId,
-                                                        AppId: extraData.AppId,
+                                                        AppId: appId,
                                                         Action: 'DEFAULT'
                                                     };
 
@@ -698,7 +712,9 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             Domain: '',
                                                             Group: grp,
                                                             CompanyId: companyId,
-                                                            TenantId: tenantId
+                                                            TenantId: tenantId,
+                                                            AppId: appId,
+                                                            Action: 'DEFAULT'
                                                         };
 
                                                         if(dodActive && dodNumber)
@@ -726,7 +742,9 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     ep.BypassMedia = false;
                                                                 }
 
-                                                                var xml = xmlBuilder.CreateForwardingDialplan(reqId, ep, context, profile, '[^\\s]*', false, pbxFwdKey, numLimitInfo);
+                                                                var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
+
+                                                                var xml = xmlBuilder.CreateForwardingDialplan(reqId, ep, context, profile, '[^\\s]*', false, pbxFwdKey, numLimitInfo, attTransInfo);
 
                                                                 callback(undefined, xml);
                                                             }
@@ -1355,7 +1373,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         Domain: toUsrDomain,
                                                                         Group: grp,
                                                                         CompanyId: companyId,
-                                                                        TenantId: tenantId
+                                                                        TenantId: tenantId,
+                                                                        AppId: appId
                                                                     };
 
                                                                     if(dodActive && dodNumber)
@@ -1384,8 +1403,10 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                                 ep.BypassMedia = false;
                                                                             }
 
+                                                                            var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
 
-                                                                            var xml = xmlBuilder.CreateForwardingDialplan(reqId, ep, context, profile, '[^\\s]*', false, pbxFwdKey, undefined);
+
+                                                                            var xml = xmlBuilder.CreateForwardingDialplan(reqId, ep, context, profile, '[^\\s]*', false, pbxFwdKey, undefined, attTransInfo);
 
 
                                                                             callback(undefined, xml);

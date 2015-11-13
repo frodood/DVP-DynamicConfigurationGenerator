@@ -1162,7 +1162,7 @@ var CreateBargeDialplan = function(reqId, uuid, context, destinationPattern, cal
 
 };
 
-var CreateForwardingDialplan = function(reqId, endpoint, context, profile, destinationPattern, ignoreEarlyMedia, fwdKey, numLimitInfo)
+var CreateForwardingDialplan = function(reqId, endpoint, context, profile, destinationPattern, ignoreEarlyMedia, fwdKey, numLimitInfo, transferLegInfo)
 {
     try
     {
@@ -1242,14 +1242,69 @@ var CreateForwardingDialplan = function(reqId, endpoint, context, profile, desti
                 .up()
                 .ele('action').att('application', 'set').att('data', bypassMedia)
                 .up()
-                .ele('action').att('application', 'bind_meta_app').att('data', '3 ab s execute_extension::att_xfer XML PBXFeatures')
+
+        if(endpoint.Action)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=' + endpoint.Action)
                 .up()
-                .ele('action').att('application', 'bind_meta_app').att('data', '4 ab s execute_extension::att_xfer_group XML PBXFeatures')
+        }
+
+        if(endpoint.Type === 'PUBLIC_USER')
+        {
+            cond.ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=PUBLIC_USER')
                 .up()
-                .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
+                .ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=PUBLIC_USER')
                 .up()
-                .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
+        }
+        else
+        {
+            cond.ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=PRIVATE_USER')
                 .up()
+        }
+
+        if(endpoint.CompanyId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + endpoint.CompanyId)
+                .up()
+        }
+        if(endpoint.TenantId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + endpoint.TenantId)
+                .up()
+        }
+        if(endpoint.AppId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + endpoint.AppId)
+                .up()
+        }
+
+
+        if(transferLegInfo && transferLegInfo.TransferCode)
+        {
+            if(transferLegInfo.InternalLegs && transferLegInfo.TransferCode.InternalTransfer)
+            {
+                cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.InternalTransfer + ' ' + transferLegInfo.InternalLegs + ' s execute_extension::att_xfer XML PBXFeatures')
+                    .up()
+            }
+
+            if(transferLegInfo.ExternalLegs && transferLegInfo.TransferCode.ExternalTransfer)
+            {
+                cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.ExternalTransfer + ' ' + transferLegInfo.ExternalLegs + ' s execute_extension::att_xfer_outbound XML PBXFeatures')
+                    .up()
+            }
+
+            if(transferLegInfo.GroupLegs && transferLegInfo.TransferCode.GroupTransfer)
+            {
+                cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.GroupTransfer + ' ' + transferLegInfo.GroupLegs + ' s execute_extension::att_xfer_group XML PBXFeatures')
+                    .up()
+            }
+
+            if(transferLegInfo.ConferenceLegs && transferLegInfo.TransferCode.ConferenceTransfer)
+            {
+                cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.ConferenceTransfer + ' ' + transferLegInfo.ConferenceLegs + ' s execute_extension::att_xfer_conference XML PBXFeatures')
+                    .up()
+            }
+        }
 
         if(numLimitInfo && numLimitInfo.CheckLimit)
         {

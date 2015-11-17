@@ -1684,6 +1684,48 @@ var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, dest
                 calling = util.format('%s%s/%s', option, destinationGroup, dnis);
             }
 
+            if(ep.Action)
+            {
+                cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=' + ep.Action)
+                    .up()
+            }
+
+            if(ep.Type === 'PUBLIC_USER')
+            {
+                cond.ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=PUBLIC_USER')
+                    .up()
+                    .ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=PUBLIC_USER')
+                    .up()
+            }
+            else if(ep.Type === 'GATEWAY')
+            {
+                cond.ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=GATEWAY')
+                    .up()
+                    .ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=GATEWAY')
+                    .up()
+            }
+            else
+            {
+                cond.ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=PRIVATE_USER')
+                    .up()
+            }
+
+            if(ep.CompanyId)
+            {
+                cond.ele('action').att('application', 'export').att('data', 'companyid=' + ep.CompanyId)
+                    .up()
+            }
+            if(ep.TenantId)
+            {
+                cond.ele('action').att('application', 'export').att('data', 'tenantid=' + ep.TenantId)
+                    .up()
+            }
+            if(ep.AppId)
+            {
+                cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + ep.AppId)
+                    .up()
+            }
+
 
             cond.ele('action').att('application', 'set').att('data', bypassMed)
                 .up()

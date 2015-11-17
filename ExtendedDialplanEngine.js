@@ -13,7 +13,7 @@ var util = require('util');
 var stringify = require('stringify');
 var underscore = require('underscore');
 
-var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId, fmList, dodNum, dodActive, callerIdNum, callerIdName, csId, callback)
+var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId, fmList, dodNum, dodActive, callerIdNum, callerIdName, csId, appId, callback)
 {
     var epList = [];
     try
@@ -40,7 +40,12 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
                                 BypassMedia: false,
                                 LegTimeout: fm.RingTimeout,
                                 Destination: rule.DNIS,
-                                Domain: rule.IpUrl
+                                Domain: rule.IpUrl,
+                                CompanyId: companyId,
+                                TenantId: tenantId,
+                                AppId: appId,
+                                Action: 'FOLLOW_ME'
+
                             };
 
                             if(dodActive && dodNum)
@@ -93,7 +98,11 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
                                     Origination: callerIdName,
                                     OriginationCallerIdNumber: callerIdNum,
                                     Destination: fm.DestinationNumber,
-                                    Domain: extDetails.SipUACEndpoint.CloudEndUser.Domain
+                                    Domain: extDetails.SipUACEndpoint.CloudEndUser.Domain,
+                                    CompanyId: companyId,
+                                    TenantId: tenantId,
+                                    AppId: appId,
+                                    Action: 'FOLLOW_ME'
                                 };
 
 
@@ -676,7 +685,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 {
                                                     if(pbxDetails.Endpoints && pbxDetails.Endpoints.length > 0)
                                                     {
-                                                        CreateFMEndpointList(reqId, ani, context, companyId, tenantId, pbxDetails.Endpoints, '', false, callerIdNum, callerIdName, csId, function(err, epList)
+                                                        CreateFMEndpointList(reqId, ani, context, companyId, tenantId, pbxDetails.Endpoints, '', false, callerIdNum, callerIdName, csId, appId, function(err, epList)
                                                         {
                                                             if(err)
                                                             {
@@ -1337,7 +1346,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             {
                                                                 if(pbxDetails.Endpoints && pbxDetails.Endpoints.length > 0)
                                                                 {
-                                                                    CreateFMEndpointList(reqId, ani, context, companyId, tenantId, pbxDetails.Endpoints, '', false, callerIdNum, callerIdName, csId, function(err, epList)
+                                                                    CreateFMEndpointList(reqId, ani, context, companyId, tenantId, pbxDetails.Endpoints, '', false, callerIdNum, callerIdName, csId, appId, function(err, epList)
                                                                     {
                                                                         if(err)
                                                                         {

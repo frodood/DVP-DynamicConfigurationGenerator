@@ -44,7 +44,8 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
                                 CompanyId: companyId,
                                 TenantId: tenantId,
                                 AppId: appId,
-                                Action: 'FOLLOW_ME'
+                                Action: 'FOLLOW_ME',
+                                Priority: fm.Priority
 
                             };
 
@@ -65,7 +66,8 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
 
                             if(count >= len)
                             {
-                                callback(undefined, epList);
+                                var tempEpList = underscore.sortBy(epList, 'Priority');
+                                callback(undefined, tempEpList);
                             }
                         }
                         else
@@ -74,7 +76,8 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
 
                             if(count >= len)
                             {
-                                callback(undefined, epList);
+                                var tempEpList = underscore.sortBy(epList, 'Priority');
+                                callback(undefined, tempEpList);
                             }
                         }
                     })
@@ -102,7 +105,8 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
                                     CompanyId: companyId,
                                     TenantId: tenantId,
                                     AppId: appId,
-                                    Action: 'FOLLOW_ME'
+                                    Action: 'FOLLOW_ME',
+                                    Priority: fm.Priority
                                 };
 
 
@@ -120,7 +124,8 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
 
                                 if(count >= len)
                                 {
-                                    callback(undefined, epList);
+                                    var tempEpList = underscore.sortBy(epList, 'Priority');
+                                    callback(undefined, tempEpList);
                                 }
                             }
                             else
@@ -129,7 +134,8 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
 
                                 if(count >= len)
                                 {
-                                    callback(undefined, epList);
+                                    var tempEpList = underscore.sortBy(epList, 'Priority');
+                                    callback(undefined, tempEpList);
                                 }
                             }
                         }
@@ -139,7 +145,8 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
 
                             if(count >= len)
                             {
-                                callback(undefined, epList);
+                                var tempEpList = underscore.sortBy(epList, 'Priority');
+                                callback(undefined, tempEpList);
                             }
                         }
 
@@ -151,20 +158,23 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
 
                     if(count >= len)
                     {
-                        callback(undefined, epList);
+                        var tempEpList = underscore.sortBy(epList, 'Priority');
+                        callback(undefined, tempEpList);
                     }
 
                 }
             }
             else
             {
-                callback(undefined, epList);
+                var tempEpList = underscore.sortBy(epList, 'Priority');
+                callback(undefined, tempEpList);
             }
         });
     }
     catch(ex)
     {
-        callback(ex, epList);
+        var tempEpList = underscore.sortBy(epList, 'Priority');
+        callback(ex, tempEpList);
     }
 };
 

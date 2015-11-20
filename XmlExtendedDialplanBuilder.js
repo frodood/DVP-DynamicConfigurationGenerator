@@ -930,7 +930,7 @@ var CreateReceiveFaxDialplan = function(reqId, context, profile, destinationPatt
 
 };
 
-var CreatePickUpDialplan = function(reqId, extension, context, destinationPattern)
+var CreatePickUpDialplan = function(reqId, extension, context, destinationPattern, appId, companyId, tenantId)
 {
     try
     {
@@ -946,19 +946,36 @@ var CreatePickUpDialplan = function(reqId, extension, context, destinationPatter
 
         var doc = xmlBuilder.create('document');
 
-        doc.att('type', 'freeswitch/xml')
-            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
-            .ele('context').att('name', context)
-            .ele('extension').att('name', 'test')
-            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
-            .ele('action').att('application', 'pickup').att('data', extension)
-            .up()
-            .up()
-            .up()
-            .up()
+        var cond = doc.att('type', 'freeswitch/xml')
+                    .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+                    .ele('context').att('name', context)
+                    .ele('extension').att('name', 'test')
+                    .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+                    .ele('action').att('application', 'pickup').att('data', extension)
+                    .up()
+
+
+
+        if(companyId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
+                .up()
+        }
+        if(tenantId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
+                .up()
+        }
+        if(appId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+                .up()
+        }
+
+        cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=PICKUP')
             .up()
 
-            .end({pretty: true});
+        cond.end({pretty: true});
 
 
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});

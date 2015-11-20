@@ -411,6 +411,31 @@ var GetGroupBy_Name_Domain = function(grpName, domain, callback)
     }
 };
 
+var GetGroupByExtension = function(reqId, extension, tenant, callback)
+{
+    try
+    {
+        dbModel.Extension
+            .find({where: [{Extension: extension},{TenantId: tenant}], include: [{model: dbModel.UserGroup, as: "UserGroup", include:[{model: dbModel.SipUACEndpoint, as: "SipUACEndpoint"}]}]})
+            .then(function (grpData)
+            {
+
+                logger.debug('[DVP-DynamicConfigurationGenerator.GetGroupByExtension] PGSQL GetGroupByExtension query success');
+
+                callback(undefined, grpData);
+            }).catch(function(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.GetGroupByExtension] PGSQL GetGroupByExtension query failed', err);
+
+                callback(err, undefined);
+            })
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+    }
+};
+
 var GetCallServersForEndUserDB = function(reqId, companyId, tenantId, callback)
 {
     var csList = [];
@@ -1201,4 +1226,5 @@ module.exports.GetUserDetailsByUsername = GetUserDetailsByUsername;
 module.exports.GetCallServersForEndUserDB = GetCallServersForEndUserDB;
 module.exports.GetPublicClusterDetailsDB = GetPublicClusterDetailsDB;
 module.exports.GetCloudForUser = GetCloudForUser;
+module.exports.GetGroupByExtension = GetGroupByExtension;
 

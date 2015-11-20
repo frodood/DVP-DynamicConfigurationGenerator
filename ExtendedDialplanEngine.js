@@ -1911,8 +1911,42 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                                 if(extraData)
                                                 {
-                                                    var xml = xmlBuilder.CreatePickUpDialplan(reqId, extraData, context, '[^\\s]*');
-                                                    callback(undefined, xml);
+                                                    //validate user belongs to same group
+                                                    backendHandler.GetGroupByExtension(reqId, extraData, tenantId, function(err, grpReslt)
+                                                    {
+                                                        if(err)
+                                                        {
+                                                            var xml = xmlBuilder.createNotFoundResponse();
+                                                            callback(err, xml);
+                                                        }
+                                                        else
+                                                        {
+                                                            if(grpReslt && grpReslt.UserGroup && grpReslt.UserGroup.SipUACEndpoint)
+                                                            {
+                                                                var usrRec = underscore.find(grpReslt.UserGroup.SipUACEndpoint, function(usrInGrp){return usrInGrp.id === fromUserData.id});
+
+                                                                if(usrRec)
+                                                                {
+                                                                    var xml = xmlBuilder.CreatePickUpDialplan(reqId, extraData, context, '[^\\s]*', companyId, tenantId, appId);
+                                                                    callback(undefined, xml);
+                                                                }
+                                                                else
+                                                                {
+                                                                    var xml = xmlBuilder.createNotFoundResponse();
+                                                                    callback(undefined, xml);
+                                                                }
+
+                                                            }
+                                                            else
+                                                            {
+                                                                var xml = xmlBuilder.createNotFoundResponse();
+                                                                callback(undefined, xml);
+                                                            }
+
+                                                        }
+                                                    })
+
+
                                                 }
                                                 else
                                                 {

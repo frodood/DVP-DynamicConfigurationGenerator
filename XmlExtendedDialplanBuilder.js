@@ -954,7 +954,8 @@ var CreatePickUpDialplan = function(reqId, extension, context, destinationPatter
                     .ele('action').att('application', 'pickup').att('data', extension)
                     .up()
 
-
+        cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=INTERCEPT')
+            .up()
 
         if(companyId)
         {

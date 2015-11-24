@@ -1960,7 +1960,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                                 if(extraData)
                                                 {
-                                                    var xml = xmlBuilder.CreateParkDialplan(reqId, extraData, context, '[^\\s]*', extraData);
+                                                    var xml = xmlBuilder.CreateParkDialplan(reqId, extraData, context, '[^\\s]*', extraData, companyId, tenantId, appId);
                                                     callback(undefined, xml);
                                                 }
                                                 else
@@ -1979,7 +1979,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 {
                                                     if(!err && redisResult)
                                                     {
-                                                        var xml = xmlBuilder.CreateInterceptDialplan(reqId, redisResult, context, '[^\\s]*');
+                                                        var xml = xmlBuilder.CreateInterceptDialplan(reqId, redisResult, context, '[^\\s]*', companyId, tenantId, appId);
                                                         callback(undefined, xml);
                                                     }
                                                     else

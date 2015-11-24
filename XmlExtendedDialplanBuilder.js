@@ -972,9 +972,6 @@ var CreatePickUpDialplan = function(reqId, extension, context, destinationPatter
                 .up()
         }
 
-        cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=PICKUP')
-            .up()
-
         cond.end({pretty: true});
 
 
@@ -1037,7 +1034,7 @@ var CreateVoicemailDialplan = function(reqId, extension, context, destinationPat
 
 };
 
-var CreateInterceptDialplan = function(reqId, uuid, context, destinationPattern)
+var CreateInterceptDialplan = function(reqId, uuid, context, destinationPattern, companyId, tenantId, appId)
 {
     try
     {
@@ -1053,21 +1050,33 @@ var CreateInterceptDialplan = function(reqId, uuid, context, destinationPattern)
 
         var doc = xmlBuilder.create('document');
 
-        doc.att('type', 'freeswitch/xml')
-            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
-            .ele('context').att('name', context)
-            .ele('extension').att('name', 'test')
-            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
-            .ele('action').att('application', 'set').att('data', 'intercept_unanswered_only=true')
-            .up()
-            .ele('action').att('application', 'intercept').att('data', uuid)
-            .up()
-            .up()
-            .up()
-            .up()
-            .up()
+        var cond = doc.att('type', 'freeswitch/xml')
+                    .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+                    .ele('context').att('name', context)
+                    .ele('extension').att('name', 'test')
+                    .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+                    .ele('action').att('application', 'set').att('data', 'intercept_unanswered_only=true')
+                    .up()
+                    .ele('action').att('application', 'intercept').att('data', uuid)
+                    .up()
 
-            .end({pretty: true});
+        if(companyId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
+                .up()
+        }
+        if(tenantId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
+                .up()
+        }
+        if(appId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+                .up()
+        }
+
+        cond.end({pretty: true});
 
 
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
@@ -1081,7 +1090,7 @@ var CreateInterceptDialplan = function(reqId, uuid, context, destinationPattern)
 
 };
 
-var CreateParkDialplan = function(reqId, extension, context, destinationPattern, parkId)
+var CreateParkDialplan = function(reqId, extension, context, destinationPattern, parkId, companyId, tenantId, appId)
 {
     try
     {
@@ -1099,21 +1108,33 @@ var CreateParkDialplan = function(reqId, extension, context, destinationPattern,
 
         var doc = xmlBuilder.create('document');
 
-        doc.att('type', 'freeswitch/xml')
-            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
-            .ele('context').att('name', context)
-            .ele('extension').att('name', 'test')
-            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
-            .ele('action').att('application', 'answer')
-            .up()
-            .ele('action').att('application', 'valet_park').att('data', parkStr)
-            .up()
-            .up()
-            .up()
-            .up()
-            .up()
+        var cond = doc.att('type', 'freeswitch/xml')
+                    .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+                    .ele('context').att('name', context)
+                    .ele('extension').att('name', 'test')
+                    .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+                    .ele('action').att('application', 'answer')
+                    .up()
+                    .ele('action').att('application', 'valet_park').att('data', parkStr)
+                    .up()
 
-            .end({pretty: true});
+        if(companyId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
+                .up()
+        }
+        if(tenantId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
+                .up()
+        }
+        if(appId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+                .up()
+        }
+
+        cond.end({pretty: true});
 
 
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});

@@ -399,33 +399,33 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
         {
             cond.ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=PUBLIC_USER')
                 .up()
-                .ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=PUBLIC_USER')
+                .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=PUBLIC_USER')
                 .up()
         }
         else if(ep.Type === 'GROUP')
         {
-            cond.ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=GROUP')
+            cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=GROUP')
                 .up()
         }
         else
         {
-            cond.ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=PRIVATE_USER')
+            cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=PRIVATE_USER')
                 .up()
         }
 
         if(ep.CompanyId)
         {
-            cond.ele('action').att('application', 'export').att('data', 'companyid=' + ep.CompanyId)
+            cond.ele('action').att('application', 'set').att('data', 'companyid=' + ep.CompanyId)
                 .up()
         }
         if(ep.TenantId)
         {
-            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + ep.TenantId)
+            cond.ele('action').att('application', 'set').att('data', 'tenantid=' + ep.TenantId)
                 .up()
         }
         if(ep.AppId)
         {
-            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + ep.AppId)
+            cond.ele('action').att('application', 'set').att('data', 'dvp_app_id=' + ep.AppId)
                 .up()
         }
 
@@ -1066,17 +1066,17 @@ var CreateInterceptDialplan = function(reqId, uuid, context, destinationPattern,
 
         if(companyId)
         {
-            cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
+            cond.ele('action').att('application', 'set').att('data', 'companyid=' + companyId)
                 .up()
         }
         if(tenantId)
         {
-            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
+            cond.ele('action').att('application', 'set').att('data', 'tenantid=' + tenantId)
                 .up()
         }
         if(appId)
         {
-            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+            cond.ele('action').att('application', 'set').att('data', 'dvp_app_id=' + appId)
                 .up()
         }
 

@@ -391,7 +391,7 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
 
         if(ep.Action)
         {
-            cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=' + ep.Action)
+            cond.ele('action').att('application', 'set').att('data', 'DVP_ACTION_CAT=' + ep.Action)
             .up()
         }
 
@@ -954,7 +954,7 @@ var CreatePickUpDialplan = function(reqId, extension, context, destinationPatter
                     .ele('action').att('application', 'pickup').att('data', extension)
                     .up()
 
-        cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=INTERCEPT')
+        cond.ele('action').att('application', 'set').att('data', 'DVP_ADVANCED_OP_ACTION=PICKUP')
             .up()
 
         if(companyId)
@@ -1060,6 +1060,9 @@ var CreateInterceptDialplan = function(reqId, uuid, context, destinationPattern,
                     .up()
                     .ele('action').att('application', 'intercept').att('data', uuid)
                     .up()
+
+        cond.ele('action').att('application', 'set').att('data', 'DVP_ADVANCED_OP_ACTION=INTERCEPT')
+            .up()
 
         if(companyId)
         {

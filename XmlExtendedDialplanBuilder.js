@@ -959,17 +959,17 @@ var CreatePickUpDialplan = function(reqId, extension, context, destinationPatter
 
         if(companyId)
         {
-            cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
+            cond.ele('action').att('application', 'set').att('data', 'companyid=' + companyId)
                 .up()
         }
         if(tenantId)
         {
-            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
+            cond.ele('action').att('application', 'set').att('data', 'tenantid=' + tenantId)
                 .up()
         }
         if(appId)
         {
-            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+            cond.ele('action').att('application', 'set').att('data', 'dvp_app_id=' + appId)
                 .up()
         }
 

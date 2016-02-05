@@ -2,7 +2,7 @@
   "name": "dvp-dynamicconfiggenerator",
   "version": "1.0.0",
   "description": "DVP-DynamicConfigurationGenerator\r =================================",
-  "main": "ConferenceOperations.js",
+  "main": "app.js",
   "dependencies": {
     "config": "^1.15.0",
     "dvp-common": "^0.0.16",

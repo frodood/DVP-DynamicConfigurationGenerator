@@ -20,6 +20,8 @@ var hostIp = config.Host.Ip;
 var hostPort = config.Host.Port;
 var hostVersion = config.Host.Version;
 
+var securityToken = config.Token;
+
 var server = restify.createServer({
     name: 'DVP-DynamicConfigurationGenerator',
     formatters : {
@@ -245,7 +247,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreT
                                 {
                                     data.DVPAppUrl = masterApp.Url;
                                     data.AppId = masterApp.id;
-                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, fromUsr, rule.CompanyId, rule.TenantId, 'test', undefined, function(err, extDialplan)
+                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, fromUsr, rule.CompanyId, rule.TenantId, securityToken, undefined, function(err, extDialplan)
                                     {
                                         if(err)
                                         {
@@ -293,7 +295,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreT
                                 {
                                     data.DVPAppUrl = app.Url;
                                     data.AppId = app.id;
-                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, fromUsr, rule.CompanyId, rule.TenantId, 'test', undefined, function(err, extDialplan)
+                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, fromUsr, rule.CompanyId, rule.TenantId, securityToken, undefined, function(err, extDialplan)
                                     {
                                         if(err)
                                         {
@@ -743,7 +745,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                             {
                                                                 data.DVPAppUrl = masterApp.Url;
                                                                 data.AppId = masterApp.id;
-                                                                extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, 'test', NumLimitInfo, function(err, extDialplan)
+                                                                extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, function(err, extDialplan)
                                                                 {
                                                                     if(err)
                                                                     {
@@ -792,7 +794,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                             {
                                                                 data.DVPAppUrl = app.Url;
                                                                 data.AppId = app.id;
-                                                                extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, 'test', NumLimitInfo, function(err, extDialplan)
+                                                                extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, function(err, extDialplan)
                                                                 {
                                                                     if(err)
                                                                     {
@@ -995,7 +997,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                 {
                                                                     data.DVPAppUrl = masterApp.Url;
                                                                     data.AppId = masterApp.id;
-                                                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, 'test', NumLimitInfo, function(err, extDialplan)
+                                                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, function(err, extDialplan)
                                                                     {
                                                                         if(err)
                                                                         {
@@ -1044,7 +1046,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                 {
                                                                     data.DVPAppUrl = app.Url;
                                                                     data.AppId = app.id;
-                                                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, 'test', NumLimitInfo, function(err, extDialplan)
+                                                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, function(err, extDialplan)
                                                                     {
                                                                         if(err)
                                                                         {

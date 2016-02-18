@@ -23,5 +23,7 @@ module.exports = {
         "IpAddress": "SYS_REDIS_HOST",
         "Port": "SYS_REDIS_PORT"
 
-    }
+    },
+
+    "Token": "SYS_DYNAMICCONFIGGEN_TOKEN"
 };

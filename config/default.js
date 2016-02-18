@@ -16,5 +16,7 @@ module.exports = {
     "Ip":"0.0.0.0",
     "Port":8816,
     "Version":"1.0.0.0"
-  }
+  },
+
+  "Token": "123"
 };

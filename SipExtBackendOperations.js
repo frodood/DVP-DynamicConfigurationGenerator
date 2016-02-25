@@ -637,7 +637,7 @@ var GetPhoneNumberDetails = function(phnNum, callback)
     try
     {
         dbModel.TrunkPhoneNumber
-            .find({where :[{PhoneNumber: phnNum},{Enable: true}], include: [{model: dbModel.LimitInfo, as: 'LimitInfoInbound'},{model: dbModel.LimitInfo, as: 'LimitInfoBoth'},{model:dbModel.Trunk, as : 'Trunk'}]})
+            .find({where :[{PhoneNumber: phnNum},{Enable: true}], include: [{model: dbModel.LimitInfo, as: 'LimitInfoInbound'},{model: dbModel.LimitInfo, as: 'LimitInfoBoth'},{model:dbModel.Trunk, as : 'Trunk', include:[{model: dbModel.TrunkIpAddress, as:'TrunkIpAddress'}]}]})
             .then(function (phnInfo)
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.GetPhoneNumberDetails] PGSQL Get phone num details query success');

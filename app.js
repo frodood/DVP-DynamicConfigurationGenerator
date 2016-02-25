@@ -14,6 +14,7 @@ var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJ
 var Buffer = require('buffer');
 var util = require('util');
 var xmlBuilder = require('./XmlExtendedDialplanBuilder.js');
+var ipValidator = require('./IpValidator');
 
 
 var hostIp = config.Host.Ip;
@@ -390,6 +391,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
         var varUsrContext = data["variable_user_context"];
         var varFromNumber = data["variable_FromNumber"];
         var callerIdNum = data["Caller-Caller-ID-Number"];
+        var varSipFromHost = data["variable_sip_from_host"];
         var dvpOriginationType = data["variable_sip_h_X-DVP-ORIGINATION-TYPE"];
         var dvpDestinationType = data["variable_sip_h_X-DVP-DESTINATION-TYPE"];
 
@@ -589,6 +591,19 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                     else if(num)
                                     {
                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - TrunkNumber found', reqId);
+
+                                        if(!num.Trunk || !num.Trunk.TrunkIpAddress)
+                                        {
+                                            throw new Error('No trunk or ip addresses found')
+                                        }
+
+                                        var isValidIp = ipValidator.ValidateRange(varSipFromHost, num.Trunk.TrunkIpAddress);
+
+                                        if(!isValidIp)
+                                        {
+                                            throw new Error('Unauthorised incoming ip address');
+                                        }
+
                                         if((num.ObjCategory === 'INBOUND' && num.LimitInfoInbound && num.LimitInfoInbound.Enable && typeof num.LimitInfoInbound.MaxCount != 'undefined') || (num.ObjCategory === 'BOTH' && ((num.LimitInfoInbound && num.LimitInfoInbound.Enable && typeof num.LimitInfoInbound.MaxCount != 'undefined') || (num.LimitInfoBoth && num.LimitInfoBoth.Enable && typeof num.LimitInfoBoth.MaxCount != 'undefined'))))
                                         {
                                             var bothLim = undefined;
@@ -627,7 +642,6 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                 data['TrunkFaxType'] = faxType;
                                             }
 
-                                            //logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - GetPhoneNumberDetails returned num obj : %j', reqId, JSON.stringify(num));
 
                                             logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, destNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, aniNum, destNum, domain, num.CompanyId, num.TenantId);
                                             ruleHandler.PickCallRuleInbound(reqId, callerIdNum, destNum, domain, callerContext, num.CompanyId, num.TenantId, function(err, rule)
@@ -868,8 +882,6 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                             res.end(xml);
                                         }
-
-
                                     }
                                     else
                                     {

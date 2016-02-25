@@ -10,8 +10,8 @@ var redisHandler = require('./RedisHandler.js');
 var ruleHandler = require('dvp-ruleservice/CallRuleBackendOperations.js');
 var conferenceHandler = require('./ConferenceOperations.js');
 var util = require('util');
-var stringify = require('stringify');
 var underscore = require('underscore');
+var libphonenumber = require('libphonenumber');
 
 var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId, fmList, dodNum, dodActive, callerIdNum, callerIdName, csId, appId, callback)
 {
@@ -244,6 +244,39 @@ var AttendantTransferLegInfoHandler = function(reqId, fromUser, toUser)
         return null;
     }
 }
+
+var CheckIddValidity = function(dnis, trNum)
+{
+    try
+    {
+        var dnisNumberType = libphonenumber.phoneUtil.getNumberType(libphonenumber.phoneUtil.parseAndKeepRawInput(dnis, null));
+
+        if(dnisNumberType === 3 || dnisNumberType === 9)
+        {
+            return true;
+        }
+        else
+        {
+            var dnisCountryCode = libphonenumber.phoneUtil.getRegionCodeForNumber(libphonenumber.phoneUtil.parseAndKeepRawInput(dnis, null));
+            var trNumCountryCode = libphonenumber.phoneUtil.getRegionCodeForNumber(libphonenumber.phoneUtil.parseAndKeepRawInput(trNum, null));
+
+            if(dnisCountryCode === trNumCountryCode)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+    catch(err)
+    {
+        logger.error('DVP-DynamicConfigurationGenerator.CheckIddValidity] - [%s] - ERROR occurred', err);
+        return false;
+    }
+
+};
 
 
 var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, context, direction, extraData, companyId, tenantId, disconReason, fwdId, dodNumber, securityToken, origName, origNum, csId, callback)
@@ -1831,6 +1864,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             var operationType = pbxObj.OperationType;
                                             var voicemailEnabled = pbxObj.VoicemailEnabled;
                                             var bypassMedia = pbxObj.BypassMedia;
+                                            var iddEnabled = pbxObj.IDDEnabled;
 
                                             var ringTime = 60;
 
@@ -1854,6 +1888,14 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     }
                                                     else if(rule)
                                                     {
+                                                        if(!iddEnabled)
+                                                        {
+                                                            if(!CheckIddValidity(rule.DNIS, rule.TrunkNumber))
+                                                            {
+                                                                callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                            }
+                                                        }
+
                                                         if(rule.FaxType)
                                                         {
                                                             toFaxType = rule.FaxType;
@@ -2134,7 +2176,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
         res.end(jsonString);
 
     }
-}
+};
 
 module.exports.ProcessExtendedDialplan = ProcessExtendedDialplan;
 module.exports.ProcessCallForwarding = ProcessCallForwarding;

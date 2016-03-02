@@ -779,6 +779,30 @@ var GetGatewayListForCallServerProfile = function(profile, csId, reqId, callback
     }
 };
 
+var ValidateBlacklistNumber = function(phnNum, companyId, tenantId, callback)
+{
+    try
+    {
+        dbModel.NumberBlacklist
+            .find({where :[{PhoneNumber: phnNum},{CompanyId: companyId},{TenantId: tenantId}]})
+            .then(function (blackListNum)
+            {
+                logger.debug('[DVP-DynamicConfigurationGenerator.GetPhoneNumberDetails] PGSQL Get phone num details query success');
+
+                callback(null, blackListNum);
+
+            }).catch(function(err)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.GetPhoneNumberDetails] PGSQL Get phone num details query failed', err);
+                callback(err, null);
+            })
+    }
+    catch(ex)
+    {
+        callback(ex, null);
+    }
+};
+
 var GetGatewayForOutgoingRequest = function(fromNumber, lbId, callback)
 {
     var outgoingRequest = {
@@ -1227,4 +1251,5 @@ module.exports.GetCallServersForEndUserDB = GetCallServersForEndUserDB;
 module.exports.GetPublicClusterDetailsDB = GetPublicClusterDetailsDB;
 module.exports.GetCloudForUser = GetCloudForUser;
 module.exports.GetGroupByExtension = GetGroupByExtension;
+module.exports.ValidateBlacklistNumber = ValidateBlacklistNumber;
 

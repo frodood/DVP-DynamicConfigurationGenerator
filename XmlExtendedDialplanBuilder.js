@@ -4,6 +4,10 @@ var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var util = require('util');
 var sf = require('stringformat');
 
+var fileServiceIp = config.Services.fileServiceHost;
+var fileServicePort = config.Services.fileServicePort;
+var fileServiceVersion = config.Services.fileServiceVersion;
+
 var createNotFoundResponse = function()
 {
     try
@@ -393,6 +397,20 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
         {
             cond.ele('action').att('application', 'set').att('data', 'DVP_ACTION_CAT=' + ep.Action)
             .up()
+        }
+
+        if(ep.RecordEnabled)
+        {
+            var fileSavePath = '$${base_dir}/recordings/${strftime(%Y%m%d%H%M%S)}_${caller_id_number}.wav';
+            var fileUploadUrl = 'http://' + fileServiceIp + ':' + fileServicePort + '/DVP/API/' + fileServiceVersion + '/FileService/File/Upload';
+
+            cond.ele('action').att('application', 'set').att('data', 'dvpRecFile=' + fileSavePath)
+                .up()
+                .ele('action').att('application', 'export').att('data', 'execute_on_answer=record_session ${dvpRecFile}')
+                .up()
+                .ele('action').att('application', 'set').att('data', 'record_post_process_exec_api=curl_sendfile:' + fileUploadUrl + ' file=${dvpRecFile} class=CALLSERVER&type=CALL&category=CONVERSATION&REFERENCEID=${uuid}')
+                .up()
+
         }
 
         if(ep.Type === 'PUBLIC_USER')
@@ -1441,6 +1459,24 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
             .up()
             .ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=GATEWAY')
             .up()
+
+        if(ep.RecordEnabled)
+        {
+            if(fileServiceIp && fileServicePort)
+            {
+                var fileSavePath = '$${base_dir}/recordings/${strftime(%Y%m%d%H%M%S)}_${caller_id_number}.wav';
+                var fileUploadUrl = 'http://' + fileServiceIp + ':' + fileServicePort + '/DVP/API/' + fileServiceVersion + '/FileService/File/Upload';
+
+                cond.ele('action').att('application', 'set').att('data', 'dvpRecFile=' + fileSavePath)
+                    .up()
+                    .ele('action').att('application', 'export').att('data', 'execute_on_answer=record_session ${dvpRecFile}')
+                    .up()
+                    .ele('action').att('application', 'set').att('data', 'record_post_process_exec_api=curl_sendfile:' + fileUploadUrl + ' file=${dvpRecFile} class=CALLSERVER&type=CALL&category=CONVERSATION&REFERENCEID=${uuid}')
+                    .up()
+
+            }
+
+        }
 
         if(ep.CompanyId)
         {

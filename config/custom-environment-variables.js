@@ -25,5 +25,14 @@ module.exports = {
 
     },
 
+    "Services":
+    {
+
+        "fileServiceHost": "SYS_FILESERVICE_HOST",
+        "fileServicePort": "SYS_FILESERVICE_PORT",
+        "fileServiceVersion":"SYS_FILESERVICE_VERSION"
+
+    },
+
     "Token": "SYS_DYNAMICCONFIGGEN_TOKEN"
 };

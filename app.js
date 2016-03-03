@@ -43,6 +43,8 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
+
+
 var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreTenant, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, res)
 {
     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to find from user for outbound call', reqId);
@@ -457,7 +459,6 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                 });
 
-
             }
             else
             {
@@ -605,14 +606,20 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                             {
                                                 if(!num.Trunk || !num.Trunk.TrunkIpAddress)
                                                 {
-                                                    throw new Error('No trunk or ip addresses found')
+                                                    logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] -  No trunk or ip addresses associated to number', reqId);
+                                                    var xml = xmlGen.createNotFoundResponse();
+
+                                                    res.end(xml);
                                                 }
 
                                                 var isValidIp = ipValidator.ValidateRange(varSipFromHost, num.Trunk.TrunkIpAddress);
 
                                                 if(!isValidIp)
                                                 {
-                                                    throw new Error('Unauthorised incoming ip address');
+                                                    logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Incoming IP validation failed', reqId);
+                                                    var xml = xmlGen.createNotFoundResponse();
+
+                                                    res.end(xml);
                                                 }
 
                                                 if((num.ObjCategory === 'INBOUND' && num.LimitInfoInbound && num.LimitInfoInbound.Enable && typeof num.LimitInfoInbound.MaxCount != 'undefined') || (num.ObjCategory === 'BOTH' && ((num.LimitInfoInbound && num.LimitInfoInbound.Enable && typeof num.LimitInfoInbound.MaxCount != 'undefined') || (num.LimitInfoBoth && num.LimitInfoBoth.Enable && typeof num.LimitInfoBoth.MaxCount != 'undefined'))))

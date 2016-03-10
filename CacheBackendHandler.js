@@ -1,5 +1,45 @@
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var dbModel = require('dvp-dbmodels');
+var underscore = require('underscore');
+var redisHandler = require('./RedisHandler.js');
+
+var data =
+{
+    SipUACEndpoint:
+    {
+        "User1": {"id": 1, "SipUsername":"User1", "Password": "123", "ExtensionId":1},
+        "User2": {"id": 2, "SipUsername":"User2", "Password": "123", "ExtensionId":null}
+    },
+    Extension:
+    {
+        "1000": {"id": 1, "Extension":"1000"},
+        "1001": {"id": 2, "Extension":"1001"}
+    },
+    TransferCode:
+    {"id":1},
+    CloudEndUser:
+    {
+        1: {"id": 1, "Domain":"192.168.1.23"},
+        2: {"id": 1, "Domain":"192.168.1.23"}
+    },
+    UserGroup:
+        [
+            {
+                "GroupName": "TestGrp",
+                "ExtensionId": "1001",
+                "SipUACEndpoint":
+                {
+                    "User1": {"id": 1, "SipUsername": "User1", "Password": "123", "ExtensionId": 1},
+                    "User2": {"id": 2, "SipUsername": "User2", "Password": "123", "ExtensionId": null}
+                }
+            }
+        ],
+    NumberBlacklist:
+    {
+        "0112300566": {"PhoneNumber": "0112300566"}
+    }
+};
+
 
 var GetUserBy_Ext_Domain = function(extension, domain, data, callback)
 {
@@ -44,7 +84,7 @@ var GetUserBy_Name_Domain = function(extName, domain, data, callback)
                 callback(err, undefined);
             })
 
-        }
+    }
     catch(ex)
     {
         callback(ex, undefined);
@@ -83,17 +123,17 @@ var GetPublicClusterDetailsDB = function(reqId, data, cb)
     try
     {
         dbModel.Cloud.find({where :[{Type: 'PUBLIC'}], include: [{model: dbModel.LoadBalancer, as: "LoadBalancer"}]})
-        .then(function(resCloud)
-        {
-            logger.debug('[DVP-DynamicConfigurationGenerator.GetPublicClusterDetailsDB] - [%s] - Public CloudEndUser details found',reqId);
+            .then(function(resCloud)
+            {
+                logger.debug('[DVP-DynamicConfigurationGenerator.GetPublicClusterDetailsDB] - [%s] - Public CloudEndUser details found',reqId);
 
-            cb(undefined, resCloud);
+                cb(undefined, resCloud);
 
-        }).catch(function(errCloud)
-        {
-            logger.error('[DVP-DynamicConfigurationGenerator.GetPublicClusterDetailsDB] - [%s] - Public CloudEndUser details searching error',reqId, errCloud);
-            cb(errCloud, undefined);
-        });
+            }).catch(function(errCloud)
+            {
+                logger.error('[DVP-DynamicConfigurationGenerator.GetPublicClusterDetailsDB] - [%s] - Public CloudEndUser details searching error',reqId, errCloud);
+                cb(errCloud, undefined);
+            });
     }
     catch(ex)
     {
@@ -101,6 +141,7 @@ var GetPublicClusterDetailsDB = function(reqId, data, cb)
     }
 }
 
+//Done
 var GatherFromUserDetails = function(reqId, usrName, tenantId, ignoreTenant, data, callback)
 {
     GetUserByNameTenantDB(reqId, usrName, tenantId, ignoreTenant, data, function(err, res)
@@ -125,25 +166,42 @@ var GatherFromUserDetails = function(reqId, usrName, tenantId, ignoreTenant, dat
     })
 };
 
+//Done
 var GetUserByNameTenantDB = function(reqId, extName, tenantId, ignoreTenant, data, callback)
 {
     try
     {
         if(!ignoreTenant)
         {
-            dbModel.SipUACEndpoint
-                .find({where: [{SipUsername: extName},{TenantId: tenantId}], include:[{model: dbModel.Extension, as: 'Extension'}]})
-                .then(function (usr)
-                {
-                    logger.debug('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query success');
+            var err = undefined;
+            if(data && data.SipUACEndpoint)
+            {
+                var usr = data.SipUACEndpoint[extName];
 
-                    callback(undefined, usr);
-
-                }).catch(function(err)
+                if(usr)
                 {
-                    logger.error('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query failed', err);
-                    callback(err, undefined);
-                })
+                    if(usr.ExtensionId)
+                    {
+                        if(data.Extension)
+                        {
+                            var extTemp = underscore.find(data.Extension, function(ext)
+                            {
+                                return ext.id === usr.ExtensionId
+                            });
+
+                            usr.Extension = extTemp;
+                        }
+
+                    }
+
+                }
+            }
+            else
+            {
+                err = new Error('Error getting SipUACEndpoint');
+            }
+
+            callback(err, usr);
         }
         else
         {
@@ -172,49 +230,64 @@ var GetUserByNameTenantDB = function(reqId, extName, tenantId, ignoreTenant, dat
 
 };
 
+//Done
 var GetTransferCodesForTenantDB = function(reqId, tenantId, data, callback)
 {
     try
     {
-        dbModel.TransferCode
-            .find({where: [{TenantId: tenantId}]})
-            .then(function (transCode)
-            {
-                logger.debug('[DVP-DynamicConfigurationGenerator.GetTransferCodesForTenantDB] - [%s] - PGSQL get transfer codes for tenant success', reqId);
-                callback(undefined, transCode);
-            })
-            .catch(function(err)
-            {
-                logger.error('[DVP-DynamicConfigurationGenerator.GetTransferCodesForTenantDB] - [%s] - PGSQL get transfer codes for tenant failed', reqId, err);
-
-                callback(err, undefined);
-            })
+        if(data)
+        {
+            callback(undefined, data.TransferCode);
+        }
+        else
+        {
+            callback(new Error('Error getting TransferCode'), undefined);
+        }
 
     }
     catch(ex)
     {
-        logger.error('[DVP-DynamicConfigurationGenerator.GetTransferCodesForTenantDB] - [%s] - PGSQL get transfer codes for tenant failed', reqId, ex);
         callback(ex, undefined);
     }
 
 
 };
 
+//Done
 var GetExtensionForDid = function(reqId, didNumber, companyId, tenantId, data, callback)
 {
     try
     {
-        dbModel.DidNumber.find({where: [{DidNumber: didNumber},{TenantId: tenantId}], include : [{model: dbModel.Extension, as: 'Extension'}]})
-            .then(function (didNumDetails)
-            {
-                logger.debug('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query success', reqId);
-                callback(undefined, didNumDetails);
+        var err = undefined;
+        if(data && data.DidNumber)
+        {
+            var did = data.DidNumber[didNumber];
 
-            }).catch(function(err)
+            if(did)
             {
-                logger.error('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query failed', reqId, err);
-                callback(err, undefined);
-            });
+                if(did.ExtensionId)
+                {
+                    if(data.Extension)
+                    {
+                        var extTemp = underscore.find(data.Extension, function(ext)
+                        {
+                            return ext.id === did.ExtensionId
+                        });
+
+                        did.Extension = extTemp;
+                    }
+
+                }
+
+            }
+        }
+        else
+        {
+            err = new Error('Error getting data from cache');
+        }
+
+        callback(err, did);
+
     }
     catch(ex)
     {
@@ -224,21 +297,22 @@ var GetExtensionForDid = function(reqId, didNumber, companyId, tenantId, data, c
 
 };
 
+//Done
 var GetExtensionDB = function(reqId, ext, tenantId, data, callback)
 {
     try
     {
-        dbModel.Extension.find({where: [{Extension: ext},{TenantId: tenantId}]})
-            .then(function (extDetails)
-            {
-                logger.debug('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query success', reqId);
-                callback(undefined, extDetails);
 
-            }).catch(function(err)
-            {
-                logger.error('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query failed', reqId, err);
-                callback(err, undefined);
-            });
+        if(data && data.Extension)
+        {
+            var extDetails = data.Extension[ext];
+
+            callback(undefined, extDetails);
+        }
+        else
+        {
+            callback(new Error('Error getting cache data'), undefined);
+        }
     }
     catch(ex)
     {
@@ -248,21 +322,23 @@ var GetExtensionDB = function(reqId, ext, tenantId, data, callback)
 
 };
 
+//Incomplete
 var GetPresenceDB = function(reqId, username, data, callback)
 {
     try
     {
-        dbModel.SipPresence.find({where: [{SipUsername: username}]})
-            .then(function (presInfo)
-            {
-                logger.debug('[DVP-DynamicConfigurationGenerator.GetPresenceDB] - [%s] - PGSQL get presence details query success', reqId);
-                callback(undefined, presInfo);
-            })
-            .catch(function(err)
-            {
-                logger.error('[DVP-DynamicConfigurationGenerator.GetPresenceDB] - [%s] - PGSQL get presence details query failed', reqId, err);
-                callback(err, undefined);
-            });
+        callback(undefined, undefined);
+        //dbModel.SipPresence.find({where: [{SipUsername: username}]})
+        //    .then(function (presInfo)
+        //    {
+        //        logger.debug('[DVP-DynamicConfigurationGenerator.GetPresenceDB] - [%s] - PGSQL get presence details query success', reqId);
+        //        callback(undefined, presInfo);
+        //    })
+        //    .catch(function(err)
+        //    {
+        //        logger.error('[DVP-DynamicConfigurationGenerator.GetPresenceDB] - [%s] - PGSQL get presence details query failed', reqId, err);
+        //        callback(err, undefined);
+        //    });
     }
     catch(ex)
     {
@@ -272,84 +348,173 @@ var GetPresenceDB = function(reqId, username, data, callback)
 
 };
 
+//Done - Without Conference
 var GetAllDataForExt = function(reqId, extension, tenantId, extType, callServerId, data, callback)
 {
     try
     {
-        console.time('time');
+
         if(extType === 'USER')
         {
-            dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}], include: [{model: dbModel.SipUACEndpoint, as:'SipUACEndpoint', include: [{model: dbModel.CloudEndUser, as:'CloudEndUser'},{model: dbModel.UserGroup, as:'UserGroup', include: [{model: dbModel.Extension, as:'Extension'}]}]}]})
-                .then(function (extData)
+            if(data && data.Extension)
+            {
+                var extData = underscore.find(data.Extension, function(ext)
                 {
-                    if(extData && extData.SipUACEndpoint)
+                    return ext.Extension === extension && ext.ObjCategory === extType
+                });
+
+                if(extData)
+                {
+                    if(data.SipUACEndpoint)
                     {
-                        console.timeEnd('time');
-                        GetTransferCodesForTenantDB(reqId, extData.SipUACEndpoint.TenantId, data, function(err, resTrans)
+                        var usrTemp = underscore.find(data.SipUACEndpoint, function (usr)
                         {
-                            if(resTrans)
+                            return usr.ExtensionId === extData.id
+                        });
+
+                        if (usrTemp)
+                        {
+                            extData.SipUACEndpoint = usrTemp;
+
+                            if (data.CloudEndUser)
                             {
-                                extData.SipUACEndpoint.TransferCode = resTrans;
+                                var ceTemp = data.CloudEndUser[usrTemp.CloudEndUserId];
+
+                                if (ceTemp)
+                                {
+                                    usrTemp.CloudEndUser = ceTemp;
+                                }
+
                             }
 
-                            GetPresenceDB(reqId, extData.SipUACEndpoint.SipUsername, data, function(err, presInf)
+                            if (data.UserGroup)
                             {
-                                if(presInf && presInf.Status === 'Available')
+                                var curGrp = null;
+                                for(i=0; i<data.UserGroup.length; i++)
+                                {
+                                    var users = data.UserGroup[i].SipUACEndpoint;
+
+                                    if(users)
+                                    {
+                                        var usrGrpTemp = underscore.find(users, function (usrGrp)
+                                        {
+                                            return usrGrp.id === usrTemp.id
+                                        });
+
+                                        if(usrGrpTemp)
+                                        {
+                                            curGrp = data.UserGroup[i];
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if(curGrp)
+                                {
+                                    var usrGrpArr = [];
+                                    usrGrpArr.push(curGrp);
+                                    var extGrpTemp = underscore.find(data.Extension, function(extGrp)
+                                    {
+                                        return extGrp.id === curGrp.ExtensionId
+                                    });
+
+                                    curGrp.Extension = extGrpTemp;
+
+                                    usrTemp.UserGroup = usrGrpArr;
+                                }
+
+                            }
+                        }
+
+
+                    }
+
+                }
+
+                if(extData && extData.SipUACEndpoint)
+                {
+                    GetTransferCodesForTenantDB(reqId, extData.SipUACEndpoint.TenantId, data, function(err, resTrans)
+                    {
+                        if(resTrans)
+                        {
+                            extData.SipUACEndpoint.TransferCode = resTrans;
+                        }
+
+                        GetPresenceDB(reqId, extData.SipUACEndpoint.SipUsername, data, function(err, presInf)
+                        {
+                            if(presInf && presInf.Status === 'Available')
+                            {
+                                extData.SipUACEndpoint.UsePublic = false;
+                                callback(err, extData);
+                            }
+                            else
+                            {
+                                if(extData.SipUACEndpoint.UsePublic)
+                                {
+                                    GetCallServerClusterDetailsDB(callServerId, data, function(err, cloudInfo)
+                                    {
+                                        if(cloudInfo && cloudInfo.Cloud && cloudInfo.Cloud.LoadBalancer)
+                                        {
+                                            extData.SipUACEndpoint.Domain = cloudInfo.Cloud.LoadBalancer.MainIP;
+                                            extData.SipUACEndpoint.UsePublic = true;
+                                        }
+
+                                        callback(err, extData);
+
+                                    })
+                                }
+                                else
                                 {
                                     extData.SipUACEndpoint.UsePublic = false;
                                     callback(err, extData);
                                 }
-                                else
-                                {
-                                    if(extData.SipUACEndpoint.UsePublic)
-                                    {
-                                        GetCallServerClusterDetailsDB(callServerId, data, function(err, cloudInfo)
-                                        {
-                                            if(cloudInfo && cloudInfo.Cloud && cloudInfo.Cloud.LoadBalancer)
-                                            {
-                                                extData.SipUACEndpoint.Domain = cloudInfo.Cloud.LoadBalancer.MainIP;
-                                                extData.SipUACEndpoint.UsePublic = true;
-                                            }
-
-                                            callback(err, extData);
-
-                                        })
-                                    }
-                                    else
-                                    {
-                                        extData.SipUACEndpoint.UsePublic = false;
-                                        callback(err, extData);
-                                    }
-                                }
-
-                            })
-
-
-
+                            }
 
                         })
 
-                    }
-                    else
-                    {
-                        callback(undefined, extData);
-                    }
+                    })
 
-                }).catch(function(err)
+                }
+                else
                 {
-                    callback(err, undefined);
-                });
+                    callback(undefined, extData);
+                }
+            }
+            else
+            {
+                callback(new Error('Error getting cache data'), undefined);
+            }
+
         }
         else if(extType === 'GROUP')
         {
-            dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}], include: [{model: dbModel.UserGroup, as:'UserGroup'}]})
-                .then(function (extData)
+
+            if(data && data.Extension)
+            {
+                var extData = underscore.find(data.Extension, function(ext)
                 {
-                    callback(undefined, extData);
-                }).catch(function(err)
-                {
-                    callback(err, undefined);
+                    return ext.Extension === extension && ext.ObjCategory === extType
                 });
+
+                if(extData)
+                {
+                    if(data.UserGroup)
+                    {
+                        var grpTemp = underscore.find(data.UserGroup, function (grp)
+                        {
+                            return grp.ExtensionId === extData.id;
+                        });
+
+                        extData.UserGroup = grpTemp;
+                    }
+                }
+
+                callback(undefined, extData);
+            }
+            else
+            {
+                callback(new Error('Error getting cache data'), undefined);
+            }
         }
         else if(extType === 'CONFERENCE')
         {
@@ -364,14 +529,19 @@ var GetAllDataForExt = function(reqId, extension, tenantId, extType, callServerI
         }
         else if(extType === 'VOICE_PORTAL')
         {
-            dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}]})
-                .then(function (extData)
+            if(data && data.Extension)
+            {
+                var extData = underscore.find(data.Extension, function(ext)
                 {
-                    callback(undefined, extData);
-                }).catch(function(err)
-                {
-                    callback(err, undefined);
+                    return ext.Extension === extension && ext.ObjCategory === extType
                 });
+
+                callback(undefined, extData);
+            }
+            else
+            {
+                callback(undefined, undefined);
+            }
         }
         else
         {
@@ -388,6 +558,7 @@ var GetAllDataForExt = function(reqId, extension, tenantId, extType, callServerI
 
 };
 
+//Only Used in Directory Profile - No Need To Cache
 var GetGroupBy_Name_Domain = function(grpName, domain, data, callback)
 {
     try
@@ -413,6 +584,7 @@ var GetGroupBy_Name_Domain = function(grpName, domain, data, callback)
     }
 };
 
+//Incomplete
 var GetGroupByExtension = function(reqId, extension, tenant, data, callback)
 {
     try
@@ -438,6 +610,7 @@ var GetGroupByExtension = function(reqId, extension, tenant, data, callback)
     }
 };
 
+//Incomplete - not used in call app
 var GetCallServersForEndUserDB = function(reqId, companyId, tenantId, data, callback)
 {
     var csList = [];
@@ -584,24 +757,16 @@ var GetCallServersForEndUserDB = function(reqId, companyId, tenantId, data, call
     }
 };
 
+//Done
 var GetContext = function(context, callback)
 {
-
     try
     {
-        dbModel.Context
-            .find({where :[{Context: context}]})
-            .then(function (ctxt)
-            {
-                logger.debug('[DVP-DynamicConfigurationGenerator.GetContext] PGSQL Get context query success');
+        redisHandler.GetObject(null, 'CONTEXT:' + context, function(err, ctxt)
+        {
+            callback(undefined, ctxt);
 
-                callback(undefined, ctxt);
-
-            }).catch(function(err)
-            {
-                logger.error('[DVP-DynamicConfigurationGenerator.GetContext] PGSQL Get context query failed', err);
-                callback(err, undefined);
-            });
+        });
 
     }
     catch(ex)
@@ -610,23 +775,19 @@ var GetContext = function(context, callback)
     }
 };
 
+//Done
 var GetEmergencyNumber = function(numb, tenantId, data, callback)
 {
     try
     {
-        dbModel.EmergencyNumber
-            .find({where :[{EmergencyNum: numb},{TenantId: tenantId}]})
-            .then(function (eNum)
-            {
-                logger.debug('[DVP-DynamicConfigurationGenerator.GetContext] PGSQL Get emergency number query success');
+        var eNum = undefined;
 
-                callback(undefined, eNum);
+        if(data && data.EmergencyNumber)
+        {
+            eNum = data.EmergencyNumber[numb];
+        }
 
-            }).catch(function(err)
-            {
-                logger.error('[DVP-DynamicConfigurationGenerator.GetContext] PGSQL Get emergency number query failed', err);
-                callback(err, undefined);
-            });
+        callback(undefined, eNum);
 
     }
     catch(ex)
@@ -635,23 +796,89 @@ var GetEmergencyNumber = function(numb, tenantId, data, callback)
     }
 };
 
+//Done
 var GetPhoneNumberDetails = function(phnNum, callback)
 {
     try
     {
-        dbModel.TrunkPhoneNumber
-            .find({where :[{PhoneNumber: phnNum},{Enable: true}], include: [{model: dbModel.LimitInfo, as: 'LimitInfoInbound'},{model: dbModel.LimitInfo, as: 'LimitInfoBoth'},{model:dbModel.Trunk, as : 'Trunk', include:[{model: dbModel.TrunkIpAddress, as:'TrunkIpAddress'}]}]})
-            .then(function (phnInfo)
-            {
-                logger.debug('[DVP-DynamicConfigurationGenerator.GetPhoneNumberDetails] PGSQL Get phone num details query success');
 
-                callback(undefined, phnInfo, null);
-
-            }).catch(function(err)
+        redisHandler.GetObject(null, 'TRUNKNUMBER:' + phnNum, function(err, phnInfo)
+        {
+            if(phnInfo)
             {
-                logger.error('[DVP-DynamicConfigurationGenerator.GetPhoneNumberDetails] PGSQL Get phone num details query failed', err);
-                callback(err, undefined, null);
-            })
+
+                if(!phnInfo.Enable)
+                {
+                    callback(undefined, undefined, null);
+                }
+                else
+                {
+
+                    redisHandler.GetObject(null, 'DVPCACHE:' + phnInfo.TenantId + ':' + phnInfo.CompanyId, function(err, data)
+                    {
+                        if(data)
+                        {
+
+                            if(data && data.LimitInfo)
+                            {
+                                if(phnInfo.InboundLimitId)
+                                {
+                                    var inbLim = data.LimitInfo[phnInfo.InboundLimitId];
+
+                                    if(inbLim)
+                                    {
+                                        phnInfo.LimitInfoInbound = inbLim;
+                                    }
+                                }
+
+                                if(phnInfo.BothLimitId)
+                                {
+                                    var bothLim = data.LimitInfo[phnInfo.BothLimitId];
+
+                                    if(bothLim)
+                                    {
+                                        phnInfo.LimitInfoBoth = bothLim;
+                                    }
+                                }
+
+                            }
+
+                            if(phnInfo.TrunkId)
+                            {
+
+                                redisHandler.GetObject(null, 'TRUNK:' + phnInfo.TrunkId, function(err, tr)
+                                {
+
+                                    if(tr)
+                                    {
+                                        phnInfo.Trunk = tr;
+                                    }
+                                    callback(undefined, phnInfo, data);
+                                });
+
+
+                            }
+                            else
+                            {
+                                callback(undefined, phnInfo, data);
+                            }
+                        }
+                        else
+                        {
+                            callback(undefined, undefined, data);
+                        }
+                    });
+
+
+                }
+            }
+            else
+            {
+                callback(undefined, undefined, null);
+            }
+
+        });
+
     }
     catch(ex)
     {
@@ -659,6 +886,7 @@ var GetPhoneNumberDetails = function(phnNum, callback)
     }
 };
 
+//Directory Profile
 var GetGatewayListForCallServerProfile = function(profile, csId, reqId, data, callback)
 {
     try
@@ -676,86 +904,86 @@ var GetGatewayListForCallServerProfile = function(profile, csId, reqId, data, ca
                         logger.debug('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] PGSQL Get SipNetworkProfile query success');
                         //check profile contains direct trunk map
 
-                            //direct trunk termination
-                            if(result.Trunk != null)
-                            {
-                                var trunkList = result.Trunk;
+                        //direct trunk termination
+                        if(result.Trunk != null)
+                        {
+                            var trunkList = result.Trunk;
 
-                                trunkList.forEach(function(trunk)
+                            trunkList.forEach(function(trunk)
+                            {
+                                var gw =
                                 {
-                                    var gw =
+                                    IpUrl : trunk.IpUrl,
+                                    Domain : result.InternalIp,
+                                    TrunkCode: trunk.TrunkCode,
+                                    Proxy: undefined
+                                };
+                                gatewayList.push(gw);
+                            })
+                        }
+
+                        if(result.CallServer && result.CallServer.ClusterId)
+                        {
+                            try
+                            {
+                                dbModel.Cloud.find({where: [{id: result.CallServer.ClusterId}], include: [{ model: dbModel.LoadBalancer, as: "LoadBalancer", include: [{model: dbModel.Trunk, as: "Trunk"}]}]})
+                                    .then(function (rslt)
                                     {
-                                        IpUrl : trunk.IpUrl,
-                                        Domain : result.InternalIp,
-                                        TrunkCode: trunk.TrunkCode,
-                                        Proxy: undefined
-                                    };
-                                    gatewayList.push(gw);
-                                })
-                            }
 
-                            if(result.CallServer && result.CallServer.ClusterId)
-                            {
-                                try
-                                {
-                                    dbModel.Cloud.find({where: [{id: result.CallServer.ClusterId}], include: [{ model: dbModel.LoadBalancer, as: "LoadBalancer", include: [{model: dbModel.Trunk, as: "Trunk"}]}]})
-                                        .then(function (rslt)
+                                        logger.debug('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] PGSQL Get Cloud - LoadBalancer - Trunk query success');
+
+                                        if (rslt)
                                         {
-
-                                            logger.debug('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] PGSQL Get Cloud - LoadBalancer - Trunk query success');
-
-                                            if (rslt)
+                                            if (rslt.LoadBalancer && rslt.LoadBalancer.Trunk)
                                             {
-                                                if (rslt.LoadBalancer && rslt.LoadBalancer.Trunk)
-                                                {
-                                                    var trunkList = rslt.LoadBalancer.Trunk;
+                                                var trunkList = rslt.LoadBalancer.Trunk;
 
-                                                    trunkList.forEach(function (trunk)
+                                                trunkList.forEach(function (trunk)
+                                                {
+                                                    var gw =
                                                     {
-                                                        var gw =
-                                                        {
-                                                            IpUrl: trunk.IpUrl,
-                                                            Domain: result.InternalIp,
-                                                            TrunkCode: trunk.TrunkCode,
-                                                            Proxy: rslt.LoadBalancer.MainIP
-                                                        };
-                                                        gatewayList.push(gw);
-                                                    });
+                                                        IpUrl: trunk.IpUrl,
+                                                        Domain: result.InternalIp,
+                                                        TrunkCode: trunk.TrunkCode,
+                                                        Proxy: rslt.LoadBalancer.MainIP
+                                                    };
+                                                    gatewayList.push(gw);
+                                                });
 
-                                                    callback(undefined, gatewayList);
-                                                }
-                                                else
-                                                {
-                                                    logger.warn('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] - [%s] - load balancer not found', reqId);
-                                                    callback(undefined, gatewayList);
-                                                }
+                                                callback(undefined, gatewayList);
                                             }
                                             else
                                             {
-                                                logger.warn('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] - [%s] - cluster query returned empty', reqId);
+                                                logger.warn('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] - [%s] - load balancer not found', reqId);
                                                 callback(undefined, gatewayList);
                                             }
-
-
-                                        }).catch(function (err)
+                                        }
+                                        else
                                         {
-                                            logger.error('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] - [%s] - PGSQL Get Cloud - LoadBalancer - Trunk query failed', reqId, err);
+                                            logger.warn('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] - [%s] - cluster query returned empty', reqId);
+                                            callback(undefined, gatewayList);
+                                        }
 
-                                            callback(err, gatewayList);
-                                        });
-                                }
-                                catch (ex)
-                                {
-                                    callback(ex, undefined);
-                                }
 
+                                    }).catch(function (err)
+                                    {
+                                        logger.error('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] - [%s] - PGSQL Get Cloud - LoadBalancer - Trunk query failed', reqId, err);
+
+                                        callback(err, gatewayList);
+                                    });
                             }
-                            else
+                            catch (ex)
                             {
-                                logger.warn('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] - [%s] - Sip network profile not connected to call server or call server connected is not in cluster', reqId);
-
-                                callback(undefined, gatewayList);
+                                callback(ex, undefined);
                             }
+
+                        }
+                        else
+                        {
+                            logger.warn('[DVP-DynamicConfigurationGenerator.GetGatewayListForCallServerProfile] - [%s] - Sip network profile not connected to call server or call server connected is not in cluster', reqId);
+
+                            callback(undefined, gatewayList);
+                        }
 
                     }
                     else
@@ -782,23 +1010,30 @@ var GetGatewayListForCallServerProfile = function(profile, csId, reqId, data, ca
     }
 };
 
+//Done
 var ValidateBlacklistNumber = function(phnNum, companyId, tenantId, data, callback)
 {
     try
     {
-        dbModel.NumberBlacklist
-            .find({where :[{PhoneNumber: phnNum},{CompanyId: companyId},{TenantId: tenantId}]})
-            .then(function (blackListNum)
+        if(data)
+        {
+            if(data.NumberBlacklist)
             {
-                logger.debug('[DVP-DynamicConfigurationGenerator.GetPhoneNumberDetails] PGSQL Get phone num details query success');
+                var blackListNum = data.NumberBlacklist[phnNum];
 
-                callback(null, blackListNum);
-
-            }).catch(function(err)
+                callback(undefined, blackListNum);
+            }
+            else
             {
-                logger.error('[DVP-DynamicConfigurationGenerator.GetPhoneNumberDetails] PGSQL Get phone num details query failed', err);
-                callback(err, null);
-            })
+                callback(undefined, undefined);
+            }
+
+        }
+        else
+        {
+            callback(new Error('Object not found on cache'), undefined);
+        }
+
     }
     catch(ex)
     {
@@ -806,6 +1041,7 @@ var ValidateBlacklistNumber = function(phnNum, companyId, tenantId, data, callba
     }
 };
 
+//Incomplete
 var GetGatewayForOutgoingRequest = function(fromNumber, lbId, data, callback)
 {
     var outgoingRequest = {
@@ -857,6 +1093,7 @@ var GetGatewayForOutgoingRequest = function(fromNumber, lbId, data, callback)
         });
 };
 
+//Incomplete
 var GetCloudForUser = function(username, data, callback)
 {
     var incomingRequest = {};
@@ -1021,6 +1258,7 @@ var GetCloudForUser = function(username, data, callback)
 
 }
 
+//Incomplete
 var GetCloudForIncomingRequest = function(toNumber, lbId, data, callback)
 {
     var incomingRequest = {
@@ -1211,6 +1449,7 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, data, callback)
 
 };
 
+//Not in use
 var GetCallServerClusterDetailsDB = function(csId, data, callback)
 {
     try
@@ -1255,4 +1494,3 @@ module.exports.GetPublicClusterDetailsDB = GetPublicClusterDetailsDB;
 module.exports.GetCloudForUser = GetCloudForUser;
 module.exports.GetGroupByExtension = GetGroupByExtension;
 module.exports.ValidateBlacklistNumber = ValidateBlacklistNumber;
-

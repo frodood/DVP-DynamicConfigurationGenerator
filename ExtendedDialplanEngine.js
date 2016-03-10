@@ -3,7 +3,6 @@ var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJ
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var config = require('config');
 var extApi = require('./ExternalApiAccess.js');
-var backendHandler = require('./SipExtBackendOperations.js');
 var xmlBuilder = require('./XmlExtendedDialplanBuilder.js');
 var transHandler = require('dvp-ruleservice/TranslationHandler.js');
 var redisHandler = require('./RedisHandler.js');
@@ -12,6 +11,19 @@ var conferenceHandler = require('./ConferenceOperations.js');
 var util = require('util');
 var underscore = require('underscore');
 var libphonenumber = require('libphonenumber');
+
+var backendHandler;
+
+var useCache = config.UseCache;
+
+if(useCache)
+{
+    backendHandler = require('./CacheBackendHandler.js');
+}
+else
+{
+    backendHandler = require('./SipExtBackendOperations.js');
+}
 
 var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId, fmList, dodNum, dodActive, callerIdNum, callerIdName, csId, appId, callback)
 {
@@ -508,7 +520,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
     }
 }
 
-var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, extraData, fromUserData, companyId, tenantId, securityToken, numLimitInfo, callback)
+var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, extraData, fromUserData, companyId, tenantId, securityToken, numLimitInfo, cacheData, callback)
 {
 
     try
@@ -545,7 +557,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
         if(direction === 'IN')
         {
             logger.debug('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Checking for DID', reqId);
-            backendHandler.GetExtensionForDid(reqId, dnis, companyId, tenantId, function(err, didRes)
+            backendHandler.GetExtensionForDid(reqId, dnis, companyId, tenantId, cacheData, function(err, didRes)
             {
                 if(err)
                 {
@@ -557,7 +569,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                     logger.debug('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Trying to get full extension details - Extension : %s, Category : %s', reqId, didRes.Extension.Extension, didRes.Extension.ObjCategory);
 
-                    backendHandler.GetAllDataForExt(reqId, didRes.Extension.Extension, tenantId, didRes.Extension.ObjCategory, csId, function(err, extDetails)
+                    backendHandler.GetAllDataForExt(reqId, didRes.Extension.Extension, tenantId, didRes.Extension.ObjCategory, csId, cacheData, function(err, extDetails)
                     {
                         if(err)
                         {
@@ -2010,7 +2022,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 if(extraData)
                                                 {
                                                     //validate user belongs to same group
-                                                    backendHandler.GetGroupByExtension(reqId, extraData, tenantId, function(err, grpReslt)
+                                                    backendHandler.GetGroupByExtension(reqId, extraData, tenantId, cacheData, function(err, grpReslt)
                                                     {
                                                         if(err)
                                                         {

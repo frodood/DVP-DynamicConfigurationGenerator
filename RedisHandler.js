@@ -5,6 +5,8 @@ var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var redisIp = Config.Redis.IpAddress;
 var redisPort = Config.Redis.Port;
 
+
+
 var client = redis.createClient(redisPort, redisIp);
 
 var SetObjectWithExpire = function(key, value, timeout, callback)
@@ -37,7 +39,7 @@ var GetObject = function(reqId, key, callback)
     try
     {
         logger.debug('[DVP-DynamicConfigurationGenerator.GetObject] - [%s] - Method Params - key : %s', reqId, key);
-        //var client = redis.createClient(redisPort, redisIp);
+        var start = new Date().getTime();
 
         client.get(key, function(err, response)
         {
@@ -47,9 +49,14 @@ var GetObject = function(reqId, key, callback)
             }
             else
             {
-                logger.debug('[DVP-DynamicConfigurationGenerator.GetObject] - [%s] - REDIS SET success', reqId);
+                logger.debug('[DVP-DynamicConfigurationGenerator.GetObject] - [%s] - REDIS GET success', reqId);
             }
-            callback(err, response);
+
+            var end = new Date().getTime();
+            var time = end - start;
+
+            console.log('Time : ' + time);
+            callback(err, JSON.parse(response));
         });
 
     }
@@ -142,7 +149,7 @@ var GetFromSet = function(setName, callback)
 
 client.on('error', function(msg)
 {
-
+console.log(msg);
 });
 
 module.exports.SetObject = SetObject;

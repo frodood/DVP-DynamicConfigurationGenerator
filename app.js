@@ -3,10 +3,9 @@ var stringify = require('stringify');
 var config = require('config');
 var nodeUuid = require('node-uuid');
 var fsMediaFormatter = require('./FreeSwitchMediaFormatter.js');
-var backendHandler = require('./SipExtBackendOperations.js');
 var xmlGen = require('./XmlResponseGenerator.js');
 var jsonFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
-var ruleHandler = require('dvp-ruleservice/CallRuleBackendOperations.js');
+var ruleHandler;
 var redisHandler = require('./RedisHandler.js');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var extDialplanEngine = require('./ExtendedDialplanEngine.js');
@@ -15,6 +14,29 @@ var Buffer = require('buffer');
 var util = require('util');
 var xmlBuilder = require('./XmlExtendedDialplanBuilder.js');
 var ipValidator = require('./IpValidator');
+var redis = require("redis");
+
+var redisIp = config.Redis.IpAddress;
+var redisPort = config.Redis.Port;
+
+var client = redis.createClient(redisPort, redisIp);
+
+var backendHandler;
+
+var useCache = config.UseCache;
+
+if(useCache)
+{
+    backendHandler = require('./CacheBackendHandler.js');
+    ruleHandler = require('dvp-ruleservice/CacheBackendOperations.js');
+}
+else
+{
+    backendHandler = require('./SipExtBackendOperations.js');
+    ruleHandler = require('dvp-ruleservice/CallRuleBackendOperations.js');
+}
+
+
 
 var hostIp = config.Host.Ip;
 var hostPort = config.Host.Port;
@@ -42,6 +64,7 @@ var server = restify.createServer({
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
+
 
 
 
@@ -365,6 +388,21 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreT
     })
 };
 
+server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp2', function(req,res,next)
+{
+
+    client.get('CONTEXT:test123', function(err, response)
+    {
+        var end = new Date().getTime();
+        var time = end - start;
+
+
+        res.end(response);
+    });
+
+    return next();
+
+});
 
 server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res,next)
 {
@@ -477,6 +515,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                     }
                     else //Same dialplan for all - only use context to find direction
                     {
+
                         var direction = 'IN';
                         var contextCompany = undefined;
                         var contextTenant = undefined;
@@ -579,7 +618,9 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Validating trunk number for inbound call - TrunkNumber : %s', reqId, destNum);
 
-                                backendHandler.GetPhoneNumberDetails(destNum, function(err, num)
+                                var start = new Date().getTime();
+
+                                backendHandler.GetPhoneNumberDetails(destNum, function(err, num, cacheData)
                                 {
                                     if(err)
                                     {
@@ -591,10 +632,16 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                     }
                                     else if(num)
                                     {
+                                        var end = new Date().getTime();
+                                        var time = end - start;
+
+                                        console.log("Time : " + time);
+
                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - TrunkNumber found', reqId);
 
-                                        backendHandler.ValidateBlacklistNumber(callerIdNum, num.CompanyId, num.TenantId, function(err, blackListNum)
+                                        backendHandler.ValidateBlacklistNumber(callerIdNum, num.CompanyId, num.TenantId, cacheData, function(err, blackListNum)
                                         {
+
                                             if(err || blackListNum)
                                             {
                                                 logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Error occurred while validating black list number or number is in black list', reqId, err);
@@ -662,7 +709,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
 
                                                     logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, destNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, aniNum, destNum, domain, num.CompanyId, num.TenantId);
-                                                    ruleHandler.PickCallRuleInbound(reqId, callerIdNum, destNum, domain, callerContext, num.CompanyId, num.TenantId, function(err, rule)
+
+                                                    ruleHandler.PickCallRuleInbound(reqId, callerIdNum, destNum, domain, callerContext, num.CompanyId, num.TenantId, cacheData, function(err, rule)
                                                     {
                                                         if(err)
                                                         {
@@ -673,6 +721,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                         }
                                                         else if(rule)
                                                         {
+
                                                             logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - PickCallRuleInbound returned rule : %s', reqId, JSON.stringify(rule));
 
                                                             //check dnis is a emergency number
@@ -826,14 +875,18 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                     {
                                                                         data.DVPAppUrl = app.Url;
                                                                         data.AppId = app.id;
-                                                                        extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, function(err, extDialplan)
+
+
+                                                                        extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, cacheData, function(err, extDialplan)
                                                                         {
+
                                                                             if(err)
                                                                             {
                                                                                 logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan Error', reqId, err);
                                                                             }
                                                                             logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
                                                                             res.end(extDialplan);
+
                                                                         })
                                                                     }
                                                                     else

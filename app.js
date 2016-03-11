@@ -14,12 +14,6 @@ var Buffer = require('buffer');
 var util = require('util');
 var xmlBuilder = require('./XmlExtendedDialplanBuilder.js');
 var ipValidator = require('./IpValidator');
-var redis = require("redis");
-
-var redisIp = config.Redis.IpAddress;
-var redisPort = config.Redis.Port;
-
-var client = redis.createClient(redisPort, redisIp);
 
 var backendHandler;
 
@@ -35,8 +29,6 @@ else
     backendHandler = require('./SipExtBackendOperations.js');
     ruleHandler = require('dvp-ruleservice/CallRuleBackendOperations.js');
 }
-
-
 
 var hostIp = config.Host.Ip;
 var hostPort = config.Host.Port;
@@ -390,18 +382,9 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreT
 
 server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp2', function(req,res,next)
 {
-
-    client.get('CONTEXT:test123', function(err, response)
-    {
-        var end = new Date().getTime();
-        var time = end - start;
-
-
-        res.end(response);
-    });
+    res.end('dsd');
 
     return next();
-
 });
 
 server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res,next)
@@ -502,6 +485,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to get context : %s', reqId, callerContext);
 
+                var cstart = new Date().getTime();
+
                 backendHandler.GetContext(callerContext, function(err, ctxt)
                 {
                     if(err)
@@ -515,6 +500,10 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                     }
                     else //Same dialplan for all - only use context to find direction
                     {
+                        var cend = new Date().getTime();
+                        var ctime = cend - cstart;
+
+                        console.log("Time Context : " + ctime);
 
                         var direction = 'IN';
                         var contextCompany = undefined;
@@ -635,7 +624,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                         var end = new Date().getTime();
                                         var time = end - start;
 
-                                        console.log("Time : " + time);
+                                        console.log("Phone Time : " + time);
 
                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - TrunkNumber found', reqId);
 
@@ -710,6 +699,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                                     logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, destNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, aniNum, destNum, domain, num.CompanyId, num.TenantId);
 
+                                                    var rstart = new Date().getTime();
+
                                                     ruleHandler.PickCallRuleInbound(reqId, callerIdNum, destNum, domain, callerContext, num.CompanyId, num.TenantId, cacheData, function(err, rule)
                                                     {
                                                         if(err)
@@ -721,6 +712,11 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                         }
                                                         else if(rule)
                                                         {
+
+                                                            var rend = new Date().getTime();
+                                                            var rtime = rend - rstart;
+
+                                                            console.log("Time Rule : " + rtime);
 
                                                             logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - PickCallRuleInbound returned rule : %s', reqId, JSON.stringify(rule));
 
@@ -875,7 +871,6 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                     {
                                                                         data.DVPAppUrl = app.Url;
                                                                         data.AppId = app.id;
-
 
                                                                         extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, cacheData, function(err, extDialplan)
                                                                         {

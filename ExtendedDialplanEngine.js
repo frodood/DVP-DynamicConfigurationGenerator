@@ -1057,10 +1057,16 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                         var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
 
+                                        var start1 = new Date().getTime();
+
                                         redisHandler.SetObjectWithExpire(customStr, uuid, 60, function(err, redisResult)
                                         {
                                             if(!err && redisResult)
                                             {
+                                                var end = new Date().getTime();
+                                                var time = end - start1;
+
+                                                console.log("Set Expire Time : " + time);
                                                 var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
 
                                                 if(extDetails.SipUACEndpoint.UsePublic)

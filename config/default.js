@@ -8,7 +8,7 @@ module.exports = {
     "Database":"dvpdb"
   },
   "Redis": {
-    "IpAddress":"192.168.2.88",
+    "IpAddress":"127.0.0.1",
     "Port":"6379"
   },
 

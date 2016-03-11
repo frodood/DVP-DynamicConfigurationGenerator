@@ -1,10 +1,8 @@
 var restify = require('restify');
-var stringify = require('stringify');
 var config = require('config');
 var nodeUuid = require('node-uuid');
 var fsMediaFormatter = require('./FreeSwitchMediaFormatter.js');
 var xmlGen = require('./XmlResponseGenerator.js');
-var jsonFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var ruleHandler;
 var redisHandler = require('./RedisHandler.js');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
@@ -48,7 +46,6 @@ var server = restify.createServer({
                 return cb(null, body.toString('base64'));
 
             return cb(null, util.inspect(body));
-            //return body;
         }
     }
 });
@@ -56,8 +53,6 @@ var server = restify.createServer({
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
-
-
 
 
 var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreTenant, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, res)
@@ -380,13 +375,6 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreT
     })
 };
 
-server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp2', function(req,res,next)
-{
-    res.end('dsd');
-
-    return next();
-});
-
 server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res,next)
 {
 
@@ -485,8 +473,6 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to get context : %s', reqId, callerContext);
 
-                var cstart = new Date().getTime();
-
                 backendHandler.GetContext(callerContext, function(err, ctxt)
                 {
                     if(err)
@@ -500,10 +486,6 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                     }
                     else //Same dialplan for all - only use context to find direction
                     {
-                        var cend = new Date().getTime();
-                        var ctime = cend - cstart;
-
-                        console.log("Time Context : " + ctime);
 
                         var direction = 'IN';
                         var contextCompany = undefined;
@@ -527,7 +509,6 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                 direction = 'OUT';
                             }
                         }
-
 
                         var decodedSipFromUri = decodeURIComponent(varSipFromUri);
                         var decodedSipToUri = decodeURIComponent(varSipToUri);
@@ -607,8 +588,6 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Validating trunk number for inbound call - TrunkNumber : %s', reqId, destNum);
 
-                                var start = new Date().getTime();
-
                                 backendHandler.GetPhoneNumberDetails(destNum, function(err, num, cacheData)
                                 {
                                     if(err)
@@ -621,11 +600,6 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                     }
                                     else if(num)
                                     {
-                                        var end = new Date().getTime();
-                                        var time = end - start;
-
-                                        console.log("Phone Time : " + time);
-
                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - TrunkNumber found', reqId);
 
                                         backendHandler.ValidateBlacklistNumber(callerIdNum, num.CompanyId, num.TenantId, cacheData, function(err, blackListNum)
@@ -699,8 +673,6 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                                     logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, destNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, aniNum, destNum, domain, num.CompanyId, num.TenantId);
 
-                                                    var rstart = new Date().getTime();
-
                                                     ruleHandler.PickCallRuleInbound(reqId, callerIdNum, destNum, domain, callerContext, num.CompanyId, num.TenantId, cacheData, function(err, rule)
                                                     {
                                                         if(err)
@@ -712,11 +684,6 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                         }
                                                         else if(rule)
                                                         {
-
-                                                            var rend = new Date().getTime();
-                                                            var rtime = rend - rstart;
-
-                                                            console.log("Time Rule : " + rtime);
 
                                                             logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - PickCallRuleInbound returned rule : %s', reqId, JSON.stringify(rule));
 

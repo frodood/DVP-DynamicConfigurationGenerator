@@ -313,7 +313,7 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
 
 };
 
-var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia, numLimitInfo, transferLegInfo)
+var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia, numLimitInfo, transferLegInfo, appId)
 {
     try
     {
@@ -443,7 +443,7 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
         }
         if(ep.AppId)
         {
-            cond.ele('action').att('application', 'set').att('data', 'dvp_app_id=' + ep.AppId)
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + ep.AppId)
                 .up()
         }
 
@@ -987,7 +987,7 @@ var CreatePickUpDialplan = function(reqId, extension, context, destinationPatter
         }
         if(appId)
         {
-            cond.ele('action').att('application', 'set').att('data', 'dvp_app_id=' + appId)
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
                 .up()
         }
 
@@ -1094,7 +1094,7 @@ var CreateInterceptDialplan = function(reqId, uuid, context, destinationPattern,
         }
         if(appId)
         {
-            cond.ele('action').att('application', 'set').att('data', 'dvp_app_id=' + appId)
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
                 .up()
         }
 

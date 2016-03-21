@@ -298,7 +298,7 @@ var createDirectoryProfile = function(extName, ext, domain, email, password, con
 
 };
 
-var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, reqId, numLimitInfo)
+var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, reqId, numLimitInfo, appId)
 {
     try
     {
@@ -349,7 +349,9 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, req
 
         }
 
-        cond.ele('action').att('application', 'answer')
+        cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+            .up()
+            .ele('action').att('application', 'answer')
             .up()
             .ele('action').att('application', 'httapi').att('data', httpApiUrl)
             .up()
@@ -370,7 +372,7 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, req
 
 };
 
-var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl, reqId, numLimitInfo)
+var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl, reqId, numLimitInfo, appId)
 {
     try
     {
@@ -417,7 +419,9 @@ var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl, r
 
         }
 
-        cond.ele('action').att('application', 'answer')
+        cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+            .up()
+            .ele('action').att('application', 'answer')
             .up()
             .ele('action').att('application', 'socket').att('data', socketUrl + ' async full')
             .up()

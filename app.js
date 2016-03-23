@@ -58,7 +58,7 @@ server.use(restify.bodyParser());
 var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreTenant, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, res)
 {
     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to find from user for outbound call', reqId);
-    backendHandler.GatherFromUserDetails(reqId, callerIdNum, contextTenant, ignoreTenant, function(err, fromUsr)
+    backendHandler.GatherFromUserDetails(reqId, callerIdNum, contextTenant, ignoreTenant, null, function(err, fromUsr)
     {
         var dodActive = false;
         var dodNumber = '';
@@ -90,7 +90,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreT
         }
 
         logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, destNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, callerIdNum, destNum, domain, contextCompany, contextTenant);
-        ruleHandler.PickCallRuleInbound(reqId, callerIdNum, destNum, domain, tempCallerContext, contextCompany, contextTenant, function(err, rule)
+        ruleHandler.PickCallRuleInbound(reqId, callerIdNum, destNum, domain, tempCallerContext, contextCompany, contextTenant, null, function(err, rule)
         {
             if(err)
             {
@@ -105,7 +105,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreT
             {
                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - PickCallRuleInbound returned rule : %s', reqId, JSON.stringify(rule));
 
-                backendHandler.GetEmergencyNumber(destNum, rule.TenantId, function(err, emNum)
+                backendHandler.GetEmergencyNumber(destNum, rule.TenantId, null, function(err, emNum)
                 {
                     if(emNum)
                     {
@@ -260,7 +260,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreT
                                 {
                                     data.DVPAppUrl = masterApp.Url;
                                     data.AppId = masterApp.id;
-                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, fromUsr, rule.CompanyId, rule.TenantId, securityToken, undefined, function(err, extDialplan)
+                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, fromUsr, rule.CompanyId, rule.TenantId, securityToken, undefined, null, function(err, extDialplan)
                                     {
                                         if(err)
                                         {
@@ -308,7 +308,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreT
                                 {
                                     data.DVPAppUrl = app.Url;
                                     data.AppId = app.id;
-                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, fromUsr, rule.CompanyId, rule.TenantId, securityToken, undefined, function(err, extDialplan)
+                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, fromUsr, rule.CompanyId, rule.TenantId, securityToken, undefined, null, function(err, extDialplan)
                                     {
                                         if(err)
                                         {
@@ -405,6 +405,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
         var varSipFromHost = data["variable_sip_from_host"];
         var dvpOriginationType = data["variable_sip_h_X-DVP-ORIGINATION-TYPE"];
         var dvpDestinationType = data["variable_sip_h_X-DVP-DESTINATION-TYPE"];
+        var appType = data["variable_dvp_app_type"];
 
         var csId = parseInt(hostname);
 
@@ -493,6 +494,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                         if(ctxt && ctxt.ContextCat && ctxt.ContextCat.toUpperCase() === "INTERNAL")
                         {
+
                             direction = 'OUT';
                             contextCompany = ctxt.CompanyId;
                             contextTenant = ctxt.TenantId;
@@ -789,7 +791,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                     {
                                                                         data.DVPAppUrl = masterApp.Url;
                                                                         data.AppId = masterApp.id;
-                                                                        extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, function(err, extDialplan)
+                                                                        extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, null, function(err, extDialplan)
                                                                         {
                                                                             if(err)
                                                                             {
@@ -1046,7 +1048,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                 {
                                                                     data.DVPAppUrl = masterApp.Url;
                                                                     data.AppId = masterApp.id;
-                                                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, function(err, extDialplan)
+                                                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, null, function(err, extDialplan)
                                                                     {
                                                                         if(err)
                                                                         {
@@ -1094,7 +1096,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                 {
                                                                     data.DVPAppUrl = app.Url;
                                                                     data.AppId = app.id;
-                                                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, function(err, extDialplan)
+                                                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, null, function(err, extDialplan)
                                                                     {
                                                                         if(err)
                                                                         {
@@ -1189,11 +1191,11 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                 if(dvpDestinationType && dvpDestinationType === 'PUBLIC_USER')
                                 {
                                     //do stuff
-                                    backendHandler.GetUserByNameTenantDB(reqId, destNum, -1, true, function(err, resUsr)
+                                    backendHandler.GetUserByNameTenantDB(reqId, destNum, -1, true, null, function(err, resUsr)
                                     {
                                         if(resUsr && resUsr.UsePublic)
                                         {
-                                            backendHandler.GetPublicClusterDetailsDB(reqId, function(err, rslt)
+                                            backendHandler.GetPublicClusterDetailsDB(reqId, null, function(err, rslt)
                                             {
                                                 if(rslt && rslt.LoadBalancer)
                                                 {
@@ -1245,7 +1247,24 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                 }
                                 else
                                 {
-                                    HandleOutRequest(reqId, data, callerIdNum, contextTenant, ignoreTenant, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, res);
+                                    if(appType && appType === 'HTTAPI')
+                                    {
+                                        extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, null, contextCompany, contextTenant, null, null, null, function(err, extDialplan)
+                                        {
+                                            if(err)
+                                            {
+                                                logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Error occurred processing extended dialplan for out call', reqId, err);
+                                            }
+
+                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
+                                            res.end(extDialplan);
+                                        })
+                                    }
+                                    else
+                                    {
+                                        HandleOutRequest(reqId, data, callerIdNum, contextTenant, ignoreTenant, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, res);
+                                    }
+
 
                                 }
                             }
@@ -1295,7 +1314,7 @@ server.get('/DVP/API/:version/DynamicConfigGenerator/PublicUserRequestController
         logger.debug('[DVP-DynamicConfigurationGenerator.PublicUserRequestController] - [%s] - Request Params - username : %s', reqId, username);
 
         logger.info('[DVP-DynamicConfigurationGenerator.PublicUserRequestController] - [%s] - call direction is IN', reqId);
-        backendHandler.GetCloudForUser(username, function(err, cb)
+        backendHandler.GetCloudForUser(username, null, function(err, cb)
         {
             if(err || !cb)
             {
@@ -1346,7 +1365,7 @@ server.get('/DVP/API/:version/DynamicConfigGenerator/LbRequestController/:direct
         if(direction === "in")
         {
             logger.info('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - call direction is IN', reqId);
-            backendHandler.GetCloudForIncomingRequest(number, 0, function(err, cb)
+            backendHandler.GetCloudForIncomingRequest(number, 0, null, function(err, cb)
             {
                 if(err || !cb)
                 {
@@ -1374,7 +1393,7 @@ server.get('/DVP/API/:version/DynamicConfigGenerator/LbRequestController/:direct
         else if(direction === "out")
         {
             logger.info('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - call direction is OUT', reqId);
-            backendHandler.GetGatewayForOutgoingRequest(number, 0, function(err, cb)
+            backendHandler.GetGatewayForOutgoingRequest(number, 0, null, function(err, cb)
             {
                 if(err || !cb)
                 {
@@ -1432,7 +1451,7 @@ server.get('/DVP/API/:version/DynamicConfigGenerator/CallServers/:companyId/:ten
 
         logger.debug('[DVP-DynamicConfigurationGenerator.CallServers] - [%s] - Request Params - companyId : %s, tenantId : %s', reqId, companyId, tenantId);
 
-        backendHandler.GetCallServersForEndUserDB(reqId, companyId, tenantId, function(err, csList)
+        backendHandler.GetCallServersForEndUserDB(reqId, companyId, tenantId, null, function(err, csList)
         {
             var state = true;
             if(err)
@@ -1487,7 +1506,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
 
             logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - Sip Auth Realm Set to : %s', reqId, tempAuthRealm);
 
-            backendHandler.GetGroupBy_Name_Domain(group, tempAuthRealm, function(err, result)
+            backendHandler.GetGroupBy_Name_Domain(group, tempAuthRealm, null, function(err, result)
             {
                 if(err)
                 {
@@ -1531,7 +1550,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
 
             logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - Sip Auth Realm Set to : %s', tempAuthRealm);
 
-            backendHandler.GetUserBy_Name_Domain(user, tempAuthRealm, function(err, usr)
+            backendHandler.GetUserBy_Name_Domain(user, tempAuthRealm, null, function(err, usr)
             {
                 if(err)
                 {
@@ -1594,7 +1613,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
 
             logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - Sip Auth Realm Set to : %s', tempAuthRealm);
 
-            backendHandler.GetUserBy_Ext_Domain(user, tempAuthRealm, function(err, usr){
+            backendHandler.GetUserBy_Ext_Domain(user, tempAuthRealm, null, function(err, usr){
 
                 if(!err && usr)
                 {
@@ -1636,7 +1655,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
         {
             logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - ACTION TYPE GATEWAYS', reqId);
             var csId = parseInt(hostname);
-            backendHandler.GetGatewayListForCallServerProfile(profile, csId, reqId, function(err, result)
+            backendHandler.GetGatewayListForCallServerProfile(profile, csId, reqId, null, function(err, result)
             {
                 if (!err && result && result.length > 0)
                 {

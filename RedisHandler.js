@@ -146,6 +146,49 @@ var GetFromSet = function(setName, callback)
     }
 };
 
+var AddChannelIdToSet = function(uuid, companyId, tenantId, callback)
+{
+    try
+    {
+        var setName = 'CHANNELS:' + tenantId + ':' + companyId;
+        if(client.connected)
+        {
+            client.sismember(setName, uuid, function (err, reply)
+            {
+                if(err)
+                {
+                    logger.error('[DVP-EventMonitor.handler] - [%s] - REDIS ERROR', err);
+
+                    callback(err, false)
+                }
+                else
+                {
+                    logger.debug('[DVP-EventMonitor.handler] - [%s] - REDIS SUCCESS');
+                    if (reply === 0)
+                    {
+                        client.sadd(setName, uuid);
+                    }
+
+                    callback(undefined, true)
+                }
+
+
+            });
+        }
+        else
+        {
+            callback(new Error('REDIS CLIENT DISCONNECTED'), false);
+        }
+
+
+    }
+    catch(ex)
+    {
+        callback(ex, false);
+    }
+
+}
+
 client.on('error', function(msg)
 {
 
@@ -156,3 +199,4 @@ module.exports.PublishToRedis = PublishToRedis;
 module.exports.GetFromSet = GetFromSet;
 module.exports.SetObjectWithExpire = SetObjectWithExpire;
 module.exports.GetObject = GetObject;
+module.exports.AddChannelIdToSet = AddChannelIdToSet;

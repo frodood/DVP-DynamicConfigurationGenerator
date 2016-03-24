@@ -1499,10 +1499,16 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
             logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - ACTION TYPE GROUP_CALL', reqId);
 
             var tempAuthRealm = domain;
-            if(sipAuthRealm != undefined)
+
+            //Remove this if
+            if(!tempAuthRealm)
             {
-                tempAuthRealm = sipAuthRealm;
+                if(sipAuthRealm != undefined)
+                {
+                    tempAuthRealm = sipAuthRealm;
+                }
             }
+
 
             logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - Sip Auth Realm Set to : %s', reqId, tempAuthRealm);
 
@@ -1543,9 +1549,13 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
         {
             logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - ACTION TYPE SIP_AUTH', reqId);
             var tempAuthRealm = domain;
-            if(sipAuthRealm != undefined)
+
+            if(!tempAuthRealm)
             {
-                tempAuthRealm = sipAuthRealm;
+                if (sipAuthRealm != undefined)
+                {
+                    tempAuthRealm = sipAuthRealm;
+                }
             }
 
             logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - Sip Auth Realm Set to : %s', tempAuthRealm);

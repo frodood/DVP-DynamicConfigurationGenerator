@@ -315,8 +315,6 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreT
                                             logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan Error', reqId, err);
                                         }
 
-                                        redisHandler.AddChannelIdToSet(varUuid, rule.CompanyId, rule.TenantId);
-
                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
                                         res.end(extDialplan);
                                     })
@@ -347,6 +345,8 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreT
 
                             var jsonStr = JSON.stringify(evtData);
                             redisHandler.PublishToRedis('DVPEVENTS', jsonStr, function(err, redisResult){});
+
+                            redisHandler.AddChannelIdToSet(varUuid, rule.CompanyId, rule.TenantId);
 
                         }
                         else
@@ -896,6 +896,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                 res.end(xml);
                                                             }
 
+                                                            redisHandler.AddChannelIdToSet(varUuid, rule.CompanyId, rule.TenantId);
+
 
                                                         }
                                                         else
@@ -1259,6 +1261,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                             }
 
                                             logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
+                                            redisHandler.AddChannelIdToSet(varUuid, rule.CompanyId, rule.TenantId);
                                             res.end(extDialplan);
                                         })
                                     }

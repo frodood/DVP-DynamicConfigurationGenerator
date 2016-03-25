@@ -205,7 +205,7 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                         logger.debug('[DVP-DynamicConfigurationGenerator.ConferenceHandlerOperation] - [%s] - Conference Direction OUT', reqId);
                         if(ext.Conference.ConferenceUser && ext.Conference.ConferenceUser.length > 0)
                         {
-                            var usr = underscore.find(ext.Conference.ConferenceUser, function(confUser){return confUser.SipUACEndpoint.SipUserUuid === fromUserUuid});
+                            var usr = underscore.find(ext.Conference.ConferenceUser, function(confUser){ return confUser.SipUACEndpoint && confUser.SipUACEndpoint.SipUserUuid === fromUserUuid});
 
                             if(usr)
                             {

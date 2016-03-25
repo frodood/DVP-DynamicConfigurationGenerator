@@ -278,13 +278,13 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
         {
             //var confStr = confName + '@' + domain + '+' + pin + '+flags{' + mode + '}';
             var confStr = confName + '@video-mcu-stereo+' + pin + '+flags{' + mode + '}';
-            cond.ele('action').att('application', 'conference').att('data', confStr)
+            cond.ele('action').att('application', 'conference').att('data', '$1-${domain_name}@video-mcu-stereo')
                 .up()
         }
         else
         {
             var confStr = confName + '@video-mcu-stereo+' + pin;
-            cond.ele('action').att('application', 'conference').att('data', confStr)
+            cond.ele('action').att('application', 'conference').att('data', '$1-${domain_name}@video-mcu-stereo')
                 .up()
         }
 

@@ -632,7 +632,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     PersonalGreeting: undefined,
                                                     CompanyId: companyId,
                                                     TenantId: tenantId,
-                                                    AppId: extraData.AppId,
+                                                    AppId: appId,
                                                     Action: 'DEFAULT',
                                                     RecordEnabled: extDetails.RecordingEnabled
                                                 };
@@ -838,7 +838,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             PersonalGreeting: personalGreeting,
                                                             CompanyId: companyId,
                                                             TenantId: tenantId,
-                                                            AppId: extraData.AppId,
+                                                            AppId: appId,
                                                             Action: 'DEFAULT'
                                                         };
 
@@ -893,7 +893,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     Domain: rule.IpUrl,
                                                                     CompanyId: companyId,
                                                                     TenantId: tenantId,
-                                                                    AppId: extraData.AppId,
+                                                                    AppId: appId,
                                                                     Action: 'CALL_DIVERT'
                                                                 };
 
@@ -936,7 +936,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         Domain: extDetails.SipUACEndpoint.CloudEndUser.Domain,
                                                                         CompanyId: companyId,
                                                                         TenantId: tenantId,
-                                                                        AppId: extraData.AppId,
+                                                                        AppId: appId,
                                                                         Action: 'DEFAULT'
                                                                     };
 
@@ -1000,7 +1000,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         PersonalGreeting: personalGreeting,
                                                         CompanyId: companyId,
                                                         TenantId: tenantId,
-                                                        AppId: extraData.AppId,
+                                                        AppId: appId,
                                                         Action: 'DEFAULT',
                                                         RecordEnabled: extDetails.RecordingEnabled
                                                     };
@@ -1054,23 +1054,18 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             PersonalGreeting: false,
                                             CompanyId: companyId,
                                             TenantId: tenantId,
-                                            AppId: extraData.AppId,
+                                            AppId: appId,
                                             Action: 'DEFAULT',
                                             RecordEnabled: extDetails.RecordingEnabled
                                         };
 
                                         var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
 
-                                        var start1 = new Date().getTime();
 
                                         redisHandler.SetObjectWithExpire(customStr, uuid, 60, function(err, redisResult)
                                         {
                                             if(!err && redisResult)
                                             {
-                                                var end = new Date().getTime();
-                                                var time = end - start1;
-
-                                                console.log("Set Expire Time : " + time);
                                                 var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
 
                                                 if(extDetails.SipUACEndpoint.UsePublic)
@@ -1117,7 +1112,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         Destination: dnis,
                                         Domain: '',
                                         CompanyId: companyId,
-                                        TenantId: tenantId
+                                        TenantId: tenantId,
+                                        AppId: appId
                                     };
 
                                     var xml = xmlBuilder.CreateRouteFaxUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, fromFaxType, toFaxType);
@@ -1150,7 +1146,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         Group: extDetails.Extension,
                                         CompanyId: companyId,
                                         TenantId: tenantId,
-                                        AppId: extraData.AppId,
+                                        AppId: appId,
                                         Action: 'DEFAULT'
                                     };
 
@@ -1300,7 +1296,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             PersonalGreeting: undefined,
                                                             CompanyId: companyId,
                                                             TenantId: tenantId,
-                                                            AppId: extraData.AppId,
+                                                            AppId: appId,
                                                             Action: 'DEFAULT',
                                                             RecordEnabled: recEnabled
                                                         };
@@ -1377,7 +1373,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     PersonalGreeting: personalGreeting,
                                                                     CompanyId: companyId,
                                                                     TenantId: tenantId,
-                                                                    AppId: extraData.AppId,
+                                                                    AppId: appId,
                                                                     Action: 'DEFAULT',
                                                                     RecordEnabled: recEnabled
                                                                 };
@@ -1509,7 +1505,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         PersonalGreeting: personalGreeting,
                                                                         CompanyId: companyId,
                                                                         TenantId: tenantId,
-                                                                        AppId: extraData.AppId,
+                                                                        AppId: appId,
                                                                         Action: 'DEFAULT',
                                                                         RecordEnabled: recEnabled
                                                                     };
@@ -1566,7 +1562,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                                 NumberType: rule.NumberType,
                                                                                 CompanyId: rule.CompanyId,
                                                                                 TenantId: rule.TenantId,
-                                                                                Action: 'CALL_DIVERT'
+                                                                                Action: 'CALL_DIVERT',
+                                                                                AppId: appId
                                                                             };
 
 
@@ -1615,7 +1612,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                                     Domain: extDetails.SipUACEndpoint.CloudEndUser.Domain,
                                                                                     CompanyId: companyId,
                                                                                     TenantId: tenantId,
-                                                                                    AppId: extraData.AppId,
+                                                                                    AppId: appId,
                                                                                     Action: 'DEFAULT'
                                                                                 };
 
@@ -1673,7 +1670,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     PersonalGreeting: personalGreeting,
                                                                     CompanyId: companyId,
                                                                     TenantId: tenantId,
-                                                                    AppId: extraData.AppId,
+                                                                    AppId: appId,
                                                                     Action: 'DEFAULT',
                                                                     RecordEnabled: recEnabled
                                                                 };
@@ -1733,7 +1730,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     PersonalGreeting: undefined,
                                                     CompanyId: companyId,
                                                     TenantId: tenantId,
-                                                    AppId: extraData.AppId,
+                                                    AppId: appId,
                                                     Action: 'DEFAULT',
                                                     RecordEnabled: recEnabled
                                                 };
@@ -1801,7 +1798,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 Group: extDetails.Extension,
                                                 CompanyId: companyId,
                                                 TenantId: tenantId,
-                                                AppId: extraData.AppId,
+                                                AppId: appId,
                                                 Action: 'DEFAULT'
                                             };
 
@@ -1957,7 +1954,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 CompanyId: rule.CompanyId,
                                                                 TenantId: rule.TenantId,
                                                                 Action: 'DEFAULT',
-                                                                RecordEnabled: false
+                                                                RecordEnabled: false,
+                                                                AppId: appId
                                                             };
 
                                                             if(dodActive && dodNumber)
@@ -2041,6 +2039,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             CompanyId: rule.CompanyId,
                                             TenantId: rule.TenantId,
                                             Action: 'DEFAULT',
+                                            AppId: appId,
                                             RecordEnable: fromUserData.Extension.RecordingEnabled
                                         };
 
@@ -2170,7 +2169,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 PersonalGreeting: undefined,
                                                                 CompanyId: companyId,
                                                                 TenantId: tenantId,
-                                                                AppId: extraData.AppId,
+                                                                AppId: appId,
                                                                 Action: 'DEFAULT',
                                                                 RecordEnabled: recEnabled
                                                             };
@@ -2255,7 +2254,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         PersonalGreeting: personalGreeting,
                                                                         CompanyId: companyId,
                                                                         TenantId: tenantId,
-                                                                        AppId: extraData.AppId,
+                                                                        AppId: appId,
                                                                         Action: 'DEFAULT',
                                                                         RecordEnabled: recEnabled
                                                                     };
@@ -2394,7 +2393,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                             PersonalGreeting: personalGreeting,
                                                                             CompanyId: companyId,
                                                                             TenantId: tenantId,
-                                                                            AppId: extraData.AppId,
+                                                                            AppId: appId,
                                                                             Action: 'DEFAULT',
                                                                             RecordEnabled: recEnabled
                                                                         };
@@ -2448,6 +2447,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                                     OutLimit: rule.OutLimit,
                                                                                     BothLimit: rule.BothLimit,
                                                                                     TrunkNumber: rule.TrunkNumber,
+                                                                                    AppId: appId,
                                                                                     NumberType: rule.NumberType,
                                                                                     CompanyId: rule.CompanyId,
                                                                                     TenantId: rule.TenantId,
@@ -2500,7 +2500,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                                         Domain: extDetails.SipUACEndpoint.CloudEndUser.Domain,
                                                                                         CompanyId: companyId,
                                                                                         TenantId: tenantId,
-                                                                                        AppId: extraData.AppId,
+                                                                                        AppId: appId,
                                                                                         Action: 'DEFAULT'
                                                                                     };
 
@@ -2565,7 +2565,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         PersonalGreeting: personalGreeting,
                                                                         CompanyId: companyId,
                                                                         TenantId: tenantId,
-                                                                        AppId: extraData.AppId,
+                                                                        AppId: appId,
                                                                         Action: 'DEFAULT',
                                                                         RecordEnabled: recEnabled
                                                                     };
@@ -2633,7 +2633,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         PersonalGreeting: undefined,
                                                         CompanyId: companyId,
                                                         TenantId: tenantId,
-                                                        AppId: extraData.AppId,
+                                                        AppId: appId,
                                                         Action: 'DEFAULT',
                                                         RecordEnabled: recEnabled
                                                     };
@@ -2701,7 +2701,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     Group: extDetails.Extension,
                                                     CompanyId: companyId,
                                                     TenantId: tenantId,
-                                                    AppId: extraData.AppId,
+                                                    AppId: appId,
                                                     Action: 'DEFAULT'
                                                 };
 
@@ -2856,6 +2856,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     NumberType: rule.NumberType,
                                                                     CompanyId: rule.CompanyId,
                                                                     TenantId: rule.TenantId,
+                                                                    AppId: appId,
                                                                     Action: 'DEFAULT',
                                                                     RecordEnabled: fromUserData.Extension.RecordingEnabled
                                                                 };
@@ -3068,6 +3069,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 NumberType: rule.NumberType,
                                                 CompanyId: rule.CompanyId,
                                                 TenantId: rule.TenantId,
+                                                AppId: appId,
                                                 Action: 'DEFAULT',
                                                 RecordEnable: fromUserData.Extension.RecordingEnabled
                                             };

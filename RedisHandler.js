@@ -146,7 +146,7 @@ var GetFromSet = function(setName, callback)
     }
 };
 
-var AddChannelIdToSet = function(uuid, companyId, tenantId, callback)
+var AddChannelIdToSet = function(uuid, companyId, tenantId)
 {
     try
     {
@@ -158,8 +158,6 @@ var AddChannelIdToSet = function(uuid, companyId, tenantId, callback)
                 if(err)
                 {
                     logger.error('[DVP-EventMonitor.handler] - [%s] - REDIS ERROR', err);
-
-                    callback(err, false)
                 }
                 else
                 {
@@ -169,22 +167,18 @@ var AddChannelIdToSet = function(uuid, companyId, tenantId, callback)
                         client.sadd(setName, uuid);
                     }
 
-                    callback(undefined, true)
                 }
 
 
             });
-        }
-        else
-        {
-            callback(new Error('REDIS CLIENT DISCONNECTED'), false);
         }
 
 
     }
     catch(ex)
     {
-        callback(ex, false);
+        console.log('dfdfd');
+
     }
 
 }

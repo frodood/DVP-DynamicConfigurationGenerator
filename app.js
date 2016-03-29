@@ -346,7 +346,13 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreT
                             var jsonStr = JSON.stringify(evtData);
                             redisHandler.PublishToRedis('DVPEVENTS', jsonStr, function(err, redisResult){});
 
-                            redisHandler.AddChannelIdToSet(varUuid, rule.CompanyId, rule.TenantId);
+                            var setName = 'CHANNELS:' + rule.TenantId + ':' + rule.CompanyId;
+
+                            redisHandler.AddChannelIdToSet(varUuid, setName);
+
+                            var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
+
+                            redisHandler.AddChannelIdToSet(varUuid, setNameApp);
 
                         }
                         else
@@ -885,7 +891,13 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                                                 });
 
-                                                                redisHandler.AddChannelIdToSet(varUuid, rule.CompanyId, rule.TenantId);
+                                                                var setName = 'CHANNELS:' + rule.TenantId + ':' + rule.CompanyId;
+
+                                                                redisHandler.AddChannelIdToSet(varUuid, setName);
+
+                                                                var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
+
+                                                                redisHandler.AddChannelIdToSet(varUuid, setNameApp);
 
                                                             }
                                                             else
@@ -1263,7 +1275,11 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                             }
 
                                             logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
-                                            redisHandler.AddChannelIdToSet (varUuid, contextCompany, contextTenant);
+
+                                            var setName = 'CHANNELS:' + contextTenant + ':' + contextCompany;
+
+                                            redisHandler.AddChannelIdToSet(varUuid, setName);
+
                                             res.end(extDialplan);
                                         })
                                     }

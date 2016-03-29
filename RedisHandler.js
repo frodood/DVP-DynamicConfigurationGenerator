@@ -146,11 +146,10 @@ var GetFromSet = function(setName, callback)
     }
 };
 
-var AddChannelIdToSet = function(uuid, companyId, tenantId)
+var AddChannelIdToSet = function(uuid, setName)
 {
     try
     {
-        var setName = 'CHANNELS:' + tenantId + ':' + companyId;
         if(client.connected)
         {
             client.sismember(setName, uuid, function (err, reply)

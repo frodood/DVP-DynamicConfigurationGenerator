@@ -6,7 +6,7 @@
   "dependencies": {
     "buffer": "^4.5.0",
     "config": "^1.15.0",
-    "dvp-common": "^0.0.16",
+    "dvp-common": "^0.1.1",
     "dvp-dbmodels": "^0.0.47",
     "dvp-ruleservice": "^1.0.13",
     "ip": "^1.1.0",

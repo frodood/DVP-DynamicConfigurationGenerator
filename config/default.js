@@ -7,6 +7,7 @@ module.exports = {
     "Host":"104.236.231.11",
     "Database":"duo"
   },
+
   "Redis": {
     "IpAddress":"127.0.0.1",
     "Port":"6379",

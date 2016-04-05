@@ -34,5 +34,5 @@ module.exports = {
 
     },
 
-    "Token": "SYS_DYNAMICCONFIGGEN_TOKEN"
+    "Token": "HOST_TOKEN"
 };

@@ -265,6 +265,39 @@ var AddTransferCode = function(companyId, tenantId, obj, callback)
     }
 };
 
+var AddPhoneNumbersForCompany = function(companyId, tenantId, obj, callback)
+{
+    try
+    {
+        obj.TrunkPhoneNumber = {};
+        dbModel.TrunkPhoneNumber.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}]})
+            .then(function (list)
+            {
+                for (i = 0; i < list.length; i++)
+                {
+                    var key = list[i].id;
+
+                    if (key)
+                    {
+                        obj.TrunkPhoneNumber[key] = list[i];
+                    }
+
+                }
+
+                callback(obj)
+
+            })
+            .catch(function(err)
+            {
+                callback(obj)
+            });
+    }
+    catch(ex)
+    {
+        callback(obj)
+    }
+};
+
 var AddCloudEndUser = function(companyId, tenantId, obj, callback)
 {
     try
@@ -491,6 +524,49 @@ var AddUserGroup = function(companyId, tenantId, obj, callback)
     }
 };
 
+var AddPBXUsers = function(companyId, tenantId, obj, callback)
+{
+    try
+    {
+        obj.PBXUser = {};
+        dbModel.PBXUser.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}], include : [{model: dbModel.PBXUserTemplate, as: "PBXUserTemplateActive"}, {model: dbModel.FollowMe, as: "FollowMe", include: [{model: dbModel.PBXUser, as: "DestinationUser"}]}, {model: dbModel.Forwarding, as: "Forwarding"}]})
+            .then(function (list)
+            {
+                for (i = 0; i < list.length; i++)
+                {
+                    var userUuid = list[i].UserUuid;
+
+                    if(userUuid)
+                    {
+                        obj.PBXUser[userUuid] = list[i];
+                    }
+
+                }
+
+                callback(obj)
+
+            })
+            .catch(function(err)
+            {
+                callback(obj)
+            });
+    }
+    catch(ex)
+    {
+        callback(obj)
+    }
+};
+
+var AddFeatureCodes = function(companyId, tenantId, obj, callback)
+{
+
+}
+
+var CreatePABXData = function(companyId, tenantId, obj, callback)
+{
+
+}
+
 var CreateDataObject = function(companyId, tenantId, obj, callback)
 {
 
@@ -514,7 +590,11 @@ var CreateDataObject = function(companyId, tenantId, obj, callback)
                                     {
                                         AddLimitInfo(companyId, tenantId, data, function(data)
                                         {
-                                            callback(data);
+                                            AddPhoneNumbersForCompany(companyId, tenantId, data, function(data)
+                                            {
+                                                callback(data);
+                                            })
+
                                         })
                                     })
 
@@ -569,7 +649,7 @@ var CreateCompanyData = function()
             console.log('ERROR');
         });
 
-}
+};
 
 var BuildGlobalData = function()
 {

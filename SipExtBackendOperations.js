@@ -584,6 +584,11 @@ var GetCallServersForEndUserDB = function(reqId, companyId, tenantId, data, call
     }
 };
 
+var GetCacheObject = function(tenantId, companyId, callback)
+{
+    callback(null, null);
+}
+
 var GetContext = function(context, callback)
 {
 
@@ -1255,4 +1260,5 @@ module.exports.GetPublicClusterDetailsDB = GetPublicClusterDetailsDB;
 module.exports.GetCloudForUser = GetCloudForUser;
 module.exports.GetGroupByExtension = GetGroupByExtension;
 module.exports.ValidateBlacklistNumber = ValidateBlacklistNumber;
+module.exports.GetCacheObject = GetCacheObject;
 

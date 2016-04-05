@@ -757,6 +757,22 @@ var GetCallServersForEndUserDB = function(reqId, companyId, tenantId, data, call
     }
 };
 
+var GetCacheObject = function(tenantId, companyId, callback)
+{
+    try
+    {
+        redisHandler.GetObject(null, 'DVPCACHE:' + tenantId + ':' + companyId, function(err, data)
+        {
+            callback(err, data);
+        });
+    }
+    catch(ex)
+    {
+        callback(ex, null);
+    }
+}
+
+
 //Done
 var GetContext = function(context, callback)
 {
@@ -764,14 +780,13 @@ var GetContext = function(context, callback)
     {
         redisHandler.GetObject(null, 'CONTEXT:' + context, function(err, ctxt)
         {
-            callback(undefined, ctxt);
-
+            callback(err, ctxt);
         });
 
     }
     catch(ex)
     {
-        callback(ex, undefined);
+        callback(ex, null);
     }
 };
 
@@ -1494,3 +1509,4 @@ module.exports.GetPublicClusterDetailsDB = GetPublicClusterDetailsDB;
 module.exports.GetCloudForUser = GetCloudForUser;
 module.exports.GetGroupByExtension = GetGroupByExtension;
 module.exports.ValidateBlacklistNumber = ValidateBlacklistNumber;
+module.exports.GetCacheObject = GetCacheObject;

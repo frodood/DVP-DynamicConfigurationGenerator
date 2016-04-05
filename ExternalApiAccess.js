@@ -1,7 +1,7 @@
 var httpReq = require('request');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 
-var RemoteGetDialplanConfig = function(reqId, ani, dnis, context, direction, userUuid, fromUserUuid, opType, extExtraData, appId, url, securityToken, callback)
+var RemoteGetDialplanConfig = function(reqId, ani, dnis, context, direction, userUuid, fromUserUuid, opType, extExtraData, appId, url, companyId, tenantId, securityToken, callback)
 {
     try
     {
@@ -10,7 +10,7 @@ var RemoteGetDialplanConfig = function(reqId, ani, dnis, context, direction, use
 
             var httpUrl = url;
 
-            var jsonObj = { ANI: ani, DNIS: dnis, Context: context, Direction: direction, ExtraData: {UserUuid: userUuid, FromUserUuid: fromUserUuid, OperationType: opType, ExtExtraData: extExtraData, AppId: appId} };
+            var jsonObj = { ANI: ani, DNIS: dnis, Context: context, Direction: direction, ExtraData: {UserUuid: userUuid, FromUserUuid: fromUserUuid, OperationType: opType, ExtExtraData: extExtraData, AppId: appId, CompanyId: companyId, TenantId: tenantId} };
 
             var jsonStr = JSON.stringify(jsonObj);
 

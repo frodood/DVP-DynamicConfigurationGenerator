@@ -5,12 +5,15 @@ var RemoteGetDialplanConfig = function(reqId, ani, dnis, context, direction, use
 {
     try
     {
-        logger.debug('[DVP-PBXService.RemoteGetPBXDialplanConfig] - [%s] -  Trying to get pbx details from pbx app', reqId);
+            logger.debug('[DVP-PBXService.RemoteGetPBXDialplanConfig] - [%s] -  Trying to get pbx details from pbx app', reqId);
 
+            securityToken = 'bearer ' + securityToken;
 
             var httpUrl = url;
 
             var jsonObj = { ANI: ani, DNIS: dnis, Context: context, Direction: direction, ExtraData: {UserUuid: userUuid, FromUserUuid: fromUserUuid, OperationType: opType, ExtExtraData: extExtraData, AppId: appId, CompanyId: companyId, TenantId: tenantId} };
+
+            var compInfo = tenantId + ':' + companyId;
 
             var jsonStr = JSON.stringify(jsonObj);
 
@@ -19,6 +22,7 @@ var RemoteGetDialplanConfig = function(reqId, ani, dnis, context, direction, use
                 method: 'POST',
                 headers: {
                     'authorization': securityToken,
+                    'companyinfo': compInfo,
                     'content-type': 'application/json'
                 },
                 body: jsonStr

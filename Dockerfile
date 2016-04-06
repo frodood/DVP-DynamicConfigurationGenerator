@@ -7,7 +7,7 @@
 
 #EXPOSE 8816
 
-FROM node:argon
+FROM node:5.10.0
 RUN git clone https://github.com/DuoSoftware/DVP-DynamicConfigurationGenerator.git /usr/local/src/dynamicconfigurationgenerator
 RUN cd /usr/local/src/dynamicconfigurationgenerator;
 WORKDIR /usr/local/src/dynamicconfigurationgenerator

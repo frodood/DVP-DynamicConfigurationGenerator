@@ -1592,7 +1592,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         }
                                                                     })
                                                                 }
-                                                                else if(pbxObj.Endpoints && (pbxObj.Endpoints.ObjCategory === 'PBXUSER' || fm.ObjCategory === 'USER'))
+                                                                else if(pbxObj.Endpoints && (pbxObj.Endpoints.ObjCategory === 'PBXUSER' || pbxObj.Endpoints.ObjCategory === 'USER'))
                                                                 {
                                                                     backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, tenantId, 'USER', csId, cacheData, function (err, extDetails)
                                                                     {
@@ -1606,11 +1606,11 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                                     Profile: '',
                                                                                     Type: 'USER',
                                                                                     LegStartDelay: 0,
-                                                                                    BypassMedia: fm.BypassMedia,
-                                                                                    LegTimeout: fm.RingTimeout,
+                                                                                    BypassMedia: false,
+                                                                                    LegTimeout: 60,
                                                                                     Origination: callerIdName,
                                                                                     OriginationCallerIdNumber: callerIdNum,
-                                                                                    Destination: fm.DestinationNumber,
+                                                                                    Destination: extDetails.Extension,
                                                                                     Domain: extDetails.SipUACEndpoint.CloudEndUser.Domain,
                                                                                     CompanyId: companyId,
                                                                                     TenantId: tenantId,
@@ -2539,7 +2539,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                             }
                                                                         })
                                                                     }
-                                                                    else if(pbxObj.Endpoints && (pbxObj.Endpoints.ObjCategory === 'PBXUSER' || fm.ObjCategory === 'USER'))
+                                                                    else if(pbxObj.Endpoints && (pbxObj.Endpoints.ObjCategory === 'PBXUSER' || pbxObj.Endpoints.ObjCategory === 'USER'))
                                                                     {
                                                                         backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, tenantId, 'USER', csId, cacheData, function (err, extDetails)
                                                                         {
@@ -2553,11 +2553,11 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                                         Profile: '',
                                                                                         Type: 'USER',
                                                                                         LegStartDelay: 0,
-                                                                                        BypassMedia: fm.BypassMedia,
-                                                                                        LegTimeout: fm.RingTimeout,
+                                                                                        BypassMedia: false,
+                                                                                        LegTimeout: 60,
                                                                                         Origination: callerIdName,
                                                                                         OriginationCallerIdNumber: callerIdNum,
-                                                                                        Destination: fm.DestinationNumber,
+                                                                                        Destination: pbxObj.Endpoints.DestinationNumber,
                                                                                         Domain: extDetails.SipUACEndpoint.CloudEndUser.Domain,
                                                                                         CompanyId: companyId,
                                                                                         TenantId: tenantId,

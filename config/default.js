@@ -29,6 +29,6 @@ module.exports = {
 
   },
 
-  "Token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJkaW51c2hhZGNrIiwianRpIjoiNjZlMjc3YzYtYjVkOS00YzVhLTg4MGQtMWJlNDI1NzFjMzlmIiwic3ViIjoiNTZhOWU3NTlmYjA3MTkwN2EwMDAwMDAxMjVkOWU4MGI1YzdjNGY5ODQ2NmY5MjExNzk2ZWJmNDMiLCJleHAiOjE4OTE5Mjk1MDYsInRlbmFudCI6MSwiY29tcGFueSI6Mywic2NvcGUiOlt7InJlc291cmNlIjoiYWxsIn0seyJyZXNvdXJjZSI6ImNhbGxydWxlIiwiYWN0aW9ucyI6WyJyZWFkIiwid3JpdGUiLCJkZWxldGUiXX1dLCJpYXQiOjE0NTk5MjU5MDZ9.ftrEdgURGhzy0NA_BInwdY29IquRASpTL71BlFxQt2k",
+  "Token": "123",
   "UseCache": false
 };

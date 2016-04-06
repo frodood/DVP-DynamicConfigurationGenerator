@@ -30,5 +30,5 @@ module.exports = {
   },
 
   "Token": "123",
-  "UseCache": true
+  "UseCache": false
 };

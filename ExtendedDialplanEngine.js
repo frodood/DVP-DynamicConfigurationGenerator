@@ -2004,7 +2004,66 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         else
                                         {
                                             logger.error('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extended App Returned Empty Result', reqId);
-                                            callback(undefined, xmlBuilder.createNotFoundResponse());
+                                            ruleHandler.PickCallRuleOutboundComplete(reqId, ani, dnis, '', context, companyId, tenantId, true, cacheData, function(err, rule)
+                                            {
+                                                if(err)
+                                                {
+                                                    callback(err, xmlBuilder.createNotFoundResponse());
+                                                }
+                                                else if(rule)
+                                                {
+                                                    if(rule.FaxType)
+                                                    {
+                                                        toFaxType = rule.FaxType;
+                                                    }
+                                                    var ep =
+                                                    {
+                                                        Profile: rule.GatewayCode,
+                                                        Type: 'GATEWAY',
+                                                        LegStartDelay: 0,
+                                                        BypassMedia: false,
+                                                        LegTimeout: 60,
+                                                        Origination: rule.ANI,
+                                                        OriginationCallerIdNumber: rule.ANI,
+                                                        Destination: rule.DNIS,
+                                                        Domain: rule.IpUrl,
+                                                        OutLimit: rule.OutLimit,
+                                                        BothLimit: rule.BothLimit,
+                                                        TrunkNumber: rule.TrunkNumber,
+                                                        NumberType: rule.NumberType,
+                                                        CompanyId: rule.CompanyId,
+                                                        TenantId: rule.TenantId,
+                                                        Action: 'DEFAULT',
+                                                        AppId: appId,
+                                                        RecordEnable: fromUserData.Extension.RecordingEnabled
+                                                    };
+
+                                                    if(dodActive && dodNumber)
+                                                    {
+                                                        ep.Origination = dodNumber;
+                                                        ep.OriginationCallerIdNumber = dodNumber;
+                                                    }
+
+                                                    if(toFaxType)
+                                                    {
+                                                        //gateway fax dialplan
+                                                        var xml = xmlBuilder.CreateRouteFaxGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, fromFaxType, toFaxType);
+                                                        callback(undefined, xml);
+                                                    }
+                                                    else
+                                                    {
+                                                        var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
+                                                        var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo);
+
+                                                        callback(undefined, xml);
+                                                    }
+
+                                                }
+                                                else
+                                                {
+                                                    callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                }
+                                            })
                                         }
                                     }
                                 })
@@ -3035,7 +3094,66 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             else
                                             {
                                                 logger.error('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extended App Returned Empty Result', reqId);
-                                                callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                ruleHandler.PickCallRuleOutboundComplete(reqId, ani, dnis, '', context, companyId, tenantId, true, cacheData, function(err, rule)
+                                                {
+                                                    if(err)
+                                                    {
+                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                    }
+                                                    else if(rule)
+                                                    {
+                                                        if(rule.FaxType)
+                                                        {
+                                                            toFaxType = rule.FaxType;
+                                                        }
+                                                        var ep =
+                                                        {
+                                                            Profile: rule.GatewayCode,
+                                                            Type: 'GATEWAY',
+                                                            LegStartDelay: 0,
+                                                            BypassMedia: false,
+                                                            LegTimeout: 60,
+                                                            Origination: rule.ANI,
+                                                            OriginationCallerIdNumber: rule.ANI,
+                                                            Destination: rule.DNIS,
+                                                            Domain: rule.IpUrl,
+                                                            OutLimit: rule.OutLimit,
+                                                            BothLimit: rule.BothLimit,
+                                                            TrunkNumber: rule.TrunkNumber,
+                                                            NumberType: rule.NumberType,
+                                                            CompanyId: rule.CompanyId,
+                                                            TenantId: rule.TenantId,
+                                                            AppId: appId,
+                                                            Action: 'DEFAULT',
+                                                            RecordEnable: fromUserData.Extension.RecordingEnabled
+                                                        };
+
+                                                        if(dodActive && dodNumber)
+                                                        {
+                                                            ep.Origination = dodNumber;
+                                                            ep.OriginationCallerIdNumber = dodNumber;
+                                                        }
+
+                                                        if(toFaxType)
+                                                        {
+                                                            //gateway fax dialplan
+                                                            var xml = xmlBuilder.CreateRouteFaxGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, fromFaxType, toFaxType);
+                                                            callback(undefined, xml);
+                                                        }
+                                                        else
+                                                        {
+                                                            var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
+                                                            var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo);
+
+                                                            callback(undefined, xml);
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                    }
+                                                })
                                             }
                                         }
                                     })

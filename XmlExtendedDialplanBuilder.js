@@ -210,6 +210,16 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
 
         if(epList)
         {
+            if(epList && epList.length > 0)
+            {
+                cond.ele('action').att('application', 'set').att('data', 'conference_auto_outcall_timeout=60')
+                    .up()
+                    .ele('action').att('application', 'set').att('data', 'conference_auto_outcall_flags=none')
+                    .up()
+                    .ele('action').att('application', 'set').att('data', 'conference_auto_outcall_profile=default')
+                    .up()
+            }
+
             epList.forEach(function(ep)
             {
                 var option = '';
@@ -289,15 +299,7 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
                 .up()
         }
 
-        if(epList && epList.length > 0)
-        {
-            cond.ele('action').att('application', 'set').att('data', 'conference_auto_outcall_timeout=20')
-                .up()
-                .ele('action').att('application', 'set').att('data', 'conference_auto_outcall_flags=none')
-                .up()
-                .ele('action').att('application', 'set').att('data', 'conference_auto_outcall_profile=default')
-                .up()
-        }
+
 
         cond.end({pretty: true});
 

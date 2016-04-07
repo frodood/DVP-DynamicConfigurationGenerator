@@ -60,7 +60,7 @@ var GetObject = function(reqId, key, callback)
                 logger.debug('[DVP-DynamicConfigurationGenerator.GetObject] - [%s] - REDIS GET success', reqId);
             }
 
-            callback(err, JSON.parse(response));
+            callback(err, response);
         });
 
     }

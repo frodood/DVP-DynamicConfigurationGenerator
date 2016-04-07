@@ -258,7 +258,7 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
 
                 }
 
-                var dnis = '';
+                var dnis = ep.Destination;
 
                 if (domain)
                 {

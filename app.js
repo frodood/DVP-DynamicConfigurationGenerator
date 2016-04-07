@@ -603,7 +603,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                 else
                                 {
                                     cacheData = cacheInfo;
-                                    extDialplanEngine.ProcessCallForwarding(reqId, callerIdNum, destNum, domain, context, direction, data, companyId, tenantId, disconReason, fwdId, dodNumber, '', origination, origCallerIdNum, csId, function(err, xml)
+                                    extDialplanEngine.ProcessCallForwarding(reqId, callerIdNum, destNum, domain, context, direction, data, companyId, tenantId, disconReason, fwdId, dodNumber, '', origination, origCallerIdNum, csId, cacheData, function(err, xml)
                                     {
                                         if(err)
                                         {

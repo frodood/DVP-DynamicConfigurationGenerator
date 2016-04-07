@@ -2101,7 +2101,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             TenantId: rule.TenantId,
                                             Action: 'DEFAULT',
                                             AppId: appId,
-                                            RecordEnable: fromUserData.Extension.RecordingEnabled
+                                            RecordEnable: false
                                         };
 
                                         if(dodActive && dodNumber)

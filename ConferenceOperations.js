@@ -197,7 +197,7 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                         {
                             //dont allow
                             logger.debug('[DVP-DynamicConfigurationGenerator.ConferenceHandlerOperation] - [%s] - ANONYMOUS NOT ALLOWED ERROR', reqId);
-                            callback(new Error('Anonymous users not allowed'), xBuilder.createNotFoundResponse());
+                            callback(new Error('Anonymous users not allowed'), xmlBuilder.createNotFoundResponse());
                         }
                     }
                     else

@@ -331,7 +331,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
             else if(redisObj)
             {
                 logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Redis object found : ', reqId, redisObj);
-                var fwdList = JSON.parse(redisObj);
+                var fwdList = redisObj;
 
                 if(fwdList && fwdList.length > 0)
                 {

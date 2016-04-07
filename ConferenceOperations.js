@@ -4,7 +4,7 @@ var xBuilder = require('./XmlResponseGenerator.js');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var ruleBackendHandler = require('dvp-ruleservice/CallRuleBackendOperations.js');
 
-var CreateConferenceEndpointList = function(reqId, context, companyId, tenantId, dialOutUsers, confExt, callback)
+var CreateConferenceEndpointList = function(reqId, context, companyId, tenantId, dialOutUsers, confExt, cacheData, callback)
 {
     var epList = [];
     try
@@ -21,7 +21,7 @@ var CreateConferenceEndpointList = function(reqId, context, companyId, tenantId,
                     if (dOutUsr.ObjCategory === 'EXTERNAL')
                     {
                         //pick outbound rule with destination as dnis
-                        ruleBackendHandler.PickCallRuleOutboundComplete(reqId, '', dOutUsr.Destination, '', context, companyId, tenantId, false, function (err, rule) {
+                        ruleBackendHandler.PickCallRuleOutboundComplete(reqId, '', dOutUsr.Destination, '', context, companyId, tenantId, false, cacheData, function (err, rule) {
                             if (!err && rule)
                             {
                                 var ep =
@@ -119,7 +119,7 @@ var CreateConferenceEndpointList = function(reqId, context, companyId, tenantId,
 };
 
 
-var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, context, profile, companyId, tenantId, callback)
+var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, context, profile, companyId, tenantId, cacheData, callback)
 {
     try
     {
@@ -213,7 +213,7 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
 
                                 var dialOutUsers = underscore.filter(ext.Conference.ConferenceUser, function(usr){return usr.JoinType === 'OUT' && usr.UserStatus != 'JOINED'});
 
-                                CreateConferenceEndpointList(reqId, context, companyId, tenantId, dialOutUsers, ext.Extension, function(err, epList)
+                                CreateConferenceEndpointList(reqId, context, companyId, tenantId, dialOutUsers, ext.Extension, cacheData, function(err, epList)
                                 {
                                     var mode = '';
                                     var isFirst = true;

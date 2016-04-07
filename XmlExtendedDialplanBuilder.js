@@ -216,8 +216,8 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
                     .up()
                     .ele('action').att('application', 'set').att('data', 'conference_auto_outcall_flags=none')
                     .up()
-                    .ele('action').att('application', 'set').att('data', 'conference_auto_outcall_profile=default')
-                    .up()
+                    //.ele('action').att('application', 'set').att('data', 'conference_auto_outcall_profile=default')
+                    //.up()
             }
 
             epList.forEach(function(ep)

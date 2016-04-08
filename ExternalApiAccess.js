@@ -5,7 +5,7 @@ var RemoteGetDialplanConfig = function(reqId, ani, dnis, context, direction, use
 {
     try
     {
-            logger.debug('[DVP-PBXService.RemoteGetPBXDialplanConfig] - [%s] -  Trying to get pbx details from pbx app - [%s]', reqId, securityToken);
+            logger.debug('[DVP-PBXService.RemoteGetPBXDialplanConfig] - [%s] -  Trying to get pbx details from pbx app', reqId);
 
             securityToken = 'bearer ' + securityToken;
 

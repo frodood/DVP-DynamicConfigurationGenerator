@@ -616,7 +616,9 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             }
                                             else if(!pbxDetails)
                                             {
-                                                logger.info('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - REMOTE EXTENDED DIALPLAN NOT FOUND', reqId);
+                                                callback(new Error('PBX app returned empty value'), xmlBuilder.createNotFoundResponse());
+
+                                                /*logger.info('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - REMOTE EXTENDED DIALPLAN NOT FOUND', reqId);
 
                                                 var ep =
                                                 {
@@ -665,7 +667,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     {
                                                         callback(err, xmlBuilder.createNotFoundResponse());
                                                     }
-                                                });
+                                                });*/
                                             }
                                             else
                                             {
@@ -1280,7 +1282,9 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     }
                                                     else if(!pbxDetails)
                                                     {
-                                                        var recEnabled = false;
+
+                                                        callback(new Error('PBX app returned empty value'), xmlBuilder.createNotFoundResponse());
+                                                        /*var recEnabled = false;
 
                                                         var ep =
                                                         {
@@ -1327,38 +1331,167 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             {
                                                                 callback(err, xmlBuilder.createNotFoundResponse());
                                                             }
-                                                        });
+                                                        });*/
                                                     }
                                                     else
                                                     {
                                                         var pbxObj = pbxDetails;
 
-                                                        if(pbxObj)
+                                                        var voicemailEnabled = pbxObj.VoicemailEnabled;
+                                                        var personalGreeting = pbxObj.PersonalGreeting;
+                                                        var bypassMedia = pbxObj.BypassMedia;
+
+                                                        var ringTime = 60;
+
+                                                        if(pbxObj.RingTimeout)
                                                         {
+                                                            ringTime = pbxObj.RingTimeout;
+                                                        }
 
-                                                            var voicemailEnabled = pbxObj.VoicemailEnabled;
-                                                            var personalGreeting = pbxObj.PersonalGreeting;
-                                                            var bypassMedia = pbxObj.BypassMedia;
 
-                                                            var ringTime = 60;
+                                                        if(pbxObj.OperationType === 'DND')
+                                                        {
+                                                            var xml = xmlBuilder.CreateSendBusyMessageDialplan(reqId, '[^\\s]*', context, undefined);
 
-                                                            if(pbxObj.RingTimeout)
+                                                            callback(undefined, xml);
+                                                        }
+                                                        else if(pbxObj.OperationType === 'USER_DIAL')
+                                                        {
+                                                            var recEnabled = false;
+
+
+                                                            var ep =
                                                             {
-                                                                ringTime = pbxObj.RingTimeout;
-                                                            }
+                                                                Profile: profile,
+                                                                Type: 'USER',
+                                                                LegStartDelay: 0,
+                                                                BypassMedia: bypassMedia,
+                                                                LegTimeout: ringTime,
+                                                                Origination: callerIdName,
+                                                                OriginationCallerIdNumber: callerIdNum,
+                                                                Destination: extDetails.Extension,
+                                                                Domain: toUsrDomain,
+                                                                Group: grp,
+                                                                IsVoicemailEnabled: voicemailEnabled,
+                                                                PersonalGreeting: personalGreeting,
+                                                                CompanyId: companyId,
+                                                                TenantId: tenantId,
+                                                                AppId: appId,
+                                                                Action: 'DEFAULT',
+                                                                RecordEnabled: recEnabled
+                                                            };
 
+                                                            var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
 
-                                                            if(pbxObj.OperationType === 'DND')
+                                                            redisHandler.SetObjectWithExpire(customStr, uuid, 60, function(err, redisResult)
                                                             {
-                                                                var xml = xmlBuilder.CreateSendBusyMessageDialplan(reqId, '[^\\s]*', context, undefined);
+                                                                if(!err && redisResult)
+                                                                {
+                                                                    var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
 
-                                                                callback(undefined, xml);
+                                                                    if(extDetails.SipUACEndpoint.UsePublic)
+                                                                    {
+                                                                        ep.Profile = 'external';
+                                                                        ep.Type = 'PUBLIC_USER';
+                                                                        ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                        ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                                    }
+
+                                                                    var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined, attTransInfo);
+
+                                                                    callback(undefined, xml);
+                                                                }
+                                                                else
+                                                                {
+                                                                    callback(err, xmlBuilder.createNotFoundResponse());
+                                                                }
+                                                            });
+                                                        }
+                                                        else if(pbxObj.OperationType === 'FOLLOW_ME')
+                                                        {
+                                                            if(pbxDetails.Endpoints && pbxDetails.Endpoints.length > 0)
+                                                            {
+                                                                CreateFMEndpointList(reqId, ani, context, companyId, tenantId, pbxDetails.Endpoints, '', false, callerIdNum, callerIdName, csId, appId, cacheData, function(err, epList)
+                                                                {
+                                                                    if(err)
+                                                                    {
+                                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                                    }
+                                                                    else if(epList && epList.length > 0)
+                                                                    {
+                                                                        var xml = xmlBuilder.CreateFollowMeDialplan(reqId, epList, context, profile, '[^\\s]*', false, undefined);
+
+                                                                        callback(undefined, xml);
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                                    }
+                                                                })
                                                             }
-                                                            else if(pbxObj.OperationType === 'USER_DIAL')
+                                                        }
+                                                        else if(pbxObj.OperationType === 'FORWARD')
+                                                        {
+                                                            if(pbxDetails.Endpoints)
+                                                            {
+                                                                var ep =
+                                                                {
+                                                                    Profile: profile,
+                                                                    Type: 'USER',
+                                                                    LegStartDelay: 0,
+                                                                    BypassMedia: bypassMedia,
+                                                                    LegTimeout: ringTime,
+                                                                    Origination: callerIdName,
+                                                                    OriginationCallerIdNumber: callerIdNum,
+                                                                    Destination: dnis,
+                                                                    Domain: toUsrDomain,
+                                                                    Group: grp,
+                                                                    CompanyId: companyId,
+                                                                    TenantId: tenantId,
+                                                                    AppId: appId
+                                                                };
+
+                                                                if(dodActive && dodNumber)
+                                                                {
+                                                                    ep.DodNumber = dodNumber;
+                                                                }
+
+                                                                var pbxFwdKey = util.format('DVPFORWARDING_%d_%d_%s', companyId, tenantId, pbxDetails.UserRefId);
+                                                                var forwardingInfo = JSON.stringify(pbxDetails.Endpoints);
+
+                                                                redisHandler.SetObjectWithExpire(pbxFwdKey, forwardingInfo, 360, function(err, redisResp)
+                                                                {
+                                                                    if(err)
+                                                                    {
+                                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                                    }
+                                                                    else
+                                                                    {
+
+                                                                        if(extDetails.SipUACEndpoint.UsePublic)
+                                                                        {
+                                                                            ep.Profile = 'external';
+                                                                            ep.Type = 'PUBLIC_USER';
+                                                                            ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                            ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                                            ep.BypassMedia = false;
+                                                                        }
+
+                                                                        var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
+
+
+                                                                        var xml = xmlBuilder.CreateForwardingDialplan(reqId, ep, context, profile, '[^\\s]*', false, pbxFwdKey, undefined, attTransInfo);
+
+
+                                                                        callback(undefined, xml);
+                                                                    }
+                                                                });
+                                                            }
+                                                            else
                                                             {
                                                                 var recEnabled = false;
 
-
+                                                                //Do Normal User Dial
                                                                 var ep =
                                                                 {
                                                                     Profile: profile,
@@ -1406,308 +1539,170 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     }
                                                                 });
                                                             }
-                                                            else if(pbxObj.OperationType === 'FOLLOW_ME')
+
+                                                        }
+                                                        else if(pbxObj.OperationType === 'CALL_DIVERT')
+                                                        {
+                                                            if (pbxObj.Endpoints && pbxObj.Endpoints.ObjCategory === 'GATEWAY')
                                                             {
-                                                                if(pbxDetails.Endpoints && pbxDetails.Endpoints.length > 0)
+                                                                //pick outbound rule
+                                                                ruleHandler.PickCallRuleOutboundComplete(reqId, ani, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, cacheData, function (err, rule)
                                                                 {
-                                                                    CreateFMEndpointList(reqId, ani, context, companyId, tenantId, pbxDetails.Endpoints, '', false, callerIdNum, callerIdName, csId, appId, cacheData, function(err, epList)
+                                                                    if (!err && rule)
                                                                     {
-                                                                        if(err)
+                                                                        var ep =
                                                                         {
-                                                                            callback(err, xmlBuilder.createNotFoundResponse());
-                                                                        }
-                                                                        else if(epList && epList.length > 0)
-                                                                        {
-                                                                            var xml = xmlBuilder.CreateFollowMeDialplan(reqId, epList, context, profile, '[^\\s]*', false, undefined);
+                                                                            Profile: rule.GatewayCode,
+                                                                            Type: 'GATEWAY',
+                                                                            LegStartDelay: 0,
+                                                                            BypassMedia: false,
+                                                                            LegTimeout: 60,
+                                                                            Destination: rule.DNIS,
+                                                                            Domain: rule.IpUrl,
+                                                                            OutLimit: rule.OutLimit,
+                                                                            BothLimit: rule.BothLimit,
+                                                                            TrunkNumber: rule.TrunkNumber,
+                                                                            NumberType: rule.NumberType,
+                                                                            CompanyId: rule.CompanyId,
+                                                                            TenantId: rule.TenantId,
+                                                                            Action: 'CALL_DIVERT',
+                                                                            AppId: appId
+                                                                        };
 
-                                                                            callback(undefined, xml);
+
+                                                                        if(dodActive && dodNumber)
+                                                                        {
+                                                                            ep.Origination = dodNumber;
+                                                                            ep.OriginationCallerIdNumber = dodNumber;
                                                                         }
                                                                         else
                                                                         {
-                                                                            callback(err, xmlBuilder.createNotFoundResponse());
-                                                                        }
-                                                                    })
-                                                                }
-                                                            }
-                                                            else if(pbxObj.OperationType === 'FORWARD')
-                                                            {
-                                                                if(pbxDetails.Endpoints)
-                                                                {
-                                                                    var ep =
-                                                                    {
-                                                                        Profile: profile,
-                                                                        Type: 'USER',
-                                                                        LegStartDelay: 0,
-                                                                        BypassMedia: bypassMedia,
-                                                                        LegTimeout: ringTime,
-                                                                        Origination: callerIdName,
-                                                                        OriginationCallerIdNumber: callerIdNum,
-                                                                        Destination: dnis,
-                                                                        Domain: toUsrDomain,
-                                                                        Group: grp,
-                                                                        CompanyId: companyId,
-                                                                        TenantId: tenantId,
-                                                                        AppId: appId
-                                                                    };
-
-                                                                    if(dodActive && dodNumber)
-                                                                    {
-                                                                        ep.DodNumber = dodNumber;
-                                                                    }
-
-                                                                    var pbxFwdKey = util.format('DVPFORWARDING_%d_%d_%s', companyId, tenantId, pbxDetails.UserRefId);
-                                                                    var forwardingInfo = JSON.stringify(pbxDetails.Endpoints);
-
-                                                                    redisHandler.SetObjectWithExpire(pbxFwdKey, forwardingInfo, 360, function(err, redisResp)
-                                                                    {
-                                                                        if(err)
-                                                                        {
-                                                                            callback(err, xmlBuilder.createNotFoundResponse());
-                                                                        }
-                                                                        else
-                                                                        {
-
-                                                                            if(extDetails.SipUACEndpoint.UsePublic)
-                                                                            {
-                                                                                ep.Profile = 'external';
-                                                                                ep.Type = 'PUBLIC_USER';
-                                                                                ep.Destination = extDetails.SipUACEndpoint.SipUsername;
-                                                                                ep.Domain = extDetails.SipUACEndpoint.Domain;
-                                                                                ep.BypassMedia = false;
-                                                                            }
-
-                                                                            var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
-
-
-                                                                            var xml = xmlBuilder.CreateForwardingDialplan(reqId, ep, context, profile, '[^\\s]*', false, pbxFwdKey, undefined, attTransInfo);
-
-
-                                                                            callback(undefined, xml);
-                                                                        }
-                                                                    });
-                                                                }
-                                                                else
-                                                                {
-                                                                    var recEnabled = false;
-
-                                                                    //Do Normal User Dial
-                                                                    var ep =
-                                                                    {
-                                                                        Profile: profile,
-                                                                        Type: 'USER',
-                                                                        LegStartDelay: 0,
-                                                                        BypassMedia: bypassMedia,
-                                                                        LegTimeout: ringTime,
-                                                                        Origination: callerIdName,
-                                                                        OriginationCallerIdNumber: callerIdNum,
-                                                                        Destination: extDetails.Extension,
-                                                                        Domain: toUsrDomain,
-                                                                        Group: grp,
-                                                                        IsVoicemailEnabled: voicemailEnabled,
-                                                                        PersonalGreeting: personalGreeting,
-                                                                        CompanyId: companyId,
-                                                                        TenantId: tenantId,
-                                                                        AppId: appId,
-                                                                        Action: 'DEFAULT',
-                                                                        RecordEnabled: recEnabled
-                                                                    };
-
-                                                                    var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
-
-                                                                    redisHandler.SetObjectWithExpire(customStr, uuid, 60, function(err, redisResult)
-                                                                    {
-                                                                        if(!err && redisResult)
-                                                                        {
-                                                                            var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
-
-                                                                            if(extDetails.SipUACEndpoint.UsePublic)
-                                                                            {
-                                                                                ep.Profile = 'external';
-                                                                                ep.Type = 'PUBLIC_USER';
-                                                                                ep.Destination = extDetails.SipUACEndpoint.SipUsername;
-                                                                                ep.Domain = extDetails.SipUACEndpoint.Domain;
-                                                                            }
-
-                                                                            var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined, attTransInfo);
-
-                                                                            callback(undefined, xml);
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            callback(err, xmlBuilder.createNotFoundResponse());
-                                                                        }
-                                                                    });
-                                                                }
-
-                                                            }
-                                                            else if(pbxObj.OperationType === 'CALL_DIVERT')
-                                                            {
-                                                                if (pbxObj.Endpoints && pbxObj.Endpoints.ObjCategory === 'GATEWAY')
-                                                                {
-                                                                    //pick outbound rule
-                                                                    ruleHandler.PickCallRuleOutboundComplete(reqId, ani, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, cacheData, function (err, rule)
-                                                                    {
-                                                                        if (!err && rule)
-                                                                        {
-                                                                            var ep =
-                                                                            {
-                                                                                Profile: rule.GatewayCode,
-                                                                                Type: 'GATEWAY',
-                                                                                LegStartDelay: 0,
-                                                                                BypassMedia: false,
-                                                                                LegTimeout: 60,
-                                                                                Destination: rule.DNIS,
-                                                                                Domain: rule.IpUrl,
-                                                                                OutLimit: rule.OutLimit,
-                                                                                BothLimit: rule.BothLimit,
-                                                                                TrunkNumber: rule.TrunkNumber,
-                                                                                NumberType: rule.NumberType,
-                                                                                CompanyId: rule.CompanyId,
-                                                                                TenantId: rule.TenantId,
-                                                                                Action: 'CALL_DIVERT',
-                                                                                AppId: appId
-                                                                            };
-
-
-                                                                            if(dodActive && dodNumber)
-                                                                            {
-                                                                                ep.Origination = dodNumber;
-                                                                                ep.OriginationCallerIdNumber = dodNumber;
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                ep.Origination = rule.ANI;
-                                                                                ep.OriginationCallerIdNumber = rule.ANI;
-                                                                            }
-
-                                                                            var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, null);
-
-                                                                            var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo);
-
-                                                                            callback(undefined, xml);
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            callback(undefined, xmlBuilder.createNotFoundResponse());
-                                                                        }
-                                                                    })
-                                                                }
-                                                                else if(pbxObj.Endpoints && (pbxObj.Endpoints.ObjCategory === 'PBXUSER' || pbxObj.Endpoints.ObjCategory === 'USER'))
-                                                                {
-                                                                    backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, tenantId, 'USER', csId, cacheData, function (err, extDetails)
-                                                                    {
-
-                                                                        if (!err && extDetails)
-                                                                        {
-                                                                            if (extDetails.SipUACEndpoint && extDetails.SipUACEndpoint.CloudEndUser)
-                                                                            {
-                                                                                var ep =
-                                                                                {
-                                                                                    Profile: '',
-                                                                                    Type: 'USER',
-                                                                                    LegStartDelay: 0,
-                                                                                    BypassMedia: false,
-                                                                                    LegTimeout: 60,
-                                                                                    Origination: callerIdName,
-                                                                                    OriginationCallerIdNumber: callerIdNum,
-                                                                                    Destination: extDetails.Extension,
-                                                                                    Domain: extDetails.SipUACEndpoint.CloudEndUser.Domain,
-                                                                                    CompanyId: companyId,
-                                                                                    TenantId: tenantId,
-                                                                                    AppId: appId,
-                                                                                    Action: 'DEFAULT'
-                                                                                };
-
-                                                                                var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
-
-                                                                                if(extDetails.SipUACEndpoint.UsePublic)
-                                                                                {
-                                                                                    ep.Profile = 'external';
-                                                                                    ep.Type = 'PUBLIC_USER';
-                                                                                    ep.Destination = extDetails.SipUACEndpoint.SipUsername;
-                                                                                    ep.Domain = extDetails.SipUACEndpoint.Domain;
-                                                                                }
-
-                                                                                var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo, attTransInfo);
-
-                                                                                callback(undefined, xml);
-
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                callback(undefined, xmlBuilder.createNotFoundResponse());
-                                                                            }
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                                            ep.Origination = rule.ANI;
+                                                                            ep.OriginationCallerIdNumber = rule.ANI;
                                                                         }
 
-                                                                    });
-                                                                }
-                                                                else
-                                                                {
-                                                                    callback(undefined, xmlBuilder.createNotFoundResponse());
-                                                                }
-                                                            }
-                                                            else
-                                                            {
+                                                                        var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, null);
 
-                                                                var recEnabled = false;
-
-
-                                                                var ep =
-                                                                {
-                                                                    Profile: profile,
-                                                                    Type: 'USER',
-                                                                    LegStartDelay: 0,
-                                                                    BypassMedia: bypassMedia,
-                                                                    LegTimeout: ringTime,
-                                                                    Origination: callerIdName,
-                                                                    OriginationCallerIdNumber: callerIdNum,
-                                                                    Destination: dnis,
-                                                                    Domain: toUsrDomain,
-                                                                    Group: grp,
-                                                                    IsVoicemailEnabled: voicemailEnabled,
-                                                                    PersonalGreeting: personalGreeting,
-                                                                    CompanyId: companyId,
-                                                                    TenantId: tenantId,
-                                                                    AppId: appId,
-                                                                    Action: 'DEFAULT',
-                                                                    RecordEnabled: recEnabled
-                                                                };
-
-                                                                var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
-
-                                                                redisHandler.SetObjectWithExpire(customStr, uuid, 60, function(err, redisResult)
-                                                                {
-                                                                    if(!err && redisResult)
-                                                                    {
-                                                                        var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
-
-                                                                        if(extDetails.SipUACEndpoint.UsePublic)
-                                                                        {
-                                                                            ep.Profile = 'external';
-                                                                            ep.Type = 'PUBLIC_USER';
-                                                                            ep.Destination = extDetails.SipUACEndpoint.SipUsername;
-                                                                            ep.Domain = extDetails.SipUACEndpoint.Domain;
-                                                                        }
-
-                                                                        var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined, attTransInfo);
+                                                                        var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo);
 
                                                                         callback(undefined, xml);
                                                                     }
                                                                     else
                                                                     {
-                                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                                        callback(undefined, xmlBuilder.createNotFoundResponse());
                                                                     }
+                                                                })
+                                                            }
+                                                            else if(pbxObj.Endpoints && (pbxObj.Endpoints.ObjCategory === 'PBXUSER' || pbxObj.Endpoints.ObjCategory === 'USER'))
+                                                            {
+                                                                backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, tenantId, 'USER', csId, cacheData, function (err, extDetails)
+                                                                {
+
+                                                                    if (!err && extDetails)
+                                                                    {
+                                                                        if (extDetails.SipUACEndpoint && extDetails.SipUACEndpoint.CloudEndUser)
+                                                                        {
+                                                                            var ep =
+                                                                            {
+                                                                                Profile: '',
+                                                                                Type: 'USER',
+                                                                                LegStartDelay: 0,
+                                                                                BypassMedia: false,
+                                                                                LegTimeout: 60,
+                                                                                Origination: callerIdName,
+                                                                                OriginationCallerIdNumber: callerIdNum,
+                                                                                Destination: extDetails.Extension,
+                                                                                Domain: extDetails.SipUACEndpoint.CloudEndUser.Domain,
+                                                                                CompanyId: companyId,
+                                                                                TenantId: tenantId,
+                                                                                AppId: appId,
+                                                                                Action: 'DEFAULT'
+                                                                            };
+
+                                                                            var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
+
+                                                                            if(extDetails.SipUACEndpoint.UsePublic)
+                                                                            {
+                                                                                ep.Profile = 'external';
+                                                                                ep.Type = 'PUBLIC_USER';
+                                                                                ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                                ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                                            }
+
+                                                                            var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo, attTransInfo);
+
+                                                                            callback(undefined, xml);
+
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                                    }
+
                                                                 });
                                                             }
-
+                                                            else
+                                                            {
+                                                                callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                            }
                                                         }
                                                         else
                                                         {
-                                                            callback(err, xmlBuilder.createNotFoundResponse());
+
+                                                            var recEnabled = false;
+
+
+                                                            var ep =
+                                                            {
+                                                                Profile: profile,
+                                                                Type: 'USER',
+                                                                LegStartDelay: 0,
+                                                                BypassMedia: bypassMedia,
+                                                                LegTimeout: ringTime,
+                                                                Origination: callerIdName,
+                                                                OriginationCallerIdNumber: callerIdNum,
+                                                                Destination: dnis,
+                                                                Domain: toUsrDomain,
+                                                                Group: grp,
+                                                                IsVoicemailEnabled: voicemailEnabled,
+                                                                PersonalGreeting: personalGreeting,
+                                                                CompanyId: companyId,
+                                                                TenantId: tenantId,
+                                                                AppId: appId,
+                                                                Action: 'DEFAULT',
+                                                                RecordEnabled: recEnabled
+                                                            };
+
+                                                            var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
+
+                                                            redisHandler.SetObjectWithExpire(customStr, uuid, 60, function(err, redisResult)
+                                                            {
+                                                                if(!err && redisResult)
+                                                                {
+                                                                    var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
+
+                                                                    if(extDetails.SipUACEndpoint.UsePublic)
+                                                                    {
+                                                                        ep.Profile = 'external';
+                                                                        ep.Type = 'PUBLIC_USER';
+                                                                        ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                        ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                                    }
+
+                                                                    var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined, attTransInfo);
+
+                                                                    callback(undefined, xml);
+                                                                }
+                                                                else
+                                                                {
+                                                                    callback(err, xmlBuilder.createNotFoundResponse());
+                                                                }
+                                                            });
                                                         }
                                                     }
                                                 })
@@ -2004,66 +1999,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         else
                                         {
                                             logger.error('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extended App Returned Empty Result', reqId);
-                                            ruleHandler.PickCallRuleOutboundComplete(reqId, ani, dnis, '', context, companyId, tenantId, true, cacheData, function(err, rule)
-                                            {
-                                                if(err)
-                                                {
-                                                    callback(err, xmlBuilder.createNotFoundResponse());
-                                                }
-                                                else if(rule)
-                                                {
-                                                    if(rule.FaxType)
-                                                    {
-                                                        toFaxType = rule.FaxType;
-                                                    }
-                                                    var ep =
-                                                    {
-                                                        Profile: rule.GatewayCode,
-                                                        Type: 'GATEWAY',
-                                                        LegStartDelay: 0,
-                                                        BypassMedia: false,
-                                                        LegTimeout: 60,
-                                                        Origination: rule.ANI,
-                                                        OriginationCallerIdNumber: rule.ANI,
-                                                        Destination: rule.DNIS,
-                                                        Domain: rule.IpUrl,
-                                                        OutLimit: rule.OutLimit,
-                                                        BothLimit: rule.BothLimit,
-                                                        TrunkNumber: rule.TrunkNumber,
-                                                        NumberType: rule.NumberType,
-                                                        CompanyId: rule.CompanyId,
-                                                        TenantId: rule.TenantId,
-                                                        Action: 'DEFAULT',
-                                                        AppId: appId,
-                                                        RecordEnable: fromUserData.Extension.RecordingEnabled
-                                                    };
-
-                                                    if(dodActive && dodNumber)
-                                                    {
-                                                        ep.Origination = dodNumber;
-                                                        ep.OriginationCallerIdNumber = dodNumber;
-                                                    }
-
-                                                    if(toFaxType)
-                                                    {
-                                                        //gateway fax dialplan
-                                                        var xml = xmlBuilder.CreateRouteFaxGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, fromFaxType, toFaxType);
-                                                        callback(undefined, xml);
-                                                    }
-                                                    else
-                                                    {
-                                                        var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
-                                                        var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo);
-
-                                                        callback(undefined, xml);
-                                                    }
-
-                                                }
-                                                else
-                                                {
-                                                    callback(undefined, xmlBuilder.createNotFoundResponse());
-                                                }
-                                            })
+                                            callback(new Error('PBX app returned empty value'), xmlBuilder.createNotFoundResponse());
                                         }
                                     }
                                 })
@@ -2205,7 +2141,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         }
                                                         else if(!pbxDetails)
                                                         {
-                                                            var recEnabled = false;
+                                                            callback(new Error('PBX app returned empty value'), xmlBuilder.createNotFoundResponse());
+                                                            /*var recEnabled = false;
                                                             if(fromUserData.Extension.RecordingEnabled)
                                                             {
                                                                 recEnabled = true;
@@ -2259,34 +2196,171 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 {
                                                                     callback(err, xmlBuilder.createNotFoundResponse());
                                                                 }
-                                                            });
+                                                            });*/
                                                         }
                                                         else
                                                         {
                                                             var pbxObj = pbxDetails;
 
-                                                            if(pbxObj)
+                                                            var voicemailEnabled = pbxObj.VoicemailEnabled;
+                                                            var personalGreeting = pbxObj.PersonalGreeting;
+                                                            var bypassMedia = pbxObj.BypassMedia;
+
+                                                            var ringTime = 60;
+
+                                                            if(pbxObj.RingTimeout)
                                                             {
+                                                                ringTime = pbxObj.RingTimeout;
+                                                            }
 
-                                                                var voicemailEnabled = pbxObj.VoicemailEnabled;
-                                                                var personalGreeting = pbxObj.PersonalGreeting;
-                                                                var bypassMedia = pbxObj.BypassMedia;
 
-                                                                var ringTime = 60;
+                                                            if(pbxObj.OperationType === 'DND')
+                                                            {
+                                                                var xml = xmlBuilder.CreateSendBusyMessageDialplan(reqId, '[^\\s]*', context, undefined);
 
-                                                                if(pbxObj.RingTimeout)
+                                                                callback(undefined, xml);
+                                                            }
+                                                            else if(pbxObj.OperationType === 'USER_DIAL')
+                                                            {
+                                                                var recEnabled = false;
+                                                                if(fromUserData.Extension.RecordingEnabled)
                                                                 {
-                                                                    ringTime = pbxObj.RingTimeout;
+                                                                    recEnabled = true;
+                                                                }
+                                                                else
+                                                                {
+                                                                    recEnabled = extDetails.RecordingEnabled;
                                                                 }
 
 
-                                                                if(pbxObj.OperationType === 'DND')
+                                                                var ep =
                                                                 {
-                                                                    var xml = xmlBuilder.CreateSendBusyMessageDialplan(reqId, '[^\\s]*', context, undefined);
+                                                                    Profile: profile,
+                                                                    Type: 'USER',
+                                                                    LegStartDelay: 0,
+                                                                    BypassMedia: bypassMedia,
+                                                                    LegTimeout: ringTime,
+                                                                    Origination: callerIdName,
+                                                                    OriginationCallerIdNumber: callerIdNum,
+                                                                    Destination: extDetails.Extension,
+                                                                    Domain: toUsrDomain,
+                                                                    Group: grp,
+                                                                    IsVoicemailEnabled: voicemailEnabled,
+                                                                    PersonalGreeting: personalGreeting,
+                                                                    CompanyId: companyId,
+                                                                    TenantId: tenantId,
+                                                                    AppId: appId,
+                                                                    Action: 'DEFAULT',
+                                                                    RecordEnabled: recEnabled
+                                                                };
 
-                                                                    callback(undefined, xml);
+                                                                var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
+
+                                                                redisHandler.SetObjectWithExpire(customStr, uuid, 60, function(err, redisResult)
+                                                                {
+                                                                    if(!err && redisResult)
+                                                                    {
+                                                                        var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, extDetails.SipUACEndpoint);
+
+                                                                        if(extDetails.SipUACEndpoint.UsePublic)
+                                                                        {
+                                                                            ep.Profile = 'external';
+                                                                            ep.Type = 'PUBLIC_USER';
+                                                                            ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                            ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                                        }
+
+                                                                        var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined, attTransInfo);
+
+                                                                        callback(undefined, xml);
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                                    }
+                                                                });
+                                                            }
+                                                            else if(pbxObj.OperationType === 'FOLLOW_ME')
+                                                            {
+                                                                if(pbxDetails.Endpoints && pbxDetails.Endpoints.length > 0)
+                                                                {
+                                                                    CreateFMEndpointList(reqId, ani, context, companyId, tenantId, pbxDetails.Endpoints, '', false, callerIdNum, callerIdName, csId, appId, cacheData, function(err, epList)
+                                                                    {
+                                                                        if(err)
+                                                                        {
+                                                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                                                        }
+                                                                        else if(epList && epList.length > 0)
+                                                                        {
+                                                                            var xml = xmlBuilder.CreateFollowMeDialplan(reqId, epList, context, profile, '[^\\s]*', false, undefined);
+
+                                                                            callback(undefined, xml);
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                                                        }
+                                                                    })
                                                                 }
-                                                                else if(pbxObj.OperationType === 'USER_DIAL')
+                                                            }
+                                                            else if(pbxObj.OperationType === 'FORWARD')
+                                                            {
+                                                                if(pbxDetails.Endpoints)
+                                                                {
+                                                                    var ep =
+                                                                    {
+                                                                        Profile: profile,
+                                                                        Type: 'USER',
+                                                                        LegStartDelay: 0,
+                                                                        BypassMedia: bypassMedia,
+                                                                        LegTimeout: ringTime,
+                                                                        Origination: callerIdName,
+                                                                        OriginationCallerIdNumber: callerIdNum,
+                                                                        Destination: dnis,
+                                                                        Domain: toUsrDomain,
+                                                                        Group: grp,
+                                                                        CompanyId: companyId,
+                                                                        TenantId: tenantId,
+                                                                        AppId: appId
+                                                                    };
+
+                                                                    if(dodActive && dodNumber)
+                                                                    {
+                                                                        ep.DodNumber = dodNumber;
+                                                                    }
+
+                                                                    var pbxFwdKey = util.format('DVPFORWARDING_%d_%d_%s', companyId, tenantId, pbxDetails.UserRefId);
+                                                                    var forwardingInfo = JSON.stringify(pbxDetails.Endpoints);
+
+                                                                    redisHandler.SetObjectWithExpire(pbxFwdKey, forwardingInfo, 360, function(err, redisResp)
+                                                                    {
+                                                                        if(err)
+                                                                        {
+                                                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                                                        }
+                                                                        else
+                                                                        {
+
+                                                                            if(extDetails.SipUACEndpoint.UsePublic)
+                                                                            {
+                                                                                ep.Profile = 'external';
+                                                                                ep.Type = 'PUBLIC_USER';
+                                                                                ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                                ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                                                ep.BypassMedia = false;
+                                                                            }
+
+                                                                            var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
+
+
+                                                                            var xml = xmlBuilder.CreateForwardingDialplan(reqId, ep, context, profile, '[^\\s]*', false, pbxFwdKey, undefined, attTransInfo);
+
+
+                                                                            callback(undefined, xml);
+                                                                        }
+                                                                    });
+                                                                }
+                                                                else
                                                                 {
                                                                     var recEnabled = false;
                                                                     if(fromUserData.Extension.RecordingEnabled)
@@ -2297,8 +2371,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     {
                                                                         recEnabled = extDetails.RecordingEnabled;
                                                                     }
-
-
+                                                                    //Do Normal User Dial
                                                                     var ep =
                                                                     {
                                                                         Profile: profile,
@@ -2346,125 +2419,86 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         }
                                                                     });
                                                                 }
-                                                                else if(pbxObj.OperationType === 'FOLLOW_ME')
-                                                                {
-                                                                    if(pbxDetails.Endpoints && pbxDetails.Endpoints.length > 0)
-                                                                    {
-                                                                        CreateFMEndpointList(reqId, ani, context, companyId, tenantId, pbxDetails.Endpoints, '', false, callerIdNum, callerIdName, csId, appId, cacheData, function(err, epList)
-                                                                        {
-                                                                            if(err)
-                                                                            {
-                                                                                callback(err, xmlBuilder.createNotFoundResponse());
-                                                                            }
-                                                                            else if(epList && epList.length > 0)
-                                                                            {
-                                                                                var xml = xmlBuilder.CreateFollowMeDialplan(reqId, epList, context, profile, '[^\\s]*', false, undefined);
 
-                                                                                callback(undefined, xml);
+                                                            }
+                                                            else if(pbxObj.OperationType === 'CALL_DIVERT')
+                                                            {
+                                                                if (pbxObj.Endpoints && pbxObj.Endpoints.ObjCategory === 'GATEWAY')
+                                                                {
+                                                                    //pick outbound rule
+                                                                    ruleHandler.PickCallRuleOutboundComplete(reqId, ani, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, cacheData, function (err, rule)
+                                                                    {
+                                                                        if (!err && rule)
+                                                                        {
+                                                                            var ep =
+                                                                            {
+                                                                                Profile: rule.GatewayCode,
+                                                                                Type: 'GATEWAY',
+                                                                                LegStartDelay: 0,
+                                                                                BypassMedia: false,
+                                                                                LegTimeout: 60,
+                                                                                Destination: rule.DNIS,
+                                                                                Domain: rule.IpUrl,
+                                                                                OutLimit: rule.OutLimit,
+                                                                                BothLimit: rule.BothLimit,
+                                                                                TrunkNumber: rule.TrunkNumber,
+                                                                                AppId: appId,
+                                                                                NumberType: rule.NumberType,
+                                                                                CompanyId: rule.CompanyId,
+                                                                                TenantId: rule.TenantId,
+                                                                                Action: 'CALL_DIVERT'
+                                                                            };
+
+
+                                                                            if(dodActive && dodNumber)
+                                                                            {
+                                                                                ep.Origination = dodNumber;
+                                                                                ep.OriginationCallerIdNumber = dodNumber;
                                                                             }
                                                                             else
                                                                             {
-                                                                                callback(err, xmlBuilder.createNotFoundResponse());
+                                                                                ep.Origination = rule.ANI;
+                                                                                ep.OriginationCallerIdNumber = rule.ANI;
                                                                             }
-                                                                        })
-                                                                    }
-                                                                }
-                                                                else if(pbxObj.OperationType === 'FORWARD')
-                                                                {
-                                                                    if(pbxDetails.Endpoints)
-                                                                    {
-                                                                        var ep =
-                                                                        {
-                                                                            Profile: profile,
-                                                                            Type: 'USER',
-                                                                            LegStartDelay: 0,
-                                                                            BypassMedia: bypassMedia,
-                                                                            LegTimeout: ringTime,
-                                                                            Origination: callerIdName,
-                                                                            OriginationCallerIdNumber: callerIdNum,
-                                                                            Destination: dnis,
-                                                                            Domain: toUsrDomain,
-                                                                            Group: grp,
-                                                                            CompanyId: companyId,
-                                                                            TenantId: tenantId,
-                                                                            AppId: appId
-                                                                        };
 
-                                                                        if(dodActive && dodNumber)
-                                                                        {
-                                                                            ep.DodNumber = dodNumber;
-                                                                        }
+                                                                            var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
 
-                                                                        var pbxFwdKey = util.format('DVPFORWARDING_%d_%d_%s', companyId, tenantId, pbxDetails.UserRefId);
-                                                                        var forwardingInfo = JSON.stringify(pbxDetails.Endpoints);
+                                                                            var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo);
 
-                                                                        redisHandler.SetObjectWithExpire(pbxFwdKey, forwardingInfo, 360, function(err, redisResp)
-                                                                        {
-                                                                            if(err)
-                                                                            {
-                                                                                callback(err, xmlBuilder.createNotFoundResponse());
-                                                                            }
-                                                                            else
-                                                                            {
-
-                                                                                if(extDetails.SipUACEndpoint.UsePublic)
-                                                                                {
-                                                                                    ep.Profile = 'external';
-                                                                                    ep.Type = 'PUBLIC_USER';
-                                                                                    ep.Destination = extDetails.SipUACEndpoint.SipUsername;
-                                                                                    ep.Domain = extDetails.SipUACEndpoint.Domain;
-                                                                                    ep.BypassMedia = false;
-                                                                                }
-
-                                                                                var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, extDetails.SipUACEndpoint);
-
-
-                                                                                var xml = xmlBuilder.CreateForwardingDialplan(reqId, ep, context, profile, '[^\\s]*', false, pbxFwdKey, undefined, attTransInfo);
-
-
-                                                                                callback(undefined, xml);
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        var recEnabled = false;
-                                                                        if(fromUserData.Extension.RecordingEnabled)
-                                                                        {
-                                                                            recEnabled = true;
+                                                                            callback(undefined, xml);
                                                                         }
                                                                         else
                                                                         {
-                                                                            recEnabled = extDetails.RecordingEnabled;
+                                                                            callback(undefined, xmlBuilder.createNotFoundResponse());
                                                                         }
-                                                                        //Do Normal User Dial
-                                                                        var ep =
-                                                                        {
-                                                                            Profile: profile,
-                                                                            Type: 'USER',
-                                                                            LegStartDelay: 0,
-                                                                            BypassMedia: bypassMedia,
-                                                                            LegTimeout: ringTime,
-                                                                            Origination: callerIdName,
-                                                                            OriginationCallerIdNumber: callerIdNum,
-                                                                            Destination: extDetails.Extension,
-                                                                            Domain: toUsrDomain,
-                                                                            Group: grp,
-                                                                            IsVoicemailEnabled: voicemailEnabled,
-                                                                            PersonalGreeting: personalGreeting,
-                                                                            CompanyId: companyId,
-                                                                            TenantId: tenantId,
-                                                                            AppId: appId,
-                                                                            Action: 'DEFAULT',
-                                                                            RecordEnabled: recEnabled
-                                                                        };
+                                                                    })
+                                                                }
+                                                                else if(pbxObj.Endpoints && (pbxObj.Endpoints.ObjCategory === 'PBXUSER' || pbxObj.Endpoints.ObjCategory === 'USER'))
+                                                                {
+                                                                    backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, tenantId, 'USER', csId, cacheData, function (err, extDetails)
+                                                                    {
 
-                                                                        var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
-
-                                                                        redisHandler.SetObjectWithExpire(customStr, uuid, 60, function(err, redisResult)
+                                                                        if (!err && extDetails)
                                                                         {
-                                                                            if(!err && redisResult)
+                                                                            if (extDetails.SipUACEndpoint && extDetails.SipUACEndpoint.CloudEndUser)
                                                                             {
+                                                                                var ep =
+                                                                                {
+                                                                                    Profile: '',
+                                                                                    Type: 'USER',
+                                                                                    LegStartDelay: 0,
+                                                                                    BypassMedia: false,
+                                                                                    LegTimeout: 60,
+                                                                                    Origination: callerIdName,
+                                                                                    OriginationCallerIdNumber: callerIdNum,
+                                                                                    Destination: pbxObj.Endpoints.DestinationNumber,
+                                                                                    Domain: extDetails.SipUACEndpoint.CloudEndUser.Domain,
+                                                                                    CompanyId: companyId,
+                                                                                    TenantId: tenantId,
+                                                                                    AppId: appId,
+                                                                                    Action: 'DEFAULT'
+                                                                                };
+
                                                                                 var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, extDetails.SipUACEndpoint);
 
                                                                                 if(extDetails.SipUACEndpoint.UsePublic)
@@ -2475,193 +2509,87 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                                     ep.Domain = extDetails.SipUACEndpoint.Domain;
                                                                                 }
 
-                                                                                var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined, attTransInfo);
+                                                                                var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo, attTransInfo);
 
                                                                                 callback(undefined, xml);
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                callback(err, xmlBuilder.createNotFoundResponse());
-                                                                            }
-                                                                        });
-                                                                    }
 
-                                                                }
-                                                                else if(pbxObj.OperationType === 'CALL_DIVERT')
-                                                                {
-                                                                    if (pbxObj.Endpoints && pbxObj.Endpoints.ObjCategory === 'GATEWAY')
-                                                                    {
-                                                                        //pick outbound rule
-                                                                        ruleHandler.PickCallRuleOutboundComplete(reqId, ani, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, cacheData, function (err, rule)
-                                                                        {
-                                                                            if (!err && rule)
-                                                                            {
-                                                                                var ep =
-                                                                                {
-                                                                                    Profile: rule.GatewayCode,
-                                                                                    Type: 'GATEWAY',
-                                                                                    LegStartDelay: 0,
-                                                                                    BypassMedia: false,
-                                                                                    LegTimeout: 60,
-                                                                                    Destination: rule.DNIS,
-                                                                                    Domain: rule.IpUrl,
-                                                                                    OutLimit: rule.OutLimit,
-                                                                                    BothLimit: rule.BothLimit,
-                                                                                    TrunkNumber: rule.TrunkNumber,
-                                                                                    AppId: appId,
-                                                                                    NumberType: rule.NumberType,
-                                                                                    CompanyId: rule.CompanyId,
-                                                                                    TenantId: rule.TenantId,
-                                                                                    Action: 'CALL_DIVERT'
-                                                                                };
-
-
-                                                                                if(dodActive && dodNumber)
-                                                                                {
-                                                                                    ep.Origination = dodNumber;
-                                                                                    ep.OriginationCallerIdNumber = dodNumber;
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    ep.Origination = rule.ANI;
-                                                                                    ep.OriginationCallerIdNumber = rule.ANI;
-                                                                                }
-
-                                                                                var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
-
-                                                                                var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo);
-
-                                                                                callback(undefined, xml);
                                                                             }
                                                                             else
                                                                             {
                                                                                 callback(undefined, xmlBuilder.createNotFoundResponse());
                                                                             }
-                                                                        })
-                                                                    }
-                                                                    else if(pbxObj.Endpoints && (pbxObj.Endpoints.ObjCategory === 'PBXUSER' || pbxObj.Endpoints.ObjCategory === 'USER'))
-                                                                    {
-                                                                        backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, tenantId, 'USER', csId, cacheData, function (err, extDetails)
-                                                                        {
-
-                                                                            if (!err && extDetails)
-                                                                            {
-                                                                                if (extDetails.SipUACEndpoint && extDetails.SipUACEndpoint.CloudEndUser)
-                                                                                {
-                                                                                    var ep =
-                                                                                    {
-                                                                                        Profile: '',
-                                                                                        Type: 'USER',
-                                                                                        LegStartDelay: 0,
-                                                                                        BypassMedia: false,
-                                                                                        LegTimeout: 60,
-                                                                                        Origination: callerIdName,
-                                                                                        OriginationCallerIdNumber: callerIdNum,
-                                                                                        Destination: pbxObj.Endpoints.DestinationNumber,
-                                                                                        Domain: extDetails.SipUACEndpoint.CloudEndUser.Domain,
-                                                                                        CompanyId: companyId,
-                                                                                        TenantId: tenantId,
-                                                                                        AppId: appId,
-                                                                                        Action: 'DEFAULT'
-                                                                                    };
-
-                                                                                    var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, extDetails.SipUACEndpoint);
-
-                                                                                    if(extDetails.SipUACEndpoint.UsePublic)
-                                                                                    {
-                                                                                        ep.Profile = 'external';
-                                                                                        ep.Type = 'PUBLIC_USER';
-                                                                                        ep.Destination = extDetails.SipUACEndpoint.SipUsername;
-                                                                                        ep.Domain = extDetails.SipUACEndpoint.Domain;
-                                                                                    }
-
-                                                                                    var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, numLimitInfo, attTransInfo);
-
-                                                                                    callback(undefined, xml);
-
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    callback(undefined, xmlBuilder.createNotFoundResponse());
-                                                                                }
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                callback(undefined, xmlBuilder.createNotFoundResponse());
-                                                                            }
-
-                                                                        });
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        callback(undefined, xmlBuilder.createNotFoundResponse());
-                                                                    }
-                                                                }
-                                                                else
-                                                                {
-
-                                                                    var recEnabled = false;
-                                                                    if(fromUserData.Extension.RecordingEnabled)
-                                                                    {
-                                                                        recEnabled = true;
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        recEnabled = extDetails.RecordingEnabled;
-                                                                    }
-
-                                                                    var ep =
-                                                                    {
-                                                                        Profile: profile,
-                                                                        Type: 'USER',
-                                                                        LegStartDelay: 0,
-                                                                        BypassMedia: bypassMedia,
-                                                                        LegTimeout: ringTime,
-                                                                        Origination: callerIdName,
-                                                                        OriginationCallerIdNumber: callerIdNum,
-                                                                        Destination: dnis,
-                                                                        Domain: toUsrDomain,
-                                                                        Group: grp,
-                                                                        IsVoicemailEnabled: voicemailEnabled,
-                                                                        PersonalGreeting: personalGreeting,
-                                                                        CompanyId: companyId,
-                                                                        TenantId: tenantId,
-                                                                        AppId: appId,
-                                                                        Action: 'DEFAULT',
-                                                                        RecordEnabled: recEnabled
-                                                                    };
-
-                                                                    var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
-
-                                                                    redisHandler.SetObjectWithExpire(customStr, uuid, 60, function(err, redisResult)
-                                                                    {
-                                                                        if(!err && redisResult)
-                                                                        {
-                                                                            var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, extDetails.SipUACEndpoint);
-
-                                                                            if(extDetails.SipUACEndpoint.UsePublic)
-                                                                            {
-                                                                                ep.Profile = 'external';
-                                                                                ep.Type = 'PUBLIC_USER';
-                                                                                ep.Destination = extDetails.SipUACEndpoint.SipUsername;
-                                                                                ep.Domain = extDetails.SipUACEndpoint.Domain;
-                                                                            }
-
-                                                                            var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined, attTransInfo);
-
-                                                                            callback(undefined, xml);
                                                                         }
                                                                         else
                                                                         {
-                                                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                                                            callback(undefined, xmlBuilder.createNotFoundResponse());
                                                                         }
+
                                                                     });
                                                                 }
-
+                                                                else
+                                                                {
+                                                                    callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                                }
                                                             }
                                                             else
                                                             {
-                                                                callback(err, xmlBuilder.createNotFoundResponse());
+
+                                                                var recEnabled = false;
+                                                                if(fromUserData.Extension.RecordingEnabled)
+                                                                {
+                                                                    recEnabled = true;
+                                                                }
+                                                                else
+                                                                {
+                                                                    recEnabled = extDetails.RecordingEnabled;
+                                                                }
+
+                                                                var ep =
+                                                                {
+                                                                    Profile: profile,
+                                                                    Type: 'USER',
+                                                                    LegStartDelay: 0,
+                                                                    BypassMedia: bypassMedia,
+                                                                    LegTimeout: ringTime,
+                                                                    Origination: callerIdName,
+                                                                    OriginationCallerIdNumber: callerIdNum,
+                                                                    Destination: dnis,
+                                                                    Domain: toUsrDomain,
+                                                                    Group: grp,
+                                                                    IsVoicemailEnabled: voicemailEnabled,
+                                                                    PersonalGreeting: personalGreeting,
+                                                                    CompanyId: companyId,
+                                                                    TenantId: tenantId,
+                                                                    AppId: appId,
+                                                                    Action: 'DEFAULT',
+                                                                    RecordEnabled: recEnabled
+                                                                };
+
+                                                                var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
+
+                                                                redisHandler.SetObjectWithExpire(customStr, uuid, 60, function(err, redisResult)
+                                                                {
+                                                                    if(!err && redisResult)
+                                                                    {
+                                                                        var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, extDetails.SipUACEndpoint);
+
+                                                                        if(extDetails.SipUACEndpoint.UsePublic)
+                                                                        {
+                                                                            ep.Profile = 'external';
+                                                                            ep.Type = 'PUBLIC_USER';
+                                                                            ep.Destination = extDetails.SipUACEndpoint.SipUsername;
+                                                                            ep.Domain = extDetails.SipUACEndpoint.Domain;
+                                                                        }
+
+                                                                        var xml = xmlBuilder.CreateRouteUserDialplan(reqId, ep, context, profile, '[^\\s]*', false, undefined, attTransInfo);
+
+                                                                        callback(undefined, xml);
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                                    }
+                                                                });
                                                             }
                                                         }
                                                     })
@@ -3094,66 +3022,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             else
                                             {
                                                 logger.error('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extended App Returned Empty Result', reqId);
-                                                ruleHandler.PickCallRuleOutboundComplete(reqId, ani, dnis, '', context, companyId, tenantId, true, cacheData, function(err, rule)
-                                                {
-                                                    if(err)
-                                                    {
-                                                        callback(err, xmlBuilder.createNotFoundResponse());
-                                                    }
-                                                    else if(rule)
-                                                    {
-                                                        if(rule.FaxType)
-                                                        {
-                                                            toFaxType = rule.FaxType;
-                                                        }
-                                                        var ep =
-                                                        {
-                                                            Profile: rule.GatewayCode,
-                                                            Type: 'GATEWAY',
-                                                            LegStartDelay: 0,
-                                                            BypassMedia: false,
-                                                            LegTimeout: 60,
-                                                            Origination: rule.ANI,
-                                                            OriginationCallerIdNumber: rule.ANI,
-                                                            Destination: rule.DNIS,
-                                                            Domain: rule.IpUrl,
-                                                            OutLimit: rule.OutLimit,
-                                                            BothLimit: rule.BothLimit,
-                                                            TrunkNumber: rule.TrunkNumber,
-                                                            NumberType: rule.NumberType,
-                                                            CompanyId: rule.CompanyId,
-                                                            TenantId: rule.TenantId,
-                                                            AppId: appId,
-                                                            Action: 'DEFAULT',
-                                                            RecordEnable: fromUserData.Extension.RecordingEnabled
-                                                        };
-
-                                                        if(dodActive && dodNumber)
-                                                        {
-                                                            ep.Origination = dodNumber;
-                                                            ep.OriginationCallerIdNumber = dodNumber;
-                                                        }
-
-                                                        if(toFaxType)
-                                                        {
-                                                            //gateway fax dialplan
-                                                            var xml = xmlBuilder.CreateRouteFaxGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, fromFaxType, toFaxType);
-                                                            callback(undefined, xml);
-                                                        }
-                                                        else
-                                                        {
-                                                            var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
-                                                            var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo);
-
-                                                            callback(undefined, xml);
-                                                        }
-
-                                                    }
-                                                    else
-                                                    {
-                                                        callback(undefined, xmlBuilder.createNotFoundResponse());
-                                                    }
-                                                })
+                                                callback(new Error('deny request from pbx'), xmlBuilder.createNotFoundResponse());
                                             }
                                         }
                                     })

@@ -243,9 +243,9 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
                     destinationGroup = 'user';
 
                     if (ep.LegStartDelay > 0)
-                        option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
+                        option = util.format("['leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s']", ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
                     else
-                        option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
+                        option = util.format("['leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s']", ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
 
                     if(ep.BypassMedia)
                     {

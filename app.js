@@ -1443,7 +1443,7 @@ server.get('/DVP/API/:version/DynamicConfigGenerator/LbRequestController/:direct
         var number = req.params.number;
         var ip = req.params.ip;
 
-        logger.debug('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - Request Params - direction : %s, number : %s', reqId, direction, number);
+        logger.debug('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - Request Params - direction : %s, number : %s, ip: %s', reqId, direction, number, ip);
 
         if(direction === "in")
         {

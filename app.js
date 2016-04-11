@@ -1441,13 +1441,14 @@ server.get('/DVP/API/:version/DynamicConfigGenerator/LbRequestController/:direct
 
         var direction = req.params.direction;
         var number = req.params.number;
+        var ip = req.params.ip;
 
         logger.debug('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - Request Params - direction : %s, number : %s', reqId, direction, number);
 
         if(direction === "in")
         {
             logger.info('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - call direction is IN', reqId);
-            backendHandler.GetCloudForIncomingRequest(number, 0, null, function(err, cb)
+            backendHandler.GetCloudForIncomingRequest(number, ip, null, function(err, cb)
             {
                 if(err || !cb)
                 {

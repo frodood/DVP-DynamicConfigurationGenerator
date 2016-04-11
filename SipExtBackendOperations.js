@@ -1026,7 +1026,7 @@ var GetCloudForUser = function(username, data, callback)
 
 }
 
-var GetCloudForIncomingRequest = function(toNumber, lbId, data, callback)
+var GetCloudForIncomingRequest = function(toNumber, fromIp, data, callback)
 {
     var incomingRequest = {
         InboundLimit: "",
@@ -1036,26 +1036,26 @@ var GetCloudForIncomingRequest = function(toNumber, lbId, data, callback)
     };
 
     dbModel.TrunkPhoneNumber
-        .find({where :[{PhoneNumber: toNumber}], include : [{model: dbModel.LimitInfo, as : 'LimitInfoInbound'}, {model: dbModel.LimitInfo, as : 'LimitInfoBoth'}]})
+        .find({where :[{PhoneNumber: toNumber}], include:[{model:dbModel.Trunk, as : 'Trunk', include:[{model: dbModel.TrunkIpAddress, as:'TrunkIpAddress', where:[{IpAddress:fromIp}]}]}]})
         .then(function (phn)
         {
             try
             {
-                if(phn && phn.CompanyId && phn.TenantId && (phn.ObjCategory === 'INBOUND' || phn.ObjCategory === 'BOTH'))
+                if(phn && phn.CompanyId && phn.TenantId && (phn.ObjCategory === 'INBOUND' || phn.ObjCategory === 'BOTH') && phn.Trunk && phn.Trunk.TrunkIpAddress.length > 0)
                 {
                     logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get trunk number query success');
                     //record found
                     var companyId = phn.CompanyId;
                     var tenantId = phn.TenantId;
 
-                    if(phn.LimitInfoInbound && phn.LimitInfoInbound.MaxCount != null)
+                    if(phn.InboundLimitId != null)
                     {
-                        incomingRequest.InboundLimit = phn.LimitInfoInbound.MaxCount.toString();
+                        incomingRequest.InboundLimit = phn.InboundLimitId;
                     }
 
-                    if(phn.LimitInfoBoth && phn.LimitInfoBoth.MaxCount != null)
+                    if(phn.BothLimitId)
                     {
-                        incomingRequest.BothLimit = phn.LimitInfoBoth.MaxCount.toString();
+                        incomingRequest.BothLimit = phn.BothLimitId;
                     }
 
                     dbModel.CloudEndUser

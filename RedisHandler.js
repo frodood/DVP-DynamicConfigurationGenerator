@@ -38,6 +38,30 @@ var SetObjectWithExpire = function(key, value, timeout, callback)
 
 };
 
+var GetObjectParseJson = function(reqId, key, callback)
+{
+    GetObject(reqId, key, function(err, resp)
+    {
+        if(err || !resp)
+        {
+            callback(err, null);
+        }
+        else
+        {
+            try
+            {
+                var jsonObj = JSON.parse(resp);
+                callback(null, jsonObj);
+            }
+            catch(ex)
+            {
+                callback(ex, null);
+            }
+
+        }
+    })
+}
+
 var GetObject = function(reqId, key, callback)
 {
     try
@@ -198,3 +222,4 @@ module.exports.GetFromSet = GetFromSet;
 module.exports.SetObjectWithExpire = SetObjectWithExpire;
 module.exports.GetObject = GetObject;
 module.exports.AddChannelIdToSet = AddChannelIdToSet;
+module.exports.GetObjectParseJson = GetObjectParseJson;

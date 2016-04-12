@@ -60,6 +60,118 @@ var AddContexts = function()
     }
 };
 
+var AddCallServersGlobally = function()
+{
+    try
+    {
+        dbModel.CallServer.findAll()
+            .then(function (csList)
+            {
+                if(csList.length)
+                {
+                    var csCount = 0;
+                    for(i=0; i<csList.length; i++)
+                    {
+                        var csId = csList[i].id;
+
+                        if(csId)
+                        {
+                            redisHandler.SetObject('CALLSERVER:' + csId, JSON.stringify(csList[i]), function(err, res)
+                            {
+                                csCount++;
+
+                                if(csList.length == csCount)
+                                {
+                                    console.log('CALLSERVER ADD COMPLETED');
+                                }
+
+                            })
+                        }
+                        else
+                        {
+                            csCount++;
+
+                            if(csList.length == csCount)
+                            {
+                                console.log('CALLSERVER ADD COMPLETED');
+                            }
+                        }
+
+                    }
+                }
+                else
+                {
+                    console.log('CALLSERVER : COUNT 0')
+                }
+
+            })
+            .catch(function(err)
+            {
+                console.log('CALLSERVER PGSQL : ERROR');
+            });
+    }
+    catch(ex)
+    {
+        console.log('CALLSERVER : ERROR');
+    }
+};
+
+var AddClusters = function()
+{
+    try
+    {
+        dbModel.Cloud.findAll()
+            .then(function (cloudList)
+            {
+                if(cloudList.length)
+                {
+                    var cloudCount = 0;
+                    for(i=0; i<cloudList.length; i++)
+                    {
+                        var cloudId = cloudList[i].id;
+
+                        if(cloudId)
+                        {
+                            redisHandler.SetObject('CLOUD:' + cloudId, JSON.stringify(cloudList[i]), function(err, res)
+                            {
+                                cloudCount++;
+
+                                if(cloudList.length == cloudCount)
+                                {
+                                    console.log('CLOUD ADD COMPLETED');
+                                }
+
+                            })
+                        }
+                        else
+                        {
+                            cloudCount++;
+
+                            if(cloudList.length == cloudCount)
+                            {
+                                console.log('CLOUD ADD COMPLETED');
+                            }
+                        }
+
+                    }
+                }
+                else
+                {
+                    console.log('CLOUD : COUNT 0')
+                }
+
+            })
+            .catch(function(err)
+            {
+                console.log('CLOUD PGSQL : ERROR');
+            });
+    }
+    catch(ex)
+    {
+        console.log('CLOUD : ERROR');
+    }
+};
+
 var AddPhoneNumbers = function()
 {
     try
@@ -172,6 +284,72 @@ var AddTrunks = function()
     }
 };
 
+var AddCallServers = function(companyId, tenantId, obj, callback)
+{
+    try
+    {
+        obj.CallServer = {};
+        dbModel.CallServer.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}]})
+            .then(function (list)
+            {
+                for (i = 0; i < list.length; i++)
+                {
+                    var key = list[i].id;
+
+                    if (key)
+                    {
+                        obj.CallServer[key] = list[i];
+                    }
+
+                }
+
+                callback(obj)
+
+            })
+            .catch(function(err)
+            {
+                callback(obj)
+            });
+    }
+    catch(ex)
+    {
+        callback(obj)
+    }
+};
+
+var AddSipProfiles = function(companyId, tenantId, obj, callback)
+{
+    try
+    {
+        obj.SipNetworkProfile = {};
+        dbModel.SipNetworkProfile.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}]})
+            .then(function (list)
+            {
+                for (i = 0; i < list.length; i++)
+                {
+                    var key = list[i].id;
+
+                    if (key)
+                    {
+                        obj.SipNetworkProfile[key] = list[i];
+                    }
+
+                }
+
+                callback(obj)
+
+            })
+            .catch(function(err)
+            {
+                callback(obj)
+            });
+    }
+    catch(ex)
+    {
+        callback(obj)
+    }
+};
+
 var AddUsers = function(companyId, tenantId, obj, callback)
 {
     try
@@ -187,6 +365,39 @@ var AddUsers = function(companyId, tenantId, obj, callback)
                     if (key)
                     {
                         obj.SipUACEndpoint[key] = list[i];
+                    }
+
+                }
+
+                callback(obj)
+
+            })
+            .catch(function(err)
+            {
+                callback(obj)
+            });
+    }
+    catch(ex)
+    {
+        callback(obj)
+    }
+};
+
+var AddCloudEndUsers = function(companyId, tenantId, obj, callback)
+{
+    try
+    {
+        obj.CloudEndUser = {};
+        dbModel.CloudEndUser.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}]})
+            .then(function (list)
+            {
+                for (i = 0; i < list.length; i++)
+                {
+                    var key = list[i].id;
+
+                    if (key)
+                    {
+                        obj.CloudEndUser[key] = list[i];
                     }
 
                 }
@@ -592,7 +803,19 @@ var CreateDataObject = function(companyId, tenantId, obj, callback)
                                         {
                                             AddPhoneNumbersForCompany(companyId, tenantId, data, function(data)
                                             {
-                                                callback(data);
+                                                AddCloudEndUsers(companyId, tenantId, data, function(data)
+                                                {
+                                                    AddCallServers(companyId, tenantId, data, function(data)
+                                                    {
+                                                        AddSipProfiles(companyId, tenantId, data, function(data)
+                                                        {
+                                                            callback(data);
+                                                        })
+
+                                                    });
+
+                                                });
+
                                             })
 
                                         })
@@ -656,7 +879,8 @@ var BuildGlobalData = function()
     AddContexts();
     AddPhoneNumbers();
     AddTrunks();
-
+    AddCallServersGlobally();
+    AddClusters();
     CreateCompanyData();
 
 };

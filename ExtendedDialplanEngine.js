@@ -263,7 +263,7 @@ var CheckIddValidity = function(dnis, trNum)
 {
     try
     {
-        var ss = libphonenumber.phoneUtil.parseAndKeepRawInput(dnis, null);
+
         var dnisNumberType = libphonenumber.phoneUtil.getNumberType(libphonenumber.phoneUtil.parseAndKeepRawInput(dnis, null));
 
         if(dnisNumberType === 3 || dnisNumberType === 9)

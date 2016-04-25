@@ -770,12 +770,78 @@ var AddPBXUsers = function(companyId, tenantId, obj, callback)
 
 var AddFeatureCodes = function(companyId, tenantId, obj, callback)
 {
+    try
+    {
+        obj.FeatureCode = {};
+        dbModel.FeatureCode.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}]})
+            .then(function (list)
+            {
+                for (i = 0; i < list.length; i++)
+                {
+                    var fcId = list[i].id;
+
+                    if(fcId)
+                    {
+                        obj.FeatureCode[fcId] = list[i];
+                    }
+                }
+
+                callback(obj)
+
+            })
+            .catch(function(err)
+            {
+                callback(obj)
+            });
+    }
+    catch(ex)
+    {
+        callback(obj)
+    }
 
 }
 
-var CreatePABXData = function(companyId, tenantId, obj, callback)
+var AddPABXMasterData = function(companyId, tenantId, obj, callback)
 {
+    try
+    {
+        obj.PBXMasterData = {};
+        dbModel.PBXMasterData.find({where :[{CompanyId: companyId},{TenantId: tenantId}]})
+            .then(function (pbxData)
+            {
+                if(pbxData)
+                {
+                    obj.PBXMasterData = pbxData;
+                }
 
+                callback(obj)
+
+            })
+            .catch(function(err)
+            {
+                callback(obj)
+            });
+    }
+    catch(ex)
+    {
+        callback(obj)
+    }
+
+}
+
+var CreatePABXObject = function(companyId, tenantId, obj, callback)
+{
+    AddPBXUsers(companyId, tenantId, obj, function(data)
+    {
+        AddFeatureCodes(companyId, tenantId, data, function(data)
+        {
+            AddPABXMasterData(companyId, tenantId, data, function(data)
+            {
+                callback(data);
+            })
+
+        })
+    })
 }
 
 var CreateDataObject = function(companyId, tenantId, obj, callback)
@@ -837,6 +903,44 @@ var CreateDataObject = function(companyId, tenantId, obj, callback)
     })
 };
 
+var CreateSpecificCompanyData = function(companyId, tenantId, callback)
+{
+    CreateDataObject(companyId, tenantId, {}, function(obj)
+    {
+        if(obj)
+        {
+            redisHandler.SetObject('DVPCACHE:' + tenantId + ':' + companyId, JSON.stringify(obj), function(err, res)
+            {
+                callback(err, res);
+            })
+        }
+        else
+        {
+            callback(new Error('Object cannot be created'), false);
+        }
+    })
+}
+
+var CreatePBXSpecificCompanyData = function(companyId, tenantId, callback)
+{
+    CreatePABXObject(companyId, tenantId, {}, function(obj)
+    {
+        if(obj)
+        {
+            redisHandler.SetObject('PBXCACHE:' + tenantId + ':' + companyId, JSON.stringify(obj), function(err, res)
+            {
+                callback(err, res);
+            });
+        }
+        else
+        {
+            callback(new Error('Object cannot be created'), false);
+        }
+    })
+}
+
+
+
 var CreateCompanyData = function()
 {
     dbModel.CloudEndUser.findAll()
@@ -854,6 +958,18 @@ var CreateCompanyData = function()
                         if(obj)
                         {
                             redisHandler.SetObject('DVPCACHE:' + tenantId + ':' + companyId, JSON.stringify(obj), function(err, res)
+                            {
+
+
+                            })
+                        }
+                    })
+
+                    CreatePABXObject(companyId, tenantId, {}, function(obj)
+                    {
+                        if(obj)
+                        {
+                            redisHandler.SetObject('PBXCACHE:' + tenantId + ':' + companyId, JSON.stringify(obj), function(err, res)
                             {
 
 
@@ -886,3 +1002,11 @@ var BuildGlobalData = function()
 };
 
 BuildGlobalData();
+
+//CreateSpecificCompanyData(3,1, function(err, resp)
+//{
+//    console.log('www');
+//})
+
+module.exports.CreateSpecificCompanyData = CreateSpecificCompanyData;
+module.exports.CreatePBXSpecificCompanyData = CreatePBXSpecificCompanyData;

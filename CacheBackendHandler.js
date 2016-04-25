@@ -168,6 +168,7 @@ var GatherFromUserDetails = function(reqId, usrName, tenantId, ignoreTenant, dat
 };
 
 //Done
+//OK
 var GetUserByNameTenantDB = function(reqId, extName, tenantId, ignoreTenant, data, callback)
 {
     try
@@ -232,6 +233,7 @@ var GetUserByNameTenantDB = function(reqId, extName, tenantId, ignoreTenant, dat
 };
 
 //Done
+//OK
 var GetTransferCodesForTenantDB = function(reqId, tenantId, data, callback)
 {
     try
@@ -255,6 +257,7 @@ var GetTransferCodesForTenantDB = function(reqId, tenantId, data, callback)
 };
 
 //Done
+//OK
 var GetExtensionForDid = function(reqId, didNumber, companyId, tenantId, data, callback)
 {
     try
@@ -299,6 +302,7 @@ var GetExtensionForDid = function(reqId, didNumber, companyId, tenantId, data, c
 };
 
 //Done
+//OK if a separate extension keys are managed by extension number for tenant
 var GetExtensionDB = function(reqId, ext, tenantId, data, callback)
 {
     try

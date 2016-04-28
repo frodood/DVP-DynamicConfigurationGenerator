@@ -12,6 +12,8 @@ client.auth(redisPassword, function (err) {
     console.log("Error Authenticating Redis : " + err);
 });
 
+client.select(7, function() { /* ... */ });
+
 
 var SetObjectWithExpire = function(key, value, timeout, callback)
 {

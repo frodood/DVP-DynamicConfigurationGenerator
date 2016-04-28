@@ -58,7 +58,7 @@ server.use(restify.bodyParser());
 var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreTenant, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, cacheData, res)
 {
     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to find from user for outbound call', reqId);
-    backendHandler.GatherFromUserDetails(reqId, callerIdNum, contextTenant, ignoreTenant, cacheData, function(err, fromUsr)
+    backendHandler.GatherFromUserDetails(reqId, callerIdNum, contextCompany, contextTenant, ignoreTenant, cacheData, function(err, fromUsr)
     {
         var dodActive = false;
         var dodNumber = '';
@@ -105,7 +105,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, ignoreT
             {
                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - PickCallRuleInbound returned rule : %s', reqId, JSON.stringify(rule));
 
-                backendHandler.GetEmergencyNumber(destNum, rule.TenantId, cacheData, function(err, emNum)
+                backendHandler.GetEmergencyNumber(destNum, rule.CompanyId, rule.TenantId, cacheData, function(err, emNum)
                 {
                     if(emNum)
                     {
@@ -1265,7 +1265,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                         if(dvpDestinationType && dvpDestinationType === 'PUBLIC_USER')
                                         {
                                             //do stuff
-                                            backendHandler.GetUserByNameTenantDB(reqId, destNum, -1, true, cacheData, function(err, resUsr)
+                                            backendHandler.GetUserByNameTenantDB(reqId, destNum, -1, -1, true, cacheData, function(err, resUsr)
                                             {
                                                 if(resUsr && resUsr.UsePublic)
                                                 {

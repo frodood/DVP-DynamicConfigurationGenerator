@@ -98,7 +98,7 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
                 }
                 else if(fm.ObjCategory === 'PBXUSER' || fm.ObjCategory === 'USER')
                 {
-                    backendHandler.GetAllDataForExt(reqId, fm.DestinationNumber, tenantId, 'USER', csId, cacheData, function (err, extDetails)
+                    backendHandler.GetAllDataForExt(reqId, fm.DestinationNumber, companyId, tenantId, 'USER', csId, cacheData, function (err, extDetails)
                     {
 
                         if (!err && extDetails)
@@ -402,7 +402,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                         {
                             //pick extension
                             logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Extension Forward - DestNum : %s, tenantId : %d', reqId, fwdRule.DestinationNumber, tenantId);
-                            backendHandler.GetAllDataForExt(reqId, fwdRule.DestinationNumber, tenantId, 'USER', csId, cacheData, function(err, extDetails)
+                            backendHandler.GetAllDataForExt(reqId, fwdRule.DestinationNumber, companyId, tenantId, 'USER', csId, cacheData, function(err, extDetails)
                             {
                                 if(err)
                                 {
@@ -575,7 +575,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                     logger.debug('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Trying to get full extension details - Extension : %s, Category : %s', reqId, didRes.Extension.Extension, didRes.Extension.ObjCategory);
 
-                    backendHandler.GetAllDataForExt(reqId, didRes.Extension.Extension, tenantId, didRes.Extension.ObjCategory, csId, cacheData, function(err, extDetails)
+                    backendHandler.GetAllDataForExt(reqId, didRes.Extension.Extension, companyId, tenantId, didRes.Extension.ObjCategory, csId, cacheData, function(err, extDetails)
                     {
                         if(err)
                         {
@@ -921,7 +921,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     }
                                                     else if(pbxObj.Endpoints && (pbxObj.Endpoints.ObjCategory === 'PBXUSER' || pbxObj.Endpoints.ObjCategory === 'USER'))
                                                     {
-                                                        backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, tenantId, 'USER', csId, function (err, extDetails)
+                                                        backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, companyId, tenantId, 'USER', csId, function (err, extDetails)
                                                         {
                                                             if (!err && extDetails)
                                                             {
@@ -1233,7 +1233,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                     var dodActive = undefined;
 
                     //Get to user
-                    backendHandler.GetExtensionDB(reqId, dnis, tenantId, cacheData, function(err, extInfo)
+                    backendHandler.GetExtensionDB(reqId, dnis, companyId, tenantId, cacheData, function(err, extInfo)
                     {
                         if(err)
                         {
@@ -1242,7 +1242,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                         else if(extInfo)
                         {
                             logger.debug('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extension found', reqId);
-                            backendHandler.GetAllDataForExt(reqId, dnis, tenantId, extInfo.ObjCategory, csId, cacheData, function(err, extDetails)
+                            backendHandler.GetAllDataForExt(reqId, dnis, companyId, tenantId, extInfo.ObjCategory, csId, cacheData, function(err, extDetails)
                             {
                                 if(err)
                                 {
@@ -1595,7 +1595,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             }
                                                             else if(pbxObj.Endpoints && (pbxObj.Endpoints.ObjCategory === 'PBXUSER' || pbxObj.Endpoints.ObjCategory === 'USER'))
                                                             {
-                                                                backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, tenantId, 'USER', csId, cacheData, function (err, extDetails)
+                                                                backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, companyId, tenantId, 'USER', csId, cacheData, function (err, extDetails)
                                                                 {
 
                                                                     if (!err && extDetails)
@@ -2092,7 +2092,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                         }
 
                         //Get to user
-                        backendHandler.GetExtensionDB(reqId, dnis, tenantId, cacheData, function(err, extInfo)
+                        backendHandler.GetExtensionDB(reqId, dnis, companyId, tenantId, cacheData, function(err, extInfo)
                         {
                             if(err)
                             {
@@ -2101,7 +2101,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                             else if(extInfo)
                             {
                                 logger.debug('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extension found', reqId);
-                                backendHandler.GetAllDataForExt(reqId, dnis, tenantId, extInfo.ObjCategory, csId, cacheData, function(err, extDetails)
+                                backendHandler.GetAllDataForExt(reqId, dnis, companyId, tenantId, extInfo.ObjCategory, csId, cacheData, function(err, extDetails)
                                 {
                                     if(err)
                                     {
@@ -2475,7 +2475,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 }
                                                                 else if(pbxObj.Endpoints && (pbxObj.Endpoints.ObjCategory === 'PBXUSER' || pbxObj.Endpoints.ObjCategory === 'USER'))
                                                                 {
-                                                                    backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, tenantId, 'USER', csId, cacheData, function (err, extDetails)
+                                                                    backendHandler.GetAllDataForExt(reqId, pbxObj.Endpoints.DestinationNumber, companyId, tenantId, 'USER', csId, cacheData, function (err, extDetails)
                                                                     {
 
                                                                         if (!err && extDetails)
@@ -2992,7 +2992,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                                     if(extraData)
                                                     {
-                                                        backendHandler.GetAllDataForExt(reqId, extraData, tenantId, 'USER', csId, cacheData, function(err, extDetails)
+                                                        backendHandler.GetAllDataForExt(reqId, extraData, companyId, tenantId, 'USER', csId, cacheData, function(err, extDetails)
                                                         {
                                                             if(err || !extDetails || !extDetails.SipUACEndpoint || !extDetails.SipUACEndpoint.CloudEndUser)
                                                             {

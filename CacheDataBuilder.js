@@ -350,22 +350,62 @@ var AddSipProfiles = function(companyId, tenantId, obj, callback)
     }
 };
 
+var AddUsersWithGroupIds = function(companyId, tenantId, user)
+{
+    try
+    {
+        dbModel.UserGroup.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}], include:[{model: dbModel.SipUACEndpoint, as: "SipUACEndpoint", where:[{id: user.id}]}]})
+            .then(function (list)
+            {
+                var arr = [];
+                for(i=0; i<list.length; i++)
+                {
+                    arr.push(list[i].id);
+                }
+
+                var usrStr = JSON.stringify(user);
+
+                var usrObj = JSON.parse(usrStr);
+
+                usrObj.GroupIDs = arr;
+                redisHandler.SetObject('SIPUSERBYID:' + tenantId + ':' + companyId + ':' + usrObj.id, JSON.stringify(usrObj), function(err, res)
+                {
+                    console.log('SIPUSER BY ID ADDED');
+                });
+
+            }).catch(function(err)
+            {
+                console.log(err);
+            });
+    }
+    catch(ex)
+    {
+        console.log(ex);
+
+    }
+
+
+
+}
+
 var AddUsers = function(companyId, tenantId, obj, callback)
 {
     try
     {
-        obj.SipUACEndpoint = {};
         dbModel.SipUACEndpoint.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}]})
             .then(function (list)
             {
+
                 for (i = 0; i < list.length; i++)
                 {
-                    var key = list[i].SipUsername;
-
-                    if (key)
+                    AddUsersWithGroupIds(companyId, tenantId, list[i], function(ee)
                     {
-                        obj.SipUACEndpoint[key] = list[i];
-                    }
+
+                    });
+                    redisHandler.SetObject('SIPUSER:' + tenantId + ':' + companyId + ':' + list[i].SipUsername, JSON.stringify(list[i]), function(err, res)
+                    {
+                        console.log('SIPUSER ADDED');
+                    });
 
                 }
 
@@ -416,22 +456,103 @@ var AddCloudEndUsers = function(companyId, tenantId, obj, callback)
     }
 };
 
+var AddExtensionWithMappingId = function(companyId, tenantId, extType, ext)
+{
+    try
+    {
+
+        if(extType === 'USER')
+        {
+            dbModel.Extension.find({where :[{CompanyId: companyId},{TenantId: tenantId},{Extension: ext.Extension}], include:[{model: dbModel.SipUACEndpoint, as: "SipUACEndpoint"}]})
+                .then(function (extension)
+                {
+                    if(extension && extension.SipUACEndpoint)
+                    {
+                        var extStr = JSON.stringify(ext);
+
+                        var extObj = JSON.parse(extStr);
+
+                        extObj.MappingID = extension.SipUACEndpoint.id;
+
+                    }
+
+                    redisHandler.SetObject('EXTENSION:' + tenantId + ':' + companyId + ':' + extension.Extension, JSON.stringify(extObj), function(err, res)
+                    {
+                        console.log('EXTENSION ADDED');
+                    });
+
+
+
+                }).catch(function(err)
+                {
+                    console.log(err);
+                });
+        }
+        else if(extType === 'GROUP')
+        {
+            dbModel.Extension.find({where :[{CompanyId: companyId},{TenantId: tenantId},{Extension: ext.Extension}], include:[{model: dbModel.UserGroup, as: "UserGroup"}]})
+                .then(function (extension)
+                {
+                    if(extension && extension.UserGroup)
+                    {
+                        var extStr = JSON.stringify(ext);
+
+                        var extObj = JSON.parse(extStr);
+
+                        extObj.MappingID = extension.UserGroup.id;
+
+                    }
+
+                    redisHandler.SetObject('EXTENSION:' + tenantId + ':' + companyId + ':' + extension.Extension, JSON.stringify(extObj), function(err, res)
+                    {
+                        console.log('EXTENSION ADDED');
+                    });
+
+
+
+                }).catch(function(err)
+                {
+                    console.log(err);
+                });
+
+        }
+        else
+        {
+            redisHandler.SetObject('EXTENSION:' + tenantId + ':' + companyId + ':' + ext.Extension, JSON.stringify(ext), function(err, res)
+            {
+                console.log('EXTENSION ADDED');
+            });
+        }
+
+
+    }
+    catch(ex)
+    {
+        console.log(ex);
+
+    }
+
+
+
+}
+
 var AddExtensions = function(companyId, tenantId, obj, callback)
 {
     try
     {
-        obj.Extension = {};
         dbModel.Extension.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}]})
             .then(function (list)
             {
                 for (i = 0; i < list.length; i++)
                 {
-                    var key = list[i].Extension;
-
-                    if (key)
+                    AddExtensionWithMappingId(companyId, tenantId, list[i].ObjCategory, list[i], function(ee)
                     {
-                        obj.Extension[key] = list[i];
-                    }
+
+                    });
+                    redisHandler.SetObject('EXTENSIONBYID:' + tenantId + ':' + companyId + ':' + list[i].id, JSON.stringify(list[i]), function(err, res)
+                    {
+                        console.log('EXTENSIONBYID ADDED');
+                    });
 
                 }
 
@@ -480,19 +601,15 @@ var AddPhoneNumbersForCompany = function(companyId, tenantId, obj, callback)
 {
     try
     {
-        obj.TrunkPhoneNumber = {};
         dbModel.TrunkPhoneNumber.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}]})
             .then(function (list)
             {
                 for (i = 0; i < list.length; i++)
                 {
-                    var key = list[i].id;
-
-                    if (key)
+                    redisHandler.SetObject('TRUNKNUMBERBYID:' + tenantId + ':' + companyId + ':' + list[i].id, JSON.stringify(list[i]), function(err, res)
                     {
-                        obj.TrunkPhoneNumber[key] = list[i];
-                    }
-
+                        console.log('TRUNKNUMBERBYID ADDED');
+                    });
                 }
 
                 callback(obj)
@@ -546,18 +663,18 @@ var AddNumberBlacklist = function(companyId, tenantId, obj, callback)
 {
     try
     {
-        obj.DidNumber = {};
-        dbModel.DidNumber.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}]})
+
+        dbModel.NumberBlacklist.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}]})
             .then(function (list)
             {
                 for (i = 0; i < list.length; i++)
                 {
-                    var key = list[i].DidNumber;
+                    var key = 'NUMBERBLACKLIST:' + tenantId + ':' + companyId + ':' + list[i].PhoneNumber;
 
-                    if (key)
+                    redisHandler.SetObject(key, JSON.stringify(list[i]), function(err, res)
                     {
-                        obj.DidNumber[key] = list[i];
-                    }
+                        console.log('NUMBERBLACKLIST ADDED');
+                    });
 
                 }
 
@@ -712,12 +829,17 @@ var AddUserGroup = function(companyId, tenantId, obj, callback)
     try
     {
         obj.UserGroup = [];
-        dbModel.UserGroup.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}], include : [{model: dbModel.SipUACEndpoint, as: "SipUACEndpoint"}]})
+        dbModel.UserGroup.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}]})
             .then(function (list)
             {
                 for (i = 0; i < list.length; i++)
                 {
-                    obj.UserGroup.push(list[i]);
+                    var key = 'USERGROUP:' + tenantId + ':' + companyId + ':' + list[i].id;
+
+                    redisHandler.SetObject(key, JSON.stringify(list[i]), function(err, res)
+                    {
+                        console.log('USERGROUP ADDED');
+                    });
 
                 }
 
@@ -745,12 +867,12 @@ var AddPBXUsers = function(companyId, tenantId, obj, callback)
             {
                 for (i = 0; i < list.length; i++)
                 {
-                    var userUuid = list[i].UserUuid;
+                    var key = 'PBXUSER:' + tenantId + ':' + companyId + ':' + list[i].UserUuid;
 
-                    if(userUuid)
+                    redisHandler.SetObject(key, JSON.stringify(list[i]), function(err, res)
                     {
-                        obj.PBXUser[userUuid] = list[i];
-                    }
+                        console.log('PBXUSER ADDED');
+                    });
 
                 }
 
@@ -772,7 +894,7 @@ var AddFeatureCodes = function(companyId, tenantId, obj, callback)
 {
     try
     {
-        obj.FeatureCode = {};
+        var FeatureCode = {};
         dbModel.FeatureCode.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}]})
             .then(function (list)
             {
@@ -782,9 +904,14 @@ var AddFeatureCodes = function(companyId, tenantId, obj, callback)
 
                     if(fcId)
                     {
-                        obj.FeatureCode[fcId] = list[i];
+                        FeatureCode[fcId] = list[i];
                     }
                 }
+
+                redisHandler.SetObject('FEATURECODE:' + tenantId + ':' + companyId + ':', JSON.stringify(FeatureCode), function(err, res)
+                {
+                    console.log('PBXUSER ADDED');
+                });
 
                 callback(obj)
 
@@ -811,7 +938,10 @@ var AddPABXMasterData = function(companyId, tenantId, obj, callback)
             {
                 if(pbxData)
                 {
-                    obj.PBXMasterData = pbxData;
+                    redisHandler.SetObject('PBXCOMPANYINFO:' + tenantId + ':' + companyId + ':', JSON.stringify(pbxData), function(err, res)
+                    {
+                        console.log('PBXUSER ADDED');
+                    });
                 }
 
                 callback(obj)
@@ -969,11 +1099,7 @@ var CreateCompanyData = function()
                     {
                         if(obj)
                         {
-                            redisHandler.SetObject('PBXCACHE:' + tenantId + ':' + companyId, JSON.stringify(obj), function(err, res)
-                            {
 
-
-                            })
                         }
                     })
 

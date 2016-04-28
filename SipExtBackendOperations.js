@@ -102,9 +102,9 @@ var GetPublicClusterDetailsDB = function(reqId, data, cb)
     }
 }
 
-var GatherFromUserDetails = function(reqId, usrName, tenantId, ignoreTenant, data, callback)
+var GatherFromUserDetails = function(reqId, usrName, companyId, tenantId, ignoreTenant, data, callback)
 {
-    GetUserByNameTenantDB(reqId, usrName, tenantId, ignoreTenant, data, function(err, res)
+    GetUserByNameTenantDB(reqId, usrName, companyId, tenantId, ignoreTenant, data, function(err, res)
     {
         if(res)
         {
@@ -126,7 +126,7 @@ var GatherFromUserDetails = function(reqId, usrName, tenantId, ignoreTenant, dat
     })
 };
 
-var GetUserByNameTenantDB = function(reqId, extName, tenantId, ignoreTenant, data, callback)
+var GetUserByNameTenantDB = function(reqId, extName, companyId, tenantId, ignoreTenant, data, callback)
 {
     try
     {
@@ -225,7 +225,7 @@ var GetExtensionForDid = function(reqId, didNumber, companyId, tenantId, data, c
 
 };
 
-var GetExtensionDB = function(reqId, ext, tenantId, data, callback)
+var GetExtensionDB = function(reqId, ext, companyId, tenantId, data, callback)
 {
     try
     {
@@ -273,7 +273,7 @@ var GetPresenceDB = function(reqId, username, data, callback)
 
 };
 
-var GetAllDataForExt = function(reqId, extension, tenantId, extType, callServerId, data, callback)
+var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, callServerId, data, callback)
 {
     try
     {
@@ -616,12 +616,12 @@ var GetContext = function(context, callback)
     }
 };
 
-var GetEmergencyNumber = function(numb, tenantId, data, callback)
+var GetEmergencyNumber = function(numb, companyId, tenantId, data, callback)
 {
     try
     {
         dbModel.EmergencyNumber
-            .find({where :[{EmergencyNum: numb},{TenantId: tenantId}]})
+            .find({where :[{EmergencyNum: numb},{TenantId: tenantId},{CompanyId: companyId}]})
             .then(function (eNum)
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.GetContext] PGSQL Get emergency number query success');

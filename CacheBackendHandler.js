@@ -1079,17 +1079,20 @@ var GetGatewayForOutgoingRequest = function(fromNumber, lbId, data, callback)
             {
                 if(trInfo)
                 {
-                    if(result.LimitInfoOutbound && result.LimitInfoOutbound.MaxCount != null)
+                    if(result.OutboundLimitId)
                     {
-                        outgoingRequest.OutboundLimit = result.LimitInfoOutbound.MaxCount.toString();
+                        outgoingRequest.OutboundLimit = result.OutboundLimitId;
                     }
 
-                    if(result.LimitInfoBoth && result.LimitInfoBoth.MaxCount != null)
+                    if(result.BothLimitId)
                     {
-                        outgoingRequest.BothLimit = result.LimitInfoBoth.MaxCount.toString();
+                        outgoingRequest.BothLimit = result.BothLimitId;
                     }
 
-                    outgoingRequest.GwIpUrl = trInfo.IpUrl;
+                    if(trInfo.IpUrl)
+                    {
+                        outgoingRequest.GwIpUrl = trInfo.IpUrl;
+                    }
 
                     callback(undefined, outgoingRequest);
 
@@ -1301,7 +1304,7 @@ var GetCloudForIncomingRequest = function(toNumber, fromIp, data, callback)
                         var companyId = phnInfo.CompanyId;
                         var tenantId = phnInfo.TenantId;
 
-                        if(phnInfo.InboundLimitId != null)
+                        if(phnInfo.InboundLimitId)
                         {
                             incomingRequest.InboundLimit = phnInfo.InboundLimitId;
                         }

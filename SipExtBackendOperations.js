@@ -830,9 +830,25 @@ var GetGatewayForOutgoingRequest = function(fromNumber, lbId, data, callback)
                 logger.debug('[DVP-DynamicConfigurationGenerator.GetGatewayForOutgoingRequest] PGSQL Get trunk number query success');
                 if(result.Trunk)
                 {
-                    outgoingRequest.OutboundLimit = result.OutboundLimitId;
-                    outgoingRequest.BothLimit = result.BothLimitId;
-                    outgoingRequest.GwIpUrl = result.Trunk.IpUrl;
+                    outgoingRequest.OutboundLimit = '';
+                    outgoingRequest.BothLimit = '';
+                    outgoingRequest.GwIpUrl = '';
+
+                    if(result.OutboundLimitId)
+                    {
+                        outgoingRequest.OutboundLimit = result.OutboundLimitId;
+                    }
+
+                    if(result.BothLimitId)
+                    {
+                        outgoingRequest.BothLimit = result.BothLimitId;
+                    }
+
+                    if(result.Trunk.IpUrl)
+                    {
+                        outgoingRequest.GwIpUrl = result.Trunk.IpUrl;
+                    }
+
 
                     callback(undefined, outgoingRequest);
 

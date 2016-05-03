@@ -1102,10 +1102,20 @@ var GetGatewayForOutgoingRequest = function(fromNumber, lbId, data, callback)
             {
                 if(trInfo)
                 {
-                    outgoingRequest.OutboundLimit = result.OutboundLimitId;
-                    outgoingRequest.BothLimit = result.BothLimitId;
+                    if(result.OutboundLimitId)
+                    {
+                        outgoingRequest.OutboundLimit = result.OutboundLimitId;
+                    }
 
-                    outgoingRequest.GwIpUrl = trInfo.IpUrl;
+                    if(result.BothLimitId)
+                    {
+                        outgoingRequest.BothLimit = result.BothLimitId;
+                    }
+
+                    if(trInfo.IpUrl)
+                    {
+                        outgoingRequest.GwIpUrl = trInfo.IpUrl;
+                    }
 
                     callback(undefined, outgoingRequest);
 

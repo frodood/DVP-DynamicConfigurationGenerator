@@ -822,7 +822,7 @@ var GetGatewayForOutgoingRequest = function(fromNumber, lbId, data, callback)
     };
 
     dbModel.TrunkPhoneNumber
-        .find({where :[{PhoneNumber: fromNumber}], include : [{model: dbModel.Trunk, as: "Trunk"},{model: dbModel.LimitInfo, as : 'LimitInfoInbound'}, {model: dbModel.LimitInfo, as : 'LimitInfoBoth'}]})
+        .find({where :[{PhoneNumber: fromNumber}], include : [{model: dbModel.Trunk, as: "Trunk"}]})
         .then(function (result)
         {
             if(result)
@@ -830,15 +830,8 @@ var GetGatewayForOutgoingRequest = function(fromNumber, lbId, data, callback)
                 logger.debug('[DVP-DynamicConfigurationGenerator.GetGatewayForOutgoingRequest] PGSQL Get trunk number query success');
                 if(result.Trunk)
                 {
-                    if(result.LimitInfoOutbound && result.LimitInfoOutbound.MaxCount != null)
-                    {
-                        outgoingRequest.OutboundLimit = result.LimitInfoOutbound.MaxCount.toString();
-                    }
-
-                    if(result.LimitInfoBoth && result.LimitInfoBoth.MaxCount != null)
-                    {
-                        outgoingRequest.BothLimit = result.LimitInfoBoth.MaxCount.toString();
-                    }
+                    outgoingRequest.OutboundLimit = result.OutboundLimitId;
+                    outgoingRequest.BothLimit = result.BothLimitId;
 
                     outgoingRequest.GwIpUrl = result.Trunk.IpUrl;
 

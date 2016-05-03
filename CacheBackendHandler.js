@@ -1102,15 +1102,8 @@ var GetGatewayForOutgoingRequest = function(fromNumber, lbId, data, callback)
             {
                 if(trInfo)
                 {
-                    if(result.LimitInfoOutbound && result.LimitInfoOutbound.MaxCount != null)
-                    {
-                        outgoingRequest.OutboundLimit = result.LimitInfoOutbound.MaxCount.toString();
-                    }
-
-                    if(result.LimitInfoBoth && result.LimitInfoBoth.MaxCount != null)
-                    {
-                        outgoingRequest.BothLimit = result.LimitInfoBoth.MaxCount.toString();
-                    }
+                    outgoingRequest.OutboundLimit = result.OutboundLimitId;
+                    outgoingRequest.BothLimit = result.BothLimitId;
 
                     outgoingRequest.GwIpUrl = trInfo.IpUrl;
 

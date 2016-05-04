@@ -228,6 +228,8 @@ var AddPhoneNumbers = function()
     }
 };
 
+
+
 var AddTrunks = function()
 {
     try
@@ -439,6 +441,36 @@ var AddCloudEndUsers = function(companyId, tenantId, obj, callback)
                     {
                         obj.CloudEndUser[key] = list[i];
                     }
+
+                }
+
+                callback(obj)
+
+            })
+            .catch(function(err)
+            {
+                callback(obj)
+            });
+    }
+    catch(ex)
+    {
+        callback(obj)
+    }
+};
+
+var AddDidNumbers = function(companyId, tenantId, obj, callback)
+{
+    try
+    {
+        dbModel.DidNumber.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}]})
+            .then(function (list)
+            {
+                for (i = 0; i < list.length; i++)
+                {
+                    redisHandler.SetObject('DIDNUMBER:' + tenantId + ':' + companyId + ':' + list[i].DidNumber, JSON.stringify(list[i]), function(err, res)
+                    {
+                        console.log('DIDNUMBER ADDED');
+                    });
 
                 }
 
@@ -972,7 +1004,7 @@ var CreatePABXObject = function(companyId, tenantId, obj, callback)
 
         })
     })
-}
+};
 
 var CreateDataObject = function(companyId, tenantId, obj, callback)
 {
@@ -1005,7 +1037,11 @@ var CreateDataObject = function(companyId, tenantId, obj, callback)
                                                     {
                                                         AddSipProfiles(companyId, tenantId, data, function(data)
                                                         {
-                                                            callback(data);
+                                                            AddDidNumbers(companyId, tenantId, data, function(data)
+                                                            {
+                                                                callback(data);
+                                                            });
+
                                                         })
 
                                                     });
@@ -1067,7 +1103,7 @@ var CreatePBXSpecificCompanyData = function(companyId, tenantId, callback)
             callback(new Error('Object cannot be created'), false);
         }
     })
-}
+};
 
 
 

@@ -266,18 +266,18 @@ var GetExtensionForDid = function(reqId, didNumber, companyId, tenantId, data, c
 {
     try
     {
-        if(data && data.DidNumber)
+        var didKey = 'DIDNUMBER:' + tenantId + ':' + companyId + ':' + didNumber;
+        redisHandler.GetObjectParseJson(null, didKey, function(err, did)
         {
-            var did = data.DidNumber[didNumber];
 
-            if(did && did.ExtensionId)
+            if (did && did.ExtensionId)
             {
 
                 var extByIdKey = 'EXTENSIONBYID:' + tenantId + ':' + companyId + ':' + did.ExtensionId;
 
-                redisHandler.GetObjectParseJson(null, extByIdKey, function(err, ext)
+                redisHandler.GetObjectParseJson(null, extByIdKey, function (err, ext)
                 {
-                    if(ext)
+                    if (ext)
                     {
                         did.Extension = ext;
                         callback(null, did);
@@ -294,14 +294,9 @@ var GetExtensionForDid = function(reqId, didNumber, companyId, tenantId, data, c
             {
                 callback(new Error('DID not found or extension not set'), null);
             }
-        }
-        else
-        {
-            callback(new Error('Error getting data from cache'), null);
-        }
 
 
-
+        });
     }
     catch(ex)
     {

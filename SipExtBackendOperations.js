@@ -277,7 +277,7 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
 {
     try
     {
-        console.time('time');
+
         if(extType === 'USER')
         {
             dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}], include: [{model: dbModel.SipUACEndpoint, as:'SipUACEndpoint', include: [{model: dbModel.CloudEndUser, as:'CloudEndUser'},{model: dbModel.UserGroup, as:'UserGroup', include: [{model: dbModel.Extension, as:'Extension'}]}]}]})
@@ -285,7 +285,7 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
                 {
                     if(extData && extData.SipUACEndpoint)
                     {
-                        console.timeEnd('time');
+
                         GetTransferCodesForTenantDB(reqId, extData.SipUACEndpoint.TenantId, data, function(err, resTrans)
                         {
                             if(resTrans)

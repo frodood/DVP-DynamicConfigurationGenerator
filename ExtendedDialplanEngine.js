@@ -1266,7 +1266,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 toUsrDomain = extDetails.SipUACEndpoint.CloudEndUser.Domain;
                                             }
 
-                                            if(extDetails.SipUACEndpoint.UserGroup.length > 0 && extDetails.SipUACEndpoint.UserGroup[0].Extension)
+                                            if(extDetails.SipUACEndpoint.UserGroup && extDetails.SipUACEndpoint.UserGroup.length > 0 && extDetails.SipUACEndpoint.UserGroup[0].Extension)
                                             {
                                                 grp = extDetails.SipUACEndpoint.UserGroup[0].Extension.Extension;
                                             }

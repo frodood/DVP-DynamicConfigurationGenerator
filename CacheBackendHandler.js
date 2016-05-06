@@ -147,23 +147,7 @@ var GatherFromUserDetails = function(reqId, usrName, companyId, tenantId, ignore
 {
     GetUserByNameTenantDB(reqId, usrName, companyId, tenantId, ignoreTenant, data, function(err, res)
     {
-        if(res)
-        {
-            GetTransferCodesForTenantDB(reqId, res.TenantId, data, function(err, resTrans)
-            {
-                if(resTrans)
-                {
-                    res.TransferCode = resTrans;
-                }
-
-                callback(err, res);
-
-            })
-        }
-        else
-        {
-            callback(err, res);
-        }
+        callback(err, res);
     })
 };
 
@@ -173,58 +157,37 @@ var GetUserByNameTenantDB = function(reqId, extName, companyId, tenantId, ignore
 {
     try
     {
-        if(!ignoreTenant)
+        var usrKey = 'SIPUSER:' + extName;
+
+        redisHandler.GetObjectParseJson(null, usrKey, function(err1, usr)
         {
-
-            var usrKey = 'SIPUSER:' + tenantId + ':' + companyId + ':' + extName;
-
-            redisHandler.GetObjectParseJson(null, usrKey, function(err1, usr)
+            if(usr && usr.ExtensionId)
             {
-                if(usr && usr.ExtensionId)
+
+                var extByIdKey = 'EXTENSIONBYID:' + usr.TenantId + ':' + usr.CompanyId + ':' + usr.ExtensionId;
+
+                redisHandler.GetObjectParseJson(null, extByIdKey, function(err2, ext)
                 {
-
-                    var extByIdKey = 'EXTENSIONBYID:' + tenantId + ':' + companyId + ':' + usr.ExtensionId;
-
-                    redisHandler.GetObjectParseJson(null, extByIdKey, function(err2, ext)
+                    if(ext)
                     {
-                        if(ext)
-                        {
-                            usr.Extension = ext;
+                        usr.Extension = ext;
 
-                            callback(null, usr);
-                        }
-                        else
-                        {
-                            callback(err2, null);
-                        }
+                        callback(null, usr);
+                    }
+                    else
+                    {
+                        callback(err2, null);
+                    }
 
-                    });
+                });
 
-                }
-                else
-                {
-                    callback(err1, null);
-                }
+            }
+            else
+            {
+                callback(err1, null);
+            }
 
-            });
-
-        }
-        else
-        {
-            dbModel.SipUACEndpoint
-                .find({where: [{SipUsername: extName}], include:[{model: dbModel.Extension, as: 'Extension'}]})
-                .then(function (usr)
-                {
-                    logger.debug('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query success');
-
-                    callback(undefined, usr);
-
-                }).catch(function(err)
-                {
-                    logger.error('[DVP-DynamicConfigurationGenerator.GetUserByNameTenantDB] PGSQL Get sip endpoint for username tenant query failed', err);
-                    callback(err, undefined);
-                })
-        }
+        });
 
 
     }
@@ -1132,7 +1095,7 @@ var GetGatewayForOutgoingRequest = function(fromNumber, lbId, data, callback)
 };
 
 //Incomplete
-var GetCloudForUser = function(username, data, callback)
+var GetCloudForUser = function(username, clusterId, data, callback)
 {
     var incomingRequest = {};
 
@@ -1148,132 +1111,140 @@ var GetCloudForUser = function(username, data, callback)
                     .find({where :[{CompanyId: companyId}, {TenantId: tenantId}]})
                     .then(function (endUser)
                     {
-                        if(endUser && endUser.SIPConnectivityProvision)
+                        if(endUser.ClusterId && endUser.ClusterId === clusterId)
                         {
-                            logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get cloud end user query success');
-                            var provisionMechanism = endUser.SIPConnectivityProvision;
-
-                            switch(provisionMechanism)
+                            if(endUser && endUser.SIPConnectivityProvision)
                             {
-                                case 1:
+                                logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get cloud end user query success');
+                                var provisionMechanism = endUser.SIPConnectivityProvision;
+
+                                switch(provisionMechanism)
                                 {
-                                    //find call server
-                                    dbModel.CallServer
-                                        .find({where :[{CompanyId: companyId}, {TenantId: tenantId}]})
-                                        .then(function (cs)
-                                        {
-                                            if(cs)
+                                    case 1:
+                                    {
+                                        //find call server
+                                        dbModel.CallServer
+                                            .find({where :[{CompanyId: companyId}, {TenantId: tenantId}]})
+                                            .then(function (cs)
                                             {
-                                                logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get call server query success');
-                                                //call server found
-                                                incomingRequest.IpCode = cs.InternalMainIP;
-                                                incomingRequest.LoadBalanceType = "cs";
-
-                                                callback(undefined, incomingRequest);
-
-                                            }
-                                            else
-                                            {
-                                                logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get call server query success');
-                                                callback(new Error('Cannot find a call server dedicated to company number'), undefined);
-                                            }
-
-                                        }).catch(function(err)
-                                        {
-                                            logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get call server query failed', err);
-                                            callback(err, undefined);
-                                        });
-                                }
-                                    break;
-                                case 2:
-                                {
-                                    //find call server that matches profile
-                                    dbModel.SipNetworkProfile
-                                        .find({where :[{CompanyId: companyId}, {TenantId: tenantId}, {ObjType: "INTERNAL"}], include : [{model: dbModel.CallServer, as: "CallServer"}]})
-                                        .then(function (res)
-                                        {
-                                            if(res)
-                                            {
-                                                logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get sip profile query success');
-                                                if(res.CallServer)
+                                                if(cs)
                                                 {
-                                                    incomingRequest.IpCode = res.CallServer.InternalMainIP;
+                                                    logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get call server query success');
+                                                    //call server found
+                                                    incomingRequest.IpCode = cs.InternalMainIP;
                                                     incomingRequest.LoadBalanceType = "cs";
 
                                                     callback(undefined, incomingRequest);
+
                                                 }
                                                 else
                                                 {
-                                                    callback(new Error('call server not connected to sip profile'), undefined);
-                                                }
-                                            }
-                                            else
-                                            {
-                                                logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get sip profile query success');
-                                                callback(new Error('Cannot find a sip network profile'), undefined);
-                                            }
-
-
-                                        }).catch(function(err)
-                                        {
-                                            logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get sip profile query failed', err);
-                                            callback(err, undefined);
-                                        });
-                                    break;
-                                }
-                                case 3:
-                                {
-                                    //find cloud code that belongs to cloud end user
-
-                                    if(endUser.ClusterId)
-                                    {
-                                        var clusId = endUser.ClusterId;
-
-                                        dbModel.Cloud
-                                            .find({where :[{id: clusId}]})
-                                            .then(function (clusterInfo)
-                                            {
-                                                if(clusterInfo)
-                                                {
-                                                    logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get cloud query success');
-
-                                                    incomingRequest.IpCode = clusterInfo.Code;
-                                                    incomingRequest.LoadBalanceType = "cluster";
-
-                                                    callback(undefined, incomingRequest);
-                                                }
-                                                else
-                                                {
-                                                    logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get cloud query success');
-                                                    callback(new Error('Cannot find a cloud for end user'), undefined);
+                                                    logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get call server query success');
+                                                    callback(new Error('Cannot find a call server dedicated to company number'), undefined);
                                                 }
 
                                             }).catch(function(err)
                                             {
-                                                logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get cloud query failed', err);
+                                                logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get call server query failed', err);
                                                 callback(err, undefined);
                                             });
-
                                     }
-                                    else
+                                        break;
+                                    case 2:
                                     {
-                                        callback(new Error('Cluster Id not set'), undefined);
-                                    }
-                                    break;
+                                        //find call server that matches profile
+                                        dbModel.SipNetworkProfile
+                                            .find({where :[{CompanyId: companyId}, {TenantId: tenantId}, {ObjType: "INTERNAL"}], include : [{model: dbModel.CallServer, as: "CallServer"}]})
+                                            .then(function (res)
+                                            {
+                                                if(res)
+                                                {
+                                                    logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get sip profile query success');
+                                                    if(res.CallServer)
+                                                    {
+                                                        incomingRequest.IpCode = res.CallServer.InternalMainIP;
+                                                        incomingRequest.LoadBalanceType = "cs";
 
+                                                        callback(undefined, incomingRequest);
+                                                    }
+                                                    else
+                                                    {
+                                                        callback(new Error('call server not connected to sip profile'), undefined);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get sip profile query success');
+                                                    callback(new Error('Cannot find a sip network profile'), undefined);
+                                                }
+
+
+                                            }).catch(function(err)
+                                            {
+                                                logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get sip profile query failed', err);
+                                                callback(err, undefined);
+                                            });
+                                        break;
+                                    }
+                                    case 3:
+                                    {
+                                        //find cloud code that belongs to cloud end user
+
+                                        if(endUser.ClusterId)
+                                        {
+                                            var clusId = endUser.ClusterId;
+
+                                            dbModel.Cloud
+                                                .find({where :[{id: clusId}]})
+                                                .then(function (clusterInfo)
+                                                {
+                                                    if(clusterInfo)
+                                                    {
+                                                        logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get cloud query success');
+
+                                                        incomingRequest.IpCode = clusterInfo.Code;
+                                                        incomingRequest.LoadBalanceType = "cluster";
+
+                                                        callback(undefined, incomingRequest);
+                                                    }
+                                                    else
+                                                    {
+                                                        logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get cloud query success');
+                                                        callback(new Error('Cannot find a cloud for end user'), undefined);
+                                                    }
+
+                                                }).catch(function(err)
+                                                {
+                                                    logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get cloud query failed', err);
+                                                    callback(err, undefined);
+                                                });
+
+                                        }
+                                        else
+                                        {
+                                            callback(new Error('Cluster Id not set'), undefined);
+                                        }
+                                        break;
+
+                                    }
+                                    default:
+                                    {
+                                        callback(new Error('Invalid provision mechanism'), undefined);
+                                        break;
+                                    }
                                 }
-                                default:
-                                {
-                                    callback(new Error('Invalid provision mechanism'), undefined);
-                                    break;
-                                }
+                            }
+                            else
+                            {
+                                logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get cloud end user query success');
+                                callback(new Error('Cloud Enduser not found'), undefined);
                             }
                         }
                         else
                         {
-                            logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForUser] PGSQL Get cloud end user query success');
-                            callback(new Error('Cloud Enduser not found'), undefined);
+                            callback(new Error('Cloud Enduser not connected to cluster or cluster provided do not match'), undefined);
                         }
+
 
                     }).catch(function(err)
                     {
@@ -1485,21 +1456,190 @@ var GetCloudForIncomingRequest = function(toNumber, fromIp, data, callback)
 
 };
 
+
+var GetCloudForPublicUserRequest = function(fromUser, clusterId, data, callback)
+{
+    var incomingRequest = {
+        IpCode: "",
+        LoadBalanceType: ""
+    };
+
+
+    redisHandler.GetObjectParseJson(null, 'SIPUSER:' + fromUser, function(err, usr)
+    {
+        if (usr && usr.TenantId && usr.CompanyId)
+        {
+            redisHandler.GetObjectParseJson(null, 'DVPCACHE:' + usr.TenantId + ':' + usr.CompanyId, function(err, data)
+            {
+                if(data && data.CloudEndUser && Object.keys(data.CloudEndUser).length > 0)
+                {
+                    var endUser = underscore.find(data.CloudEndUser, function(eu)
+                    {
+                        return eu;
+                    });
+
+                    if(endUser && endUser.SIPConnectivityProvision)
+                    {
+                        var provisionMechanism = endUser.SIPConnectivityProvision;
+
+                        switch(provisionMechanism)
+                        {
+                            case 1:
+                            {
+                                //find call server
+
+                                if(data.CallServer && Object.keys(data.CallServer).length > 0)
+                                {
+                                    var cs = underscore.find(data.CallServer, function(cls)
+                                    {
+                                        return cls;
+                                    });
+
+                                    incomingRequest.IpCode = cs.InternalMainIP;
+                                    incomingRequest.LoadBalanceType = "cs";
+
+                                    callback(undefined, incomingRequest);
+                                }
+                                else
+                                {
+                                    callback(new Error('Callserver not found'), null);
+                                }
+
+                                break;
+
+                            }
+
+                            case 2:
+                            {
+                                //find call server that matches profile
+
+                                if(data.SipNetworkProfile)
+                                {
+                                    var prof = underscore.find(data.SipNetworkProfile, function(profile)
+                                    {
+                                        return profile.ObjType === "INTERNAL"
+                                    });
+
+                                    if(prof && prof.CallServerId)
+                                    {
+                                        redisHandler.GetObjectParseJson(null, 'CALLSERVER:' + prof.CallServerId, function(err, csInfo)
+                                        {
+                                            if(csInfo)
+                                            {
+                                                incomingRequest.IpCode = csInfo.InternalMainIP;
+                                                incomingRequest.LoadBalanceType = "cs";
+
+                                                callback(undefined, incomingRequest);
+                                            }
+                                            else
+                                            {
+                                                callback(new Error('Callserver not found'), null);
+                                            }
+                                        });
+                                    }
+                                    else
+                                    {
+                                        callback(new Error('cs not tagged to profile'), null);
+                                    }
+                                }
+                                else
+                                {
+                                    callback(new Error('Sip Network profile not found'), null);
+                                }
+
+                                break;
+
+                            }
+                            case 3:
+                            {
+                                //find cloud code that belongs to cloud end user
+
+                                if(endUser.ClusterId === clusterId)
+                                {
+                                    var clusId = clusterId;
+
+                                    redisHandler.GetObjectParseJson(null, 'CLOUD:' + clusId, function(err, clusterInfo)
+                                    {
+                                        if(clusterInfo)
+                                        {
+                                            incomingRequest.IpCode = clusterInfo.Code;
+                                            incomingRequest.LoadBalanceType = "cluster";
+
+                                            callback(undefined, incomingRequest);
+                                        }
+                                        else
+                                        {
+                                            callback(new Error('Cannot find a cloud for end user'), null);
+                                        }
+                                    });
+
+                                }
+                                else
+                                {
+                                    callback(new Error('Cluster Id not set or do not match'), undefined);
+                                }
+                                break;
+
+                            }
+                            default:
+                            {
+                                callback(new Error('Invalid provision mechanism'), undefined);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        callback(new Error('Enduser not found'), null);
+                    }
+                }
+                else
+                {
+                    callback(new Error('Cloud Enduser not found'), null);
+                }
+
+            });
+
+        }
+        else
+        {
+            callback(new Error('From user not found'), null);
+        }
+    });
+
+
+};
+
+
 //Not in use
 var GetCallServerClusterDetailsDB = function(csId, data, callback)
 {
     try
     {
-        dbModel.CallServer
-            .find({where :[{id: csId}], include: [{model: dbModel.Cloud, as: 'Cloud', include: [{model: dbModel.LoadBalancer, as: 'LoadBalancer'}]}]})
-            .then(function (cloudInfo)
+        redisHandler.GetObjectParseJson(null, 'CALLSERVER:' + csId, function(err1, csInfo)
+        {
+            if(csInfo && csInfo.ClusterId)
             {
-                callback(undefined, cloudInfo);
-            })
-            .catch(function(err)
+                redisHandler.GetObjectParseJson(null, 'CLOUD:' + csInfo.ClusterId, function(err, cloudInfo)
+                {
+                    callback(err, cloudInfo);
+
+                });
+            }
+            else
             {
-                callback(err, undefined);
-            })
+                if(err1)
+                {
+                    callback(err1, null);
+                }
+                else
+                {
+                    callback(new Error('Call server not found or cluster not set'), null);
+                }
+
+            }
+
+        });
     }
     catch(ex)
     {
@@ -1531,3 +1671,4 @@ module.exports.GetCloudForUser = GetCloudForUser;
 module.exports.GetGroupByExtension = GetGroupByExtension;
 module.exports.ValidateBlacklistNumber = ValidateBlacklistNumber;
 module.exports.GetCacheObject = GetCacheObject;
+module.exports.GetCloudForPublicUserRequest = GetCloudForPublicUserRequest;

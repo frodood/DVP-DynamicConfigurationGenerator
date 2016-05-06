@@ -2,7 +2,7 @@ module.exports = {
   "DB": {
     "Type":"postgres",
     "User":"duo",
-    "Password":"123",
+    "Password":"DuoS123",
     "Port":5432,
     "Host":"127.0.0.1",
     "Database":"duo"
@@ -30,5 +30,5 @@ module.exports = {
   },
 
   "Token": "123",
-  "UseCache": true
+  "UseCache": false
 };

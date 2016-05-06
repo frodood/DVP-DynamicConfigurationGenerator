@@ -120,7 +120,7 @@ var AddClusters = function()
 {
     try
     {
-        dbModel.Cloud.findAll()
+        dbModel.Cloud.findAll({include:[{model: dbModel.LoadBalancer, as: "LoadBalancer"}]})
             .then(function (cloudList)
             {
                 if(cloudList.length)
@@ -404,7 +404,7 @@ var AddUsers = function(companyId, tenantId, obj, callback)
                     {
 
                     });
-                    redisHandler.SetObject('SIPUSER:' + tenantId + ':' + companyId + ':' + list[i].SipUsername, JSON.stringify(list[i]), function(err, res)
+                    redisHandler.SetObject('SIPUSER:' + list[i].SipUsername, JSON.stringify(list[i]), function(err, res)
                     {
                         console.log('SIPUSER ADDED');
                     });

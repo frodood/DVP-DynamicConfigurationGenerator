@@ -298,7 +298,7 @@ var createDirectoryProfile = function(extName, ext, domain, email, password, con
 
 };
 
-var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, reqId, numLimitInfo, appId)
+var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, reqId, numLimitInfo, appId, companyId, tenantId)
 {
     try
     {
@@ -349,9 +349,23 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, req
 
         }
 
-        cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
-            .up()
-            .ele('action').att('application', 'export').att('data', 'dvp_app_type=HTTAPI')
+        if(companyId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
+                .up()
+        }
+        if(tenantId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
+                .up()
+        }
+        if(appId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+                .up()
+        }
+
+        cond.ele('action').att('application', 'export').att('data', 'dvp_app_type=HTTAPI')
             .up()
             .ele('action').att('application', 'answer')
             .up()
@@ -374,7 +388,7 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, req
 
 };
 
-var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl, reqId, numLimitInfo, appId)
+var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl, reqId, numLimitInfo, appId, companyId, tenantId)
 {
     try
     {
@@ -421,9 +435,23 @@ var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl, r
 
         }
 
-        cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
-            .up()
-            .ele('action').att('application', 'answer')
+        if(companyId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
+                .up()
+        }
+        if(tenantId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
+                .up()
+        }
+        if(appId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+                .up()
+        }
+
+        cond.ele('action').att('application', 'answer')
             .up()
             .ele('action').att('application', 'socket').att('data', socketUrl + ' async full')
             .up()

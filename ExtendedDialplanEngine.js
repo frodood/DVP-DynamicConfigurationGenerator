@@ -1182,7 +1182,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                             else if(extDetails.ObjCategory === 'CONFERENCE')
                             {
                                 //call conference handler
-                                conferenceHandler.ConferenceHandlerOperation(reqId, extDetails, direction, '', context, profile, companyId, tenantId, cacheData, function(err, confXml)
+                                conferenceHandler.ConferenceHandlerOperation(reqId, extDetails, direction, '', context, profile, companyId, tenantId, appId, cacheData, function(err, confXml)
                                 {
                                     callback(err, confXml);
                                 })
@@ -1826,7 +1826,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                     }
                                     else if(extDetails.ObjCategory === 'CONFERENCE')
                                     {
-                                        conferenceHandler.ConferenceHandlerOperation(reqId, extDetails, direction, fromUserUuid, context, profile, companyId, tenantId, cacheData, function(err, confXml)
+                                        conferenceHandler.ConferenceHandlerOperation(reqId, extDetails, direction, fromUserUuid, context, profile, companyId, tenantId, appId, cacheData, function(err, confXml)
                                         {
                                             callback(err, confXml);
                                         })
@@ -2721,7 +2721,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         }
                                         else if(extDetails.ObjCategory === 'CONFERENCE')
                                         {
-                                            conferenceHandler.ConferenceHandlerOperation(reqId, extDetails, direction, fromUserUuid, context, profile, companyId, tenantId, cacheData, function(err, confXml)
+                                            conferenceHandler.ConferenceHandlerOperation(reqId, extDetails, direction, fromUserUuid, context, profile, companyId, tenantId, appId, cacheData, function(err, confXml)
                                             {
                                                 callback(err, confXml);
                                             })

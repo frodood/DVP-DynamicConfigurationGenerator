@@ -179,7 +179,7 @@ var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context,
 
 };
 
-var CreateConferenceDialplan = function(reqId, epList, context, destinationPattern, ignoreEarlyMedia, confName, domain, pin, mode)
+var CreateConferenceDialplan = function(reqId, epList, context, destinationPattern, ignoreEarlyMedia, confName, domain, pin, mode, companyId, tenantId, appId)
 {
     try
     {
@@ -207,6 +207,26 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
 
         cond.ele('action').att('application', 'set').att('data', 'ringback=${us-ring}')
             .up()
+
+        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=CONFERENCE:' + confName)
+            .up()
+
+
+        if(companyId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
+                .up()
+        }
+        if(tenantId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
+                .up()
+        }
+        if(appId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+                .up()
+        }
 
         if(epList)
         {
@@ -437,12 +457,12 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
 
         if(ep.CompanyId)
         {
-            cond.ele('action').att('application', 'set').att('data', 'companyid=' + ep.CompanyId)
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + ep.CompanyId)
                 .up()
         }
         if(ep.TenantId)
         {
-            cond.ele('action').att('application', 'set').att('data', 'tenantid=' + ep.TenantId)
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + ep.TenantId)
                 .up()
         }
         if(ep.AppId)

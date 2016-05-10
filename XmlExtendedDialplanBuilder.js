@@ -208,7 +208,7 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
         cond.ele('action').att('application', 'set').att('data', 'ringback=${us-ring}')
             .up()
 
-        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=CONFERENCE:' + confName)
+        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=CONFERENCE-' + confName)
             .up()
 
 
@@ -295,6 +295,26 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
                 else
                 {
                     calling = util.format('%s%s/%s', option, destinationGroup, dnis);
+                }
+
+                cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=CONFERENCE-' + confName)
+                    .up()
+
+
+                if(companyId)
+                {
+                    cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
+                        .up()
+                }
+                if(tenantId)
+                {
+                    cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
+                        .up()
+                }
+                if(appId)
+                {
+                    cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+                        .up()
                 }
 
 

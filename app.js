@@ -119,7 +119,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
 
                             redisHandler.AddChannelIdToSet(varUuid, setName);
 
-                            redisHandler.SetObject('CHANNELMAP:' + varUuid, setName);
+                            //redisHandler.SetObject('CHANNELMAP:' + varUuid, setName);
 
                             res.end(extDialplan);
                         })
@@ -394,7 +394,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
 
                                                 redisHandler.AddChannelIdToSet(varUuid, setName);
 
-                                                redisHandler.SetObject('CHANNELMAP:' + varUuid, setName);
+                                                //redisHandler.SetObject('CHANNELMAP:' + varUuid, setName);
 
                                                 var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
 
@@ -1004,7 +1004,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                                                         redisHandler.AddChannelIdToSet(varUuid, setName);
 
-                                                                        redisHandler.SetObject('CHANNELMAP:' + varUuid, setName);
+                                                                        //redisHandler.SetObject('CHANNELMAP:' + varUuid, setName);
 
                                                                         var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
 

@@ -398,6 +398,10 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
 
                                                     redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
 
+                                                    var chanIncrKey = 'DVP_CHANNEL_COUNT_COMPANY:' + rule.TenantId + ':' + rule.CompanyId;
+
+                                                    redisHandler.IncrementKey(chanIncrKey, function(err, redisResp){});
+
 
                                                     var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
 
@@ -1018,6 +1022,10 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                         redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
 
                                                                         redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
+
+                                                                        var chanIncrKey = 'DVP_CHANNEL_COUNT_COMPANY:' + rule.TenantId + ':' + rule.CompanyId;
+
+                                                                        redisHandler.IncrementKey(chanIncrKey, function(err, redisResp){});
 
                                                                         var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
 

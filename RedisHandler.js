@@ -175,6 +175,36 @@ var GetFromSet = function(setName, callback)
     }
 };
 
+var IncrementKey = function(key, callback)
+{
+    try
+    {
+        if(client.connected)
+        {
+            client.incr(key, function (err, reply)
+            {
+                if(err)
+                {
+                    logger.error('[DVP-DynamicConfigurationGenerator.IncrementKey] - [%s] - REDIS ERROR', err);
+                }
+                else
+                {
+                    logger.debug('[DVP-DynamicConfigurationGenerator.IncrementKey] - [%s] - REDIS SUCCESS');
+
+                }
+
+
+            });
+        }
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.IncrementKey] - [%s] - REDIS ERROR', ex);
+    }
+}
+
 var AddChannelIdToSet = function(uuid, setName)
 {
     try
@@ -223,3 +253,4 @@ module.exports.SetObjectWithExpire = SetObjectWithExpire;
 module.exports.GetObject = GetObject;
 module.exports.AddChannelIdToSet = AddChannelIdToSet;
 module.exports.GetObjectParseJson = GetObjectParseJson;
+module.exports.IncrementKey = IncrementKey;

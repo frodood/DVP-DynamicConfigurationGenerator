@@ -107,7 +107,7 @@ var SetObject = function(key, value, callback)
             }
             else
             {
-                logger.error('[DVP-DynamicConfigurationGenerator.SetObjectWithExpire] - REDIS SUCCESS', err)
+                logger.debug('[DVP-DynamicConfigurationGenerator.SetObjectWithExpire] - REDIS SUCCESS')
             }
             callback(err, response);
         });

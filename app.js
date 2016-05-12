@@ -119,9 +119,9 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
 
                                 var setName = 'CHANNELS:' + contextTenant + ':' + contextCompany;
 
-                                redisHandler.AddChannelIdToSet(varUuid, setName);
+                                redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
 
-                                redisHandler.SetObject('CHANNELMAP:' + varUuid, setName);
+                                redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
 
                                 res.end(extDialplan);
                             })
@@ -394,14 +394,14 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
 
                                                     var setName = 'CHANNELS:' + rule.TenantId + ':' + rule.CompanyId;
 
-                                                    redisHandler.AddChannelIdToSet(varUuid, setName);
+                                                    redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
 
-                                                    redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err1, resp1){});
+                                                    redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
 
 
                                                     var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
 
-                                                    redisHandler.AddChannelIdToSet(varUuid, setNameApp);
+                                                    redisHandler.AddChannelIdToSet(varUuid, setNameApp, function(err, redisRes){});
 
                                                 }
                                                 else
@@ -1015,13 +1015,13 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                                                         var setName = 'CHANNELS:' + rule.TenantId + ':' + rule.CompanyId;
 
-                                                                        redisHandler.AddChannelIdToSet(varUuid, setName);
+                                                                        redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
 
-                                                                        redisHandler.SetObject('CHANNELMAP:' + varUuid, setName);
+                                                                        redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
 
                                                                         var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
 
-                                                                        redisHandler.AddChannelIdToSet(varUuid, setNameApp);
+                                                                        redisHandler.AddChannelIdToSet(varUuid, setNameApp, function(err, redisRes){});
 
                                                                     }
                                                                     else

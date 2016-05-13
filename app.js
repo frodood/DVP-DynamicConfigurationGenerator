@@ -407,6 +407,10 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
 
                                                     redisHandler.AddChannelIdToSet(varUuid, setNameApp, function(err, redisRes){});
 
+                                                    var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.CompanyId, rule.TenantId, "CALLSERVER", "CHANNEL", "CREATE", rule.Application.id, "", varUuid);
+
+                                                    redisHandler.PublishToRedis('event', pubMessage, function(err, redisRes){});
+
                                                 }
                                                 else
                                                 {
@@ -1030,6 +1034,10 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                         var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
 
                                                                         redisHandler.AddChannelIdToSet(varUuid, setNameApp, function(err, redisRes){});
+
+                                                                        var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.CompanyId, rule.TenantId, "CALLSERVER", "CHANNEL", "CREATE", rule.Application.id, "", varUuid);
+
+                                                                        redisHandler.PublishToRedis('event', pubMessage, function(err, redisRes){});
 
                                                                     }
                                                                     else

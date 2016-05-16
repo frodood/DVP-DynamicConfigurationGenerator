@@ -244,37 +244,27 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
             {
                 var option = '';
                 var destinationGroup = '';
-                var bypassMed = 'bypass_media=false';
-
 
                 if(ep.Type === 'GATEWAY')
                 {
                     destinationGroup = util.format('gateway/%s', ep.Profile);
 
                     if (ep.LegStartDelay > 0)
-                        option = util.format("['leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s']", ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
+                        option = util.format("['leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s,DVP_OPERATION_CAT=%s,companyid=%s,tenantid=%s,dvp_app_id=%s']", ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl, 'CONFERENCE-' + confName, companyId, tenantId, appId);
                     else
-                        option = util.format("['leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s']", ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl);
+                        option = util.format("['leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s,DVP_OPERATION_CAT=%s,companyid=%s,tenantid=%s,dvp_app_id=%s']", ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl, 'CONFERENCE-' + confName, companyId, tenantId, appId);
 
-                    bypassMed = 'bypass_media=false';
+
                 }
                 else
                 {
                     destinationGroup = 'user';
 
                     if (ep.LegStartDelay > 0)
-                        option = util.format("['leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s']", ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
+                        option = util.format("['leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,DVP_OPERATION_CAT=%s,companyid=%s,tenantid=%s,dvp_app_id=%s']", ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, 'CONFERENCE-' + confName, companyId, tenantId, appId);
                     else
-                        option = util.format("['leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s']", ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
+                        option = util.format("['leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,DVP_OPERATION_CAT=%s,companyid=%s,tenantid=%s,dvp_app_id=%s']", ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, 'CONFERENCE-' + confName, companyId, tenantId, appId);
 
-                    if(ep.BypassMedia)
-                    {
-                        bypassMed = 'bypass_media=true';
-                    }
-                    else
-                    {
-                        bypassMed = 'bypass_media=false';
-                    }
 
                 }
 
@@ -295,26 +285,6 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
                 else
                 {
                     calling = util.format('%s%s/%s', option, destinationGroup, dnis);
-                }
-
-                cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=CONFERENCE-' + confName)
-                    .up()
-
-
-                if(companyId)
-                {
-                    cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
-                        .up()
-                }
-                if(tenantId)
-                {
-                    cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
-                        .up()
-                }
-                if(appId)
-                {
-                    cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
-                        .up()
                 }
 
 

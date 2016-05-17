@@ -866,7 +866,7 @@ var GetCloudForUser = function(username, clusterId, data, callback)
                     .find({where :[{CompanyId: companyId}, {TenantId: tenantId}]})
                     .then(function (endUser)
                     {
-                        if(endUser.ClusterId && endUser.ClusterId === clusterId)
+                        if(endUser.ClusterId && endUser.ClusterId == clusterId)
                         {
                             if(endUser && endUser.SIPConnectivityProvision)
                             {

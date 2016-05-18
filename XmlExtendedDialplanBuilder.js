@@ -1091,7 +1091,7 @@ var CreateInterceptDialplan = function(reqId, uuid, context, destinationPattern,
                     .ele('action').att('application', 'intercept').att('data', uuid)
                     .up()
 
-        cond.ele('action').att('application', 'set').att('data', 'DVP_ADVANCED_OP_ACTION=INTERCEPT')
+        cond.ele('action').att('application', 'export').att('data', 'DVP_ADVANCED_OP_ACTION=INTERCEPT')
             .up()
 
         if(companyId)

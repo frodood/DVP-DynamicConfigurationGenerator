@@ -378,7 +378,7 @@ var GetGroupBy_Name_Domain = function(grpName, domain, data, callback)
     try
     {
         dbModel.UserGroup
-            .find({where: [{Domain: domain},{GroupName: grpName}], include: [{model: dbModel.SipUACEndpoint, as: "SipUACEndpoint", include:[{model: dbModel.CloudEndUser, as : "CloudEndUser"}]}, {model: dbModel.Extension, as: "Extension"}]})
+            .find({where: [{Domain: domain}], include: [{model: dbModel.SipUACEndpoint, as: "SipUACEndpoint", include:[{model: dbModel.CloudEndUser, as : "CloudEndUser"}]}, {model: dbModel.Extension, as: "Extension", where:[{Extension: grpName}]}]})
             .then(function (grpData)
             {
 

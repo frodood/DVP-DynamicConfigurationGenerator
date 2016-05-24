@@ -24,7 +24,7 @@ var createNotFoundResponse = function()
 
 }
 
-var createRejectResponse = function()
+var createRejectResponse = function(context)
 {
     try
     {
@@ -32,11 +32,11 @@ var createRejectResponse = function()
 
         var cond = doc.att('type', 'freeswitch/xml')
             .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
-            .ele('context').att('name', 'public')
+            .ele('context').att('name', context)
             .ele('extension').att('name', 'test')
             .ele('condition').att('field', 'destination_number').att('expression', '[^\\s]*')
 
-        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=CALL_REJECTED')
+        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=REJECTED')
             .up()
         cond.ele('action').att('application', 'hangup').att('data', 'CALL_REJECTED')
             .up()

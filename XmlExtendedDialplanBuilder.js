@@ -8,21 +8,19 @@ var fileServiceIp = config.Services.fileServiceHost;
 var fileServicePort = config.Services.fileServicePort;
 var fileServiceVersion = config.Services.fileServiceVersion;
 
-var createRejectResponse = function()
+var createRejectResponse = function(context)
 {
     try
     {
-        //var httpUrl = Config.Services.HttApiUrl;
-
         var doc = xmlBuilder.create('document');
 
         var cond = doc.att('type', 'freeswitch/xml')
             .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
-            .ele('context').att('name', 'public')
+            .ele('context').att('name', context)
             .ele('extension').att('name', 'test')
             .ele('condition').att('field', 'destination_number').att('expression', '[^\\s]*')
 
-        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=CALL_REJECTED')
+        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=REJECTED')
             .up()
         cond.ele('action').att('application', 'hangup').att('data', 'CALL_REJECTED')
             .up()
@@ -143,7 +141,7 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
     }
 };
 
-var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context, numLimitInfo)
+var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context, numLimitInfo, companyId, tenantId, appId)
 {
     try
     {
@@ -155,7 +153,6 @@ var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context,
             context = "";
         }
 
-        //var httpUrl = Config.Services.HttApiUrl;
 
         var doc = xmlBuilder.create('document');
 
@@ -164,6 +161,26 @@ var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context,
             .ele('context').att('name', context)
             .ele('extension').att('name', 'test')
             .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+
+
+        if(companyId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
+                .up()
+        }
+        if(tenantId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
+                .up()
+        }
+        if(appId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+                .up()
+        }
+
+        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=DND')
+            .up()
 
         if(numLimitInfo && numLimitInfo.CheckLimit)
         {
@@ -191,6 +208,8 @@ var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context,
             }
 
         }
+
+
 
         cond.ele('action').att('application', 'hangup').att('data', 'USER_BUSY')
             .up()

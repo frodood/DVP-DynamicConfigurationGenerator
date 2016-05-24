@@ -692,7 +692,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                                 if(pbxObj.OperationType === 'DND')
                                                 {
-                                                    var xml = xmlBuilder.CreateSendBusyMessageDialplan(reqId, '[^\\s]*', context, numLimitInfo);
+                                                    var xml = xmlBuilder.CreateSendBusyMessageDialplan(reqId, '[^\\s]*', context, numLimitInfo, companyId, tenantId, appId);
 
                                                     callback(undefined, xml);
                                                 }
@@ -1351,7 +1351,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                                         if(pbxObj.OperationType === 'DND')
                                                         {
-                                                            var xml = xmlBuilder.CreateSendBusyMessageDialplan(reqId, '[^\\s]*', context, undefined);
+                                                            var xml = xmlBuilder.CreateSendBusyMessageDialplan(reqId, '[^\\s]*', context, undefined, companyId, tenantId, appId);
 
                                                             callback(undefined, xml);
                                                         }
@@ -2216,7 +2216,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                                             if(pbxObj.OperationType === 'DND')
                                                             {
-                                                                var xml = xmlBuilder.CreateSendBusyMessageDialplan(reqId, '[^\\s]*', context, undefined);
+                                                                var xml = xmlBuilder.CreateSendBusyMessageDialplan(reqId, '[^\\s]*', context, undefined, companyId, tenantId, appId);
 
                                                                 callback(undefined, xml);
                                                             }

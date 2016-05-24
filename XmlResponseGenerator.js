@@ -28,12 +28,13 @@ var createRejectResponse = function()
 {
     try
     {
-        //var httpUrl = Config.Services.HttApiUrl;
-
         var doc = xmlBuilder.create('document');
 
         var cond = doc.att('type', 'freeswitch/xml')
             .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', 'default')
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', '99')
 
         cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=CALL_REJECTED')
             .up()
@@ -44,7 +45,6 @@ var createRejectResponse = function()
 
 
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
-
 
     }
     catch(ex)

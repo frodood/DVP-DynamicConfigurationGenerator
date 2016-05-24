@@ -8,6 +8,36 @@ var fileServiceIp = config.Services.fileServiceHost;
 var fileServicePort = config.Services.fileServicePort;
 var fileServiceVersion = config.Services.fileServiceVersion;
 
+var createRejectResponse = function()
+{
+    try
+    {
+        //var httpUrl = Config.Services.HttApiUrl;
+
+        var doc = xmlBuilder.create('document');
+
+        var cond = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+
+        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=CALL_REJECTED')
+            .up()
+        cond.ele('action').att('application', 'hangup').att('data', 'CALL_REJECTED')
+            .up()
+
+            .end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+}
+
 var createNotFoundResponse = function()
 {
     try
@@ -159,9 +189,7 @@ var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context,
 
         }
 
-        cond.ele('action').att('application', 'answer')
-            .up()
-            .ele('action').att('application', 'hangup').att('data', 'USER_BUSY')
+        cond.ele('action').att('application', 'hangup').att('data', 'USER_BUSY')
             .up()
 
             .end({pretty: true});
@@ -1856,3 +1884,4 @@ module.exports.CreateRouteFaxGatewayDialplan = CreateRouteFaxGatewayDialplan;
 module.exports.CreateConferenceDialplan = CreateConferenceDialplan;
 module.exports.CreateReceiveFaxDialplan = CreateReceiveFaxDialplan;
 module.exports.CreatePbxFeatures = CreatePbxFeatures;
+module.exports.createRejectResponse = createRejectResponse;

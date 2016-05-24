@@ -197,7 +197,7 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                         {
                             //dont allow
                             logger.debug('[DVP-DynamicConfigurationGenerator.ConferenceHandlerOperation] - [%s] - ANONYMOUS NOT ALLOWED ERROR', reqId);
-                            callback(new Error('Anonymous users not allowed'), xmlBuilder.createNotFoundResponse());
+                            callback(new Error('Anonymous users not allowed'), xmlBuilder.createRejectResponse());
                         }
                     }
                     else
@@ -264,7 +264,7 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                                 }
                                 else
                                 {
-                                    callback(new Error('Anonymous users not allowed'), xBuilder.createNotFoundResponse());
+                                    callback(new Error('Anonymous users not allowed'), xBuilder.createRejectResponse());
                                 }
                             }
                         }
@@ -281,7 +281,7 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                             else
                             {
                                 logger.error('[DVP-DynamicConfigurationGenerator.ConferenceHandlerOperation] - [%s] - Error Occurred', reqId, new Error('Anonymous users not allowed'));
-                                callback(new Error('Anonymous users not allowed'), xBuilder.createNotFoundResponse());
+                                callback(new Error('Anonymous users not allowed'), xBuilder.createRejectResponse());
                             }
                         }
 
@@ -291,27 +291,27 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                 {
                     //dont allow
                     logger.error('[DVP-DynamicConfigurationGenerator.ConferenceHandlerOperation] - [%s] - Error Occurred', reqId, new Error('Max allowed users reached'));
-                    callback(new Error('Max allowed users reached'), xBuilder.createNotFoundResponse());
+                    callback(new Error('Max allowed users reached'), xBuilder.createRejectResponse());
                 }
 
             }
             else
             {
                 logger.error('[DVP-DynamicConfigurationGenerator.ConferenceHandlerOperation] - [%s] - Error Occurred', reqId, new Error('Conference not started yet'));
-                callback(new Error('Conference not started yet'), xBuilder.createNotFoundResponse());
+                callback(new Error('Conference not started yet'), xBuilder.createRejectResponse());
             }
         }
         else
         {
             logger.error('[DVP-DynamicConfigurationGenerator.ConferenceHandlerOperation] - [%s] - Error Occurred', reqId, new Error('Conference not found'));
-            callback(new Error('Conference not found'), xBuilder.createNotFoundResponse());
+            callback(new Error('Conference not found'), xBuilder.createRejectResponse());
         }
 
     }
     catch(ex)
     {
         logger.error('[DVP-DynamicConfigurationGenerator.ConferenceHandlerOperation] - [%s] - Error Occurred', reqId, ex);
-        callback(ex, xBuilder.createNotFoundResponse());
+        callback(ex, xBuilder.createRejectResponse());
     }
 };
 

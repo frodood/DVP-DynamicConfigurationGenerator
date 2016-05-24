@@ -24,6 +24,36 @@ var createNotFoundResponse = function()
 
 }
 
+var createRejectResponse = function()
+{
+    try
+    {
+        //var httpUrl = Config.Services.HttApiUrl;
+
+        var doc = xmlBuilder.create('document');
+
+        var cond = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+
+        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=CALL_REJECTED')
+            .up()
+        cond.ele('action').att('application', 'hangup').att('data', 'CALL_REJECTED')
+            .up()
+
+            .end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+}
+
 var CreateUserGroupDirectoryProfile = function(grp, reqId)
 {
     try
@@ -365,6 +395,9 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, req
                 .up()
         }
 
+        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=HTTAPI')
+            .up()
+
         cond.ele('action').att('application', 'export').att('data', 'dvp_app_type=HTTAPI')
             .up()
             .ele('action').att('application', 'answer')
@@ -450,6 +483,9 @@ var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl, r
             cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
                 .up()
         }
+
+        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=SOCKET')
+            .up()
 
         cond.ele('action').att('application', 'answer')
             .up()
@@ -558,3 +594,4 @@ module.exports.CreateHttpApiDialplan = CreateHttpApiDialplan;
 module.exports.CreateUserGroupDirectoryProfile = CreateUserGroupDirectoryProfile;
 module.exports.CreateSocketApiDialplan = CreateSocketApiDialplan;
 module.exports.CreateRouteGatewayDialplan = CreateRouteGatewayDialplan;
+module.exports.createRejectResponse = createRejectResponse;

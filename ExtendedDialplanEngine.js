@@ -326,7 +326,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
             if(err)
             {
                 logger.error('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Error occurred while getting fwd obj from redis', reqId, err);
-                callback(err, xmlBuilder.createNotFoundResponse());
+                callback(err, xmlBuilder.createRejectResponse());
             }
             else if(redisObj)
             {
@@ -348,7 +348,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                 if(err)
                                 {
                                     logger.error('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Outbound rule for gateway forward not found', reqId, err);
-                                    callback(err, xmlBuilder.createNotFoundResponse());
+                                    callback(err, xmlBuilder.createRejectResponse());
                                 }
                                 else if(rule)
                                 {
@@ -394,7 +394,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                 else
                                 {
                                     logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Outbound rule for gateway forward not found', reqId);
-                                    callback(undefined, xmlBuilder.createNotFoundResponse());
+                                    callback(undefined, xmlBuilder.createRejectResponse());
                                 }
                             })
                         }
@@ -407,7 +407,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                 if(err)
                                 {
                                     logger.error('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Error occurred while getting all data for ext for forward', reqId, err);
-                                    callback(err, xmlBuilder.createNotFoundResponse());
+                                    callback(err, xmlBuilder.createRejectResponse());
                                 }
                                 else if(extDetails)
                                 {
@@ -471,7 +471,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                             else
                                             {
                                                 logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Redis set object failed', reqId);
-                                                callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                callback(undefined, xmlBuilder.createRejectResponse());
                                             }
                                         })
 
@@ -480,13 +480,13 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                     else
                                     {
                                         logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Cloud enduser not set', reqId);
-                                        callback(undefined, xmlBuilder.createNotFoundResponse());
+                                        callback(undefined, xmlBuilder.createRejectResponse());
                                     }
                                 }
                                 else
                                 {
                                     logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Extension details not found', reqId, err);
-                                    callback(undefined, xmlBuilder.createNotFoundResponse());
+                                    callback(undefined, xmlBuilder.createRejectResponse());
                                 }
                             });
 
@@ -495,19 +495,19 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                     else
                     {
                         logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - No objects in forwarding rule not found', reqId);
-                        callback(undefined, xmlBuilder.createNotFoundResponse());
+                        callback(undefined, xmlBuilder.createRejectResponse());
                     }
                 }
                 else
                 {
                     logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - No objects in forwarding list', reqId);
-                    callback(undefined, xmlBuilder.createNotFoundResponse());
+                    callback(undefined, xmlBuilder.createRejectResponse());
                 }
             }
             else
             {
                 logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Redis object not found : ', reqId);
-                callback(undefined, xmlBuilder.createNotFoundResponse());
+                callback(undefined, xmlBuilder.createRejectResponse());
             }
         })
 
@@ -518,7 +518,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
     }
     catch(ex)
     {
-        callback(ex, xmlBuilder.createNotFoundResponse());
+        callback(ex, xmlBuilder.createRejectResponse());
 
     }
 };
@@ -567,7 +567,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
             {
                 if(err)
                 {
-                    callback(err, xmlBuilder.createNotFoundResponse());
+                    callback(err, xmlBuilder.createRejectResponse());
                 }
                 else if(didRes && didRes.Extension)
                 {
@@ -582,7 +582,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                             //return default xml
                             logger.error('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Error occurred getting AllDataForExt', reqId, err);
 
-                            callback(err, xmlBuilder.createNotFoundResponse());
+                            callback(err, xmlBuilder.createRejectResponse());
                         }
                         else if(extDetails)
                         {
@@ -612,11 +612,11 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         {
                                             if(err)
                                             {
-                                                callback(err, xmlBuilder.createNotFoundResponse());
+                                                callback(err, xmlBuilder.createRejectResponse());
                                             }
                                             else if(!pbxDetails)
                                             {
-                                                callback(new Error('PBX app returned empty value'), xmlBuilder.createNotFoundResponse());
+                                                callback(new Error('PBX app returned empty value'), xmlBuilder.createRejectResponse());
 
                                                 /*logger.info('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - REMOTE EXTENDED DIALPLAN NOT FOUND', reqId);
 
@@ -665,7 +665,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     }
                                                     else
                                                     {
-                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                        callback(err, xmlBuilder.createRejectResponse());
                                                     }
                                                 });*/
                                             }
@@ -742,7 +742,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         }
                                                         else
                                                         {
-                                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                                            callback(err, xmlBuilder.createRejectResponse());
                                                         }
                                                     });
                                                 }
@@ -754,7 +754,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         {
                                                             if(err)
                                                             {
-                                                                callback(err, xmlBuilder.createNotFoundResponse());
+                                                                callback(err, xmlBuilder.createRejectResponse());
                                                             }
                                                             else if(epList && epList.length > 0)
                                                             {
@@ -764,7 +764,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             }
                                                             else
                                                             {
-                                                                callback(err, xmlBuilder.createNotFoundResponse());
+                                                                callback(err, xmlBuilder.createRejectResponse());
                                                             }
                                                         })
                                                     }
@@ -803,7 +803,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         {
                                                             if(err)
                                                             {
-                                                                callback(err, xmlBuilder.createNotFoundResponse());
+                                                                callback(err, xmlBuilder.createRejectResponse());
                                                             }
                                                             else
                                                             {
@@ -868,7 +868,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             }
                                                             else
                                                             {
-                                                                callback(err, xmlBuilder.createNotFoundResponse());
+                                                                callback(err, xmlBuilder.createRejectResponse());
                                                             }
                                                         });
 
@@ -915,7 +915,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             }
                                                             else
                                                             {
-                                                                callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                                callback(undefined, xmlBuilder.createRejectResponse());
                                                             }
                                                         })
                                                     }
@@ -960,19 +960,19 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 }
                                                                 else
                                                                 {
-                                                                    callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                                    callback(undefined, xmlBuilder.createRejectResponse());
                                                                 }
                                                             }
                                                             else
                                                             {
-                                                                callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                                callback(undefined, xmlBuilder.createRejectResponse());
                                                             }
 
                                                         });
                                                     }
                                                     else
                                                     {
-                                                        callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                        callback(undefined, xmlBuilder.createRejectResponse());
                                                     }
                                                 }
                                                 else
@@ -1031,7 +1031,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         }
                                                         else
                                                         {
-                                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                                            callback(err, xmlBuilder.createRejectResponse());
                                                         }
                                                     });
                                                 }
@@ -1086,7 +1086,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             }
                                             else
                                             {
-                                                callback(err, xmlBuilder.createNotFoundResponse());
+                                                callback(err, xmlBuilder.createRejectResponse());
                                             }
                                         });
                                     }
@@ -1095,7 +1095,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                 else
                                 {
                                     logger.error('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - SipUACEndpoint not found for extension', reqId);
-                                    callback(new Error('SipUACEndpoint not found for extension'), xmlBuilder.createNotFoundResponse());
+                                    callback(new Error('SipUACEndpoint not found for extension'), xmlBuilder.createRejectResponse());
                                 }
 
                             }
@@ -1128,7 +1128,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                 }
                                 else
                                 {
-                                    callback(new Error('fax types not set'), xmlBuilder.createNotFoundResponse());
+                                    callback(new Error('fax types not set'), xmlBuilder.createRejectResponse());
                                 }
 
                             }
@@ -1166,7 +1166,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         }
                                         else
                                         {
-                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                            callback(err, xmlBuilder.createRejectResponse());
                                         }
                                     });
 
@@ -1174,7 +1174,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                 }
                                 else
                                 {
-                                    callback(new Error('Group not found'), xmlBuilder.createNotFoundResponse());
+                                    callback(new Error('Group not found'), xmlBuilder.createRejectResponse());
                                 }
 
 
@@ -1189,7 +1189,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                             }
                             else
                             {
-                                callback(err, xmlBuilder.createNotFoundResponse());
+                                callback(err, xmlBuilder.createRejectResponse());
                             }
 
                         }
@@ -1197,7 +1197,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                         {
                             logger.info('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - All Data For Extension Returned Empty Object - TYPE : %s', reqId, didRes.Extension.ObjCategory);
 
-                            callback(new Error('Extension not found'), xmlBuilder.createNotFoundResponse());
+                            callback(new Error('Extension not found'), xmlBuilder.createRejectResponse());
 
                         }
                     });
@@ -1214,7 +1214,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                     else
                     {
                         logger.info('[DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - DID Not Found Or Not Mapped To an Extension - TYPE : %s', reqId);
-                        callback(err, xmlBuilder.createNotFoundResponse());
+                        callback(err, xmlBuilder.createRejectResponse());
                     }
 
                 }
@@ -1237,7 +1237,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                     {
                         if(err)
                         {
-                            callback(err, xmlBuilder.createNotFoundResponse());
+                            callback(err, xmlBuilder.createRejectResponse());
                         }
                         else if(extInfo)
                         {
@@ -1247,7 +1247,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                 if(err)
                                 {
                                     //return default xml
-                                    callback(err, xmlBuilder.createNotFoundResponse());
+                                    callback(err, xmlBuilder.createRejectResponse());
                                 }
                                 else if(extDetails)
                                 {
@@ -1278,12 +1278,12 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 {
                                                     if(err)
                                                     {
-                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                        callback(err, xmlBuilder.createRejectResponse());
                                                     }
                                                     else if(!pbxDetails)
                                                     {
 
-                                                        callback(new Error('PBX app returned empty value'), xmlBuilder.createNotFoundResponse());
+                                                        callback(new Error('PBX app returned empty value'), xmlBuilder.createRejectResponse());
                                                         /*var recEnabled = false;
 
                                                         var ep =
@@ -1329,7 +1329,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             }
                                                             else
                                                             {
-                                                                callback(err, xmlBuilder.createNotFoundResponse());
+                                                                callback(err, xmlBuilder.createRejectResponse());
                                                             }
                                                         });*/
                                                     }
@@ -1403,7 +1403,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 }
                                                                 else
                                                                 {
-                                                                    callback(err, xmlBuilder.createNotFoundResponse());
+                                                                    callback(err, xmlBuilder.createRejectResponse());
                                                                 }
                                                             });
                                                         }
@@ -1415,7 +1415,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 {
                                                                     if(err)
                                                                     {
-                                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                                        callback(err, xmlBuilder.createRejectResponse());
                                                                     }
                                                                     else if(epList && epList.length > 0)
                                                                     {
@@ -1425,7 +1425,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     }
                                                                     else
                                                                     {
-                                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                                        callback(err, xmlBuilder.createRejectResponse());
                                                                     }
                                                                 })
                                                             }
@@ -1463,7 +1463,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 {
                                                                     if(err)
                                                                     {
-                                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                                        callback(err, xmlBuilder.createRejectResponse());
                                                                     }
                                                                     else
                                                                     {
@@ -1535,7 +1535,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     }
                                                                     else
                                                                     {
-                                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                                        callback(err, xmlBuilder.createRejectResponse());
                                                                     }
                                                                 });
                                                             }
@@ -1589,7 +1589,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     }
                                                                     else
                                                                     {
-                                                                        callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                                        callback(undefined, xmlBuilder.createRejectResponse());
                                                                     }
                                                                 })
                                                             }
@@ -1636,19 +1636,19 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         }
                                                                         else
                                                                         {
-                                                                            callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                                            callback(undefined, xmlBuilder.createRejectResponse());
                                                                         }
                                                                     }
                                                                     else
                                                                     {
-                                                                        callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                                        callback(undefined, xmlBuilder.createRejectResponse());
                                                                     }
 
                                                                 });
                                                             }
                                                             else
                                                             {
-                                                                callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                                callback(undefined, xmlBuilder.createRejectResponse());
                                                             }
                                                         }
                                                         else
@@ -1700,7 +1700,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 }
                                                                 else
                                                                 {
-                                                                    callback(err, xmlBuilder.createNotFoundResponse());
+                                                                    callback(err, xmlBuilder.createRejectResponse());
                                                                 }
                                                             });
                                                         }
@@ -1754,7 +1754,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     }
                                                     else
                                                     {
-                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                        callback(err, xmlBuilder.createRejectResponse());
                                                     }
                                                 });
                                             }
@@ -1762,7 +1762,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         }
                                         else
                                         {
-                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                            callback(err, xmlBuilder.createRejectResponse());
                                         }
 
                                     }
@@ -1774,7 +1774,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         }
                                         else
                                         {
-                                            callback(new Error('fax types not set'), xmlBuilder.createNotFoundResponse());
+                                            callback(new Error('fax types not set'), xmlBuilder.createRejectResponse());
                                         }
                                     }
                                     else if(extDetails.ObjCategory === 'GROUP')
@@ -1811,7 +1811,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 }
                                                 else
                                                 {
-                                                    callback(err, xmlBuilder.createNotFoundResponse());
+                                                    callback(err, xmlBuilder.createRejectResponse());
                                                 }
                                             });
 
@@ -1819,7 +1819,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         }
                                         else
                                         {
-                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                            callback(err, xmlBuilder.createRejectResponse());
                                         }
 
 
@@ -1837,7 +1837,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         {
                                             if(err)
                                             {
-                                                callback(err, xmlBuilder.createNotFoundResponse());
+                                                callback(err, xmlBuilder.createRejectResponse());
                                             }
                                             else if(pbxDetails)
                                             {
@@ -1848,7 +1848,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             }
                                             else
                                             {
-                                                callback(new Error('PBX app returned empty value'), xmlBuilder.createNotFoundResponse());
+                                                callback(new Error('PBX app returned empty value'), xmlBuilder.createRejectResponse());
                                             }
 
                                         });
@@ -1856,13 +1856,13 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                     }
                                     else
                                     {
-                                        callback(new Error('Unsupported extension category'), xmlBuilder.createNotFoundResponse());
+                                        callback(new Error('Unsupported extension category'), xmlBuilder.createRejectResponse());
                                     }
 
                                 }
                                 else
                                 {
-                                    callback(new Error('Unsupported extension'), xmlBuilder.createNotFoundResponse());
+                                    callback(new Error('Unsupported extension'), xmlBuilder.createRejectResponse());
 
                                 }
                             });
@@ -1878,7 +1878,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                     if(err)
                                     {
                                         logger.error('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extended App Returned Error', reqId, err);
-                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                        callback(err, xmlBuilder.createRejectResponse());
                                     }
                                     else
                                     {
@@ -1910,7 +1910,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 {
                                                     if(err)
                                                     {
-                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                        callback(err, xmlBuilder.createRejectResponse());
                                                     }
                                                     else if(rule)
                                                     {
@@ -1977,7 +1977,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         }
                                                         else
                                                         {
-                                                            callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                            callback(undefined, xmlBuilder.createRejectResponse());
                                                         }
 
 
@@ -1985,21 +1985,21 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     }
                                                     else
                                                     {
-                                                        callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                        callback(undefined, xmlBuilder.createRejectResponse());
                                                     }
                                                 })
                                             }
                                             else
                                             {
                                                 logger.error('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Unsupported Operation Type Returned From Extended App', reqId);
-                                                callback(new Error('Unsupported Operation Type Returned From Extended App'), xmlBuilder.createNotFoundResponse());
+                                                callback(new Error('Unsupported Operation Type Returned From Extended App'), xmlBuilder.createRejectResponse());
                                             }
 
                                         }
                                         else
                                         {
                                             logger.error('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extended App Returned Empty Result', reqId);
-                                            callback(new Error('PBX app returned empty value'), xmlBuilder.createNotFoundResponse());
+                                            callback(new Error('PBX app returned empty value'), xmlBuilder.createRejectResponse());
                                         }
                                     }
                                 })
@@ -2010,7 +2010,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                 {
                                     if(err)
                                     {
-                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                        callback(err, xmlBuilder.createRejectResponse());
                                     }
                                     else if(rule)
                                     {
@@ -2063,7 +2063,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                     }
                                     else
                                     {
-                                        callback(undefined, xmlBuilder.createNotFoundResponse());
+                                        callback(undefined, xmlBuilder.createRejectResponse());
                                     }
                                 })
                             }
@@ -2096,7 +2096,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                         {
                             if(err)
                             {
-                                callback(err, xmlBuilder.createNotFoundResponse());
+                                callback(err, xmlBuilder.createRejectResponse());
                             }
                             else if(extInfo)
                             {
@@ -2106,7 +2106,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                     if(err)
                                     {
                                         //return default xml
-                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                        callback(err, xmlBuilder.createRejectResponse());
                                     }
                                     else if(extDetails)
                                     {
@@ -2137,11 +2137,11 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     {
                                                         if(err)
                                                         {
-                                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                                            callback(err, xmlBuilder.createRejectResponse());
                                                         }
                                                         else if(!pbxDetails)
                                                         {
-                                                            callback(new Error('PBX app returned empty value'), xmlBuilder.createNotFoundResponse());
+                                                            callback(new Error('PBX app returned empty value'), xmlBuilder.createRejectResponse());
                                                             /*var recEnabled = false;
                                                             if(fromUserData.Extension.RecordingEnabled)
                                                             {
@@ -2194,7 +2194,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 }
                                                                 else
                                                                 {
-                                                                    callback(err, xmlBuilder.createNotFoundResponse());
+                                                                    callback(err, xmlBuilder.createRejectResponse());
                                                                 }
                                                             });*/
                                                         }
@@ -2276,7 +2276,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     }
                                                                     else
                                                                     {
-                                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                                        callback(err, xmlBuilder.createRejectResponse());
                                                                     }
                                                                 });
                                                             }
@@ -2288,7 +2288,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     {
                                                                         if(err)
                                                                         {
-                                                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                                                            callback(err, xmlBuilder.createRejectResponse());
                                                                         }
                                                                         else if(epList && epList.length > 0)
                                                                         {
@@ -2298,7 +2298,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         }
                                                                         else
                                                                         {
-                                                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                                                            callback(err, xmlBuilder.createRejectResponse());
                                                                         }
                                                                     })
                                                                 }
@@ -2336,7 +2336,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     {
                                                                         if(err)
                                                                         {
-                                                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                                                            callback(err, xmlBuilder.createRejectResponse());
                                                                         }
                                                                         else
                                                                         {
@@ -2415,7 +2415,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         }
                                                                         else
                                                                         {
-                                                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                                                            callback(err, xmlBuilder.createRejectResponse());
                                                                         }
                                                                     });
                                                                 }
@@ -2469,7 +2469,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         }
                                                                         else
                                                                         {
-                                                                            callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                                            callback(undefined, xmlBuilder.createRejectResponse());
                                                                         }
                                                                     })
                                                                 }
@@ -2516,19 +2516,19 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                             }
                                                                             else
                                                                             {
-                                                                                callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                                                callback(undefined, xmlBuilder.createRejectResponse());
                                                                             }
                                                                         }
                                                                         else
                                                                         {
-                                                                            callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                                            callback(undefined, xmlBuilder.createRejectResponse());
                                                                         }
 
                                                                     });
                                                                 }
                                                                 else
                                                                 {
-                                                                    callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                                    callback(undefined, xmlBuilder.createRejectResponse());
                                                                 }
                                                             }
                                                             else
@@ -2587,7 +2587,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     }
                                                                     else
                                                                     {
-                                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                                        callback(err, xmlBuilder.createRejectResponse());
                                                                     }
                                                                 });
                                                             }
@@ -2649,7 +2649,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         }
                                                         else
                                                         {
-                                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                                            callback(err, xmlBuilder.createRejectResponse());
                                                         }
                                                     });
                                                 }
@@ -2657,7 +2657,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             }
                                             else
                                             {
-                                                callback(err, xmlBuilder.createNotFoundResponse());
+                                                callback(err, xmlBuilder.createRejectResponse());
                                             }
 
                                         }
@@ -2669,7 +2669,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             }
                                             else
                                             {
-                                                callback(new Error('fax types not set'), xmlBuilder.createNotFoundResponse());
+                                                callback(new Error('fax types not set'), xmlBuilder.createRejectResponse());
                                             }
                                         }
                                         else if(extDetails.ObjCategory === 'GROUP')
@@ -2706,7 +2706,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     }
                                                     else
                                                     {
-                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                        callback(err, xmlBuilder.createRejectResponse());
                                                     }
                                                 });
 
@@ -2714,7 +2714,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             }
                                             else
                                             {
-                                                callback(err, xmlBuilder.createNotFoundResponse());
+                                                callback(err, xmlBuilder.createRejectResponse());
                                             }
 
 
@@ -2732,7 +2732,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             {
                                                 if(err)
                                                 {
-                                                    callback(err, xmlBuilder.createNotFoundResponse());
+                                                    callback(err, xmlBuilder.createRejectResponse());
                                                 }
                                                 else if(pbxDetails)
                                                 {
@@ -2743,7 +2743,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 }
                                                 else
                                                 {
-                                                    callback(new Error('PBX app returned empty value'), xmlBuilder.createNotFoundResponse());
+                                                    callback(new Error('PBX app returned empty value'), xmlBuilder.createRejectResponse());
                                                 }
 
                                             });
@@ -2751,13 +2751,13 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         }
                                         else
                                         {
-                                            callback(new Error('Unsupported extension category'), xmlBuilder.createNotFoundResponse());
+                                            callback(new Error('Unsupported extension category'), xmlBuilder.createRejectResponse());
                                         }
 
                                     }
                                     else
                                     {
-                                        callback(new Error('Unsupported extension'), xmlBuilder.createNotFoundResponse());
+                                        callback(new Error('Unsupported extension'), xmlBuilder.createRejectResponse());
 
                                     }
                                 });
@@ -2773,7 +2773,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         if(err)
                                         {
                                             logger.error('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extended App Returned Error', reqId, err);
-                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                            callback(err, xmlBuilder.createRejectResponse());
                                         }
                                         else
                                         {
@@ -2805,7 +2805,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     {
                                                         if(err)
                                                         {
-                                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                                            callback(err, xmlBuilder.createRejectResponse());
                                                         }
                                                         else if(rule)
                                                         {
@@ -2872,13 +2872,13 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             }
                                                             else
                                                             {
-                                                                callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                                callback(undefined, xmlBuilder.createRejectResponse());
                                                             }
 
                                                         }
                                                         else
                                                         {
-                                                            callback(undefined, xmlBuilder.createNotFoundResponse());
+                                                            callback(undefined, xmlBuilder.createRejectResponse());
                                                         }
                                                     })
                                                 }
@@ -2893,7 +2893,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         {
                                                             if(err)
                                                             {
-                                                                var xml = xmlBuilder.createNotFoundResponse();
+                                                                var xml = xmlBuilder.createRejectResponse();
                                                                 callback(err, xml);
                                                             }
                                                             else
@@ -2909,14 +2909,14 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     }
                                                                     else
                                                                     {
-                                                                        var xml = xmlBuilder.createNotFoundResponse();
+                                                                        var xml = xmlBuilder.createRejectResponse();
                                                                         callback(undefined, xml);
                                                                     }
 
                                                                 }
                                                                 else
                                                                 {
-                                                                    var xml = xmlBuilder.createNotFoundResponse();
+                                                                    var xml = xmlBuilder.createRejectResponse();
                                                                     callback(undefined, xml);
                                                                 }
 
@@ -2927,7 +2927,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     }
                                                     else
                                                     {
-                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                        callback(err, xmlBuilder.createRejectResponse());
                                                     }
 
                                                 }
@@ -2942,7 +2942,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     }
                                                     else
                                                     {
-                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                        callback(err, xmlBuilder.createRejectResponse());
                                                     }
 
                                                 }
@@ -2961,7 +2961,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         }
                                                         else
                                                         {
-                                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                                            callback(err, xmlBuilder.createRejectResponse());
                                                         }
                                                     })
 
@@ -2981,7 +2981,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         }
                                                         else
                                                         {
-                                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                                            callback(err, xmlBuilder.createRejectResponse());
                                                         }
                                                     })
 
@@ -2996,7 +2996,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         {
                                                             if(err || !extDetails || !extDetails.SipUACEndpoint || !extDetails.SipUACEndpoint.CloudEndUser)
                                                             {
-                                                                callback(err, xmlBuilder.createNotFoundResponse());
+                                                                callback(err, xmlBuilder.createRejectResponse());
                                                             }
                                                             else
                                                             {
@@ -3008,21 +3008,21 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     }
                                                     else
                                                     {
-                                                        callback(err, xmlBuilder.createNotFoundResponse());
+                                                        callback(err, xmlBuilder.createRejectResponse());
                                                     }
 
                                                 }
                                                 else
                                                 {
                                                     logger.error('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Unsupported Operation Type Returned From Extended App', reqId);
-                                                    callback(new Error('Unsupported Operation Type Returned From Extended App'), xmlBuilder.createNotFoundResponse());
+                                                    callback(new Error('Unsupported Operation Type Returned From Extended App'), xmlBuilder.createRejectResponse());
                                                 }
 
                                             }
                                             else
                                             {
                                                 logger.error('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Extended App Returned Empty Result', reqId);
-                                                callback(new Error('deny request from pbx'), xmlBuilder.createNotFoundResponse());
+                                                callback(new Error('deny request from pbx'), xmlBuilder.createRejectResponse());
                                             }
                                         }
                                     })
@@ -3033,7 +3033,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                     {
                                         if(err)
                                         {
-                                            callback(err, xmlBuilder.createNotFoundResponse());
+                                            callback(err, xmlBuilder.createRejectResponse());
                                         }
                                         else if(rule)
                                         {
@@ -3086,7 +3086,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         }
                                         else
                                         {
-                                            callback(undefined, xmlBuilder.createNotFoundResponse());
+                                            callback(undefined, xmlBuilder.createRejectResponse());
                                         }
                                     })
                                 }
@@ -3095,7 +3095,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                     }
                     else
                     {
-                        callback(new Error('From User Not Found'), xmlBuilder.createNotFoundResponse());
+                        callback(new Error('From User Not Found'), xmlBuilder.createRejectResponse());
                     }
                 }
 

@@ -22,6 +22,8 @@ var createRejectResponse = function()
             .ele('extension').att('name', 'test')
             .ele('condition').att('field', 'destination_number').att('expression', '99')
 
+        cond.ele('action').att('application', 'answer')
+            .up()
         cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=CALL_REJECTED')
             .up()
         cond.ele('action').att('application', 'hangup').att('data', 'CALL_REJECTED')

@@ -1625,7 +1625,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
                 if(err)
                 {
                     logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetGroupBy_Name_Domain threw an exception', reqId, err);
-                    var xml = xmlGen.createRejectResponse();
+                    var xml = xmlGen.createNotFoundResponse();
 
                     logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
 
@@ -1644,7 +1644,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
                 else
                 {
                     logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetGroupBy_Name_Domain returned empty object', reqId);
-                    var xml = xmlGen.createRejectResponse();
+                    var xml = xmlGen.createNotFoundResponse();
 
                     logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
 
@@ -1673,7 +1673,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
                 if(err)
                 {
                     logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - GetUserBy_Name_Domain threw an exception', reqId, err);
-                    var xml = xmlGen.createRejectResponse();
+                    var xml = xmlGen.createNotFoundResponse();
 
                     logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
 
@@ -1696,7 +1696,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
                     else
                     {
                         logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - User Has NO Cloud End User', reqId);
-                        var xml = xmlGen.createRejectResponse();
+                        var xml = xmlGen.createNotFoundResponse();
                         logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
                         res.end(xml);
                     }
@@ -1704,7 +1704,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
                 else
                 {
                     logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - backendHandler.GetUserBy_Name_Domain returned empty object', reqId);
-                    var xml = xmlGen.createRejectResponse();
+                    var xml = xmlGen.createNotFoundResponse();
 
                     logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
 
@@ -1750,7 +1750,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
                     {
                         logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - User Has NO Cloud End User', reqId);
 
-                        var xml = xmlGen.createRejectResponse();
+                        var xml = xmlGen.createNotFoundResponse();
 
                         logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
 
@@ -1761,7 +1761,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
                 {
                     logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - User not found', reqId, err);
 
-                    var xml = xmlGen.createRejectResponse();
+                    var xml = xmlGen.createNotFoundResponse();
 
                     logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
 
@@ -1788,7 +1788,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
                 else
                 {
                     logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - Gateways not found', reqId, err);
-                    var xml = xmlGen.createRejectResponse();
+                    var xml = xmlGen.createNotFoundResponse();
 
                     logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
 
@@ -1799,7 +1799,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
         }
         else
         {
-            var xml = xmlGen.createRejectResponse();
+            var xml = xmlGen.createNotFoundResponse();
             logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
             res.end(xml);
         }
@@ -1808,7 +1808,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
     catch(ex)
     {
         logger.error('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - Exception occurred on DirectoryProfile Api Method - Error : ', reqId, ex);
-        var xml = xmlGen.createRejectResponse();
+        var xml = xmlGen.createNotFoundResponse();
         logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - API RESPONSE - %s', reqId, xml);
     }
 

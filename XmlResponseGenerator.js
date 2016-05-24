@@ -38,7 +38,7 @@ var createRejectResponse = function()
 
         cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=CALL_REJECTED')
             .up()
-        cond.ele('action').att('application', 'hangup').att('data', 'CALL_REJECTED')
+        cond.ele('action').att('application', 'hangup').att('data', 'USER_BUSY')
             .up()
 
             .end({pretty: true});

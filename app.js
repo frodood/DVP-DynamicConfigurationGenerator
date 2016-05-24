@@ -407,9 +407,13 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
 
                                                     redisHandler.AddChannelIdToSet(varUuid, setNameApp, function(err, redisRes){});
 
-                                                    var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CHANNEL", "CREATE", rule.Application.id, "", varUuid);
+                                                    var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CHANNEL", "CREATE", "", "", varUuid);
 
                                                     redisHandler.PublishToRedis('events', pubMessage, function(err, redisRes){});
+
+                                                    var pubMessageCalls = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CALL", "CREATE", "", "", varUuid);
+
+                                                    redisHandler.PublishToRedis('events', pubMessageCalls, function(err, redisRes){});
 
                                                 }
                                                 else
@@ -1035,9 +1039,13 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                                                         redisHandler.AddChannelIdToSet(varUuid, setNameApp, function(err, redisRes){});
 
-                                                                        var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CHANNEL", "CREATE", rule.Application.id, "", varUuid);
+                                                                        var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CHANNEL", "CREATE", "", "", varUuid);
 
                                                                         redisHandler.PublishToRedis('events', pubMessage, function(err, redisRes){});
+
+                                                                        var pubMessageCalls = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CALL", "CREATE", "", "", varUuid);
+
+                                                                        redisHandler.PublishToRedis('events', pubMessageCalls, function(err, redisRes){});
 
                                                                     }
                                                                     else

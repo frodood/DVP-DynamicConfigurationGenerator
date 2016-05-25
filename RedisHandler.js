@@ -241,6 +241,36 @@ var AddChannelIdToSet = function(uuid, setName)
 
 }
 
+var AddToHash = function(hashId, key, value, callback)
+{
+    try
+    {
+        if(client.connected)
+        {
+            client.hset(hashId, key, value, function (err, reply)
+            {
+                if(err)
+                {
+                    logger.error('[DVP-DynamicConfigurationGenerator.AddToHash] - [%s] - REDIS ERROR', err);
+                }
+                else
+                {
+                    logger.debug('[DVP-DynamicConfigurationGenerator.AddToHash] - [%s] - REDIS SUCCESS');
+
+                }
+
+                callback(err, reply);
+
+            });
+        }
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.AddToHash] - [%s] - REDIS ERROR', ex);
+    }
+};
+
 client.on('error', function(msg)
 {
 
@@ -254,3 +284,4 @@ module.exports.GetObject = GetObject;
 module.exports.AddChannelIdToSet = AddChannelIdToSet;
 module.exports.GetObjectParseJson = GetObjectParseJson;
 module.exports.IncrementKey = IncrementKey;
+module.exports.AddToHash = AddToHash;

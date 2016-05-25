@@ -12,11 +12,17 @@ var createRejectResponse = function(context)
 {
     try
     {
+        var tempContext = 'public';
+
+        if(context)
+        {
+            tempContext = context;
+        }
         var doc = xmlBuilder.create('document');
 
         var cond = doc.att('type', 'freeswitch/xml')
             .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
-            .ele('context').att('name', context)
+            .ele('context').att('name', tempContext)
             .ele('extension').att('name', 'test')
             .ele('condition').att('field', 'destination_number').att('expression', '[^\\s]*')
 
@@ -34,7 +40,7 @@ var createRejectResponse = function(context)
     }
     catch(ex)
     {
-        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', ex);
         return createNotFoundResponse();
     }
 }
@@ -179,7 +185,7 @@ var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context,
                 .up()
         }
 
-        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=DND')
+        cond.ele('action').att('application', 'set').att('data', 'DVP_ACTION_CAT=DND')
             .up()
 
         if(numLimitInfo && numLimitInfo.CheckLimit)

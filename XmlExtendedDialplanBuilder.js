@@ -266,6 +266,8 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
 
         cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=CONFERENCE')
             .up()
+            .ele('action').att('application', 'set').att('data', 'DVP_CONFERENCE_NAME=' + confName)
+            .up()
 
 
         if(companyId)
@@ -306,9 +308,9 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
                     destinationGroup = util.format('gateway/%s', ep.Profile);
 
                     if (ep.LegStartDelay > 0)
-                        option = util.format("['leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s,DVP_OPERATION_CAT=%s, DVP_ACTION_CAT=%s, companyid=%s,tenantid=%s,dvp_app_id=%s']", ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl, 'CONFERENCE', 'GATEWAYOUT', companyId, tenantId, appId);
+                        option = util.format("['leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s,DVP_OPERATION_CAT=%s, DVP_ACTION_CAT=%s, companyid=%s,tenantid=%s,dvp_app_id=%s,DVP_CONFERENCE_NAME=%s']", ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl, 'CONFERENCE', 'GATEWAYOUT', companyId, tenantId, appId, confName);
                     else
-                        option = util.format("['leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s,DVP_OPERATION_CAT=%s, DVP_ACTION_CAT=%s, companyid=%s,tenantid=%s,dvp_app_id=%s']", ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl, 'CONFERENCE', 'GATEWAYOUT', companyId, tenantId, appId);
+                        option = util.format("['leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s,DVP_OPERATION_CAT=%s, DVP_ACTION_CAT=%s, companyid=%s,tenantid=%s,dvp_app_id=%s,DVP_CONFERENCE_NAME=%s']", ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl, 'CONFERENCE', 'GATEWAYOUT', companyId, tenantId, appId, confName);
 
                 }
                 else
@@ -316,9 +318,9 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
                     destinationGroup = 'user';
 
                     if (ep.LegStartDelay > 0)
-                        option = util.format("['leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,DVP_OPERATION_CAT=%s, DVP_ACTION_CAT=%s, companyid=%s,tenantid=%s,dvp_app_id=%s']", ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, 'CONFERENCE', 'USEROUT', companyId, tenantId, appId);
+                        option = util.format("['leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,DVP_OPERATION_CAT=%s, DVP_ACTION_CAT=%s, companyid=%s,tenantid=%s,dvp_app_id=%s,DVP_CONFERENCE_NAME=%s']", ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, 'CONFERENCE', 'USEROUT', companyId, tenantId, appId, confName);
                     else
-                        option = util.format("['leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,DVP_OPERATION_CAT=%s, DVP_ACTION_CAT=%s, companyid=%s,tenantid=%s,dvp_app_id=%s']", ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, 'CONFERENCE', 'USEROUT', companyId, tenantId, appId);
+                        option = util.format("['leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,DVP_OPERATION_CAT=%s, DVP_ACTION_CAT=%s, companyid=%s,tenantid=%s,dvp_app_id=%s,DVP_CONFERENCE_NAME=%s']", ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, 'CONFERENCE', 'USEROUT', companyId, tenantId, appId, confName);
 
                 }
 

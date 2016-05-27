@@ -1695,7 +1695,7 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
 
 };
 
-var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, destinationPattern, ignoreEarlyMedia, numLimitInfo)
+var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, destinationPattern, ignoreEarlyMedia, numLimitInfo, companyId, tenantId, appId)
 {
     try
     {
@@ -1738,6 +1738,25 @@ var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, dest
             .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
             .up()
 
+        cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=FOLLOW_ME')
+            .up()
+
+        if(companyId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
+                .up()
+        }
+        if(tenantId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
+                .up()
+        }
+        if(appId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+                .up()
+        }
+
         if(numLimitInfo && numLimitInfo.CheckLimit)
         {
             if(numLimitInfo.NumType === 'INBOUND')
@@ -1771,39 +1790,32 @@ var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, dest
         {
             var option = '';
             var destinationGroup = '';
-            var bypassMed = 'bypass_media=false';
-
 
             if(ep.Type === 'GATEWAY')
             {
                 destinationGroup = util.format('gateway/%s', ep.Profile);
 
                 if (ep.LegStartDelay > 0)
-                    option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain);
+                    option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s,sip_h_DVP-DESTINATION-TYPE=%s,DVP_OPERATION_CAT=%s,bypass_media=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain, 'GATEWAY', 'GATEWAY', 'false');
                 else
-                    option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain);
+                    option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s,sip_h_DVP-DESTINATION-TYPE=%s,DVP_OPERATION_CAT=%s,bypass_media=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain, 'GATEWAY', 'GATEWAY', 'false');
 
-                bypassMed = 'bypass_media=false';
             }
             else if(ep.Type === 'PUBLIC_USER')
             {
                 destinationGroup = ep.Profile;
 
                 if (ep.LegStartDelay > 0)
-                    option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain);
+                    option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s,sip_h_DVP-DESTINATION-TYPE=%s,DVP_OPERATION_CAT=%s,bypass_media=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain, 'PUBLIC_USER', 'PUBLIC_USER', 'false');
                 else
-                    option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain);
+                    option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s,sip_h_DVP-DESTINATION-TYPE=%s,DVP_OPERATION_CAT=%s,bypass_media=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain, 'PUBLIC_USER', 'PUBLIC_USER', 'false');
 
-                bypassMed = 'bypass_media=false';
             }
             else
             {
                 destinationGroup = 'user';
 
-                if (ep.LegStartDelay > 0)
-                    option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
-                else
-                    option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
+                var bypassMed = 'bypass_media=false';
 
                 if(ep.BypassMedia)
                 {
@@ -1813,6 +1825,13 @@ var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, dest
                 {
                     bypassMed = 'bypass_media=false';
                 }
+
+                if (ep.LegStartDelay > 0)
+                    option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,DVP_OPERATION_CAT=%s,bypass_media=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, 'PRIVATE_USER', bypassMed);
+                else
+                    option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,DVP_OPERATION_CAT=%s,bypass_media=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, 'PRIVATE_USER', bypassMed);
+
+
 
             }
 
@@ -1839,52 +1858,7 @@ var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, dest
                 calling = util.format('%s%s/%s', option, destinationGroup, dnis);
             }
 
-            if(ep.Action)
-            {
-                cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=' + ep.Action)
-                    .up()
-            }
-
-            if(ep.Type === 'PUBLIC_USER')
-            {
-                cond.ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=PUBLIC_USER')
-                    .up()
-                    .ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=PUBLIC_USER')
-                    .up()
-            }
-            else if(ep.Type === 'GATEWAY')
-            {
-                cond.ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=GATEWAY')
-                    .up()
-                    .ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=GATEWAY')
-                    .up()
-            }
-            else
-            {
-                cond.ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=PRIVATE_USER')
-                    .up()
-            }
-
-            if(ep.CompanyId)
-            {
-                cond.ele('action').att('application', 'export').att('data', 'companyid=' + ep.CompanyId)
-                    .up()
-            }
-            if(ep.TenantId)
-            {
-                cond.ele('action').att('application', 'export').att('data', 'tenantid=' + ep.TenantId)
-                    .up()
-            }
-            if(ep.AppId)
-            {
-                cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + ep.AppId)
-                    .up()
-            }
-
-
-            cond.ele('action').att('application', 'set').att('data', bypassMed)
-                .up()
-                .ele('action').att('application', 'bridge').att('data', calling)
+            cond.ele('action').att('application', 'bridge').att('data', calling)
                 .up()
 
         });

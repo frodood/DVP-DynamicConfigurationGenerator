@@ -600,6 +600,9 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
                 .up()
         }
 
+        cond.ele('action').att('application', 'hangup')
+        .up()
+
         cond.end({pretty: true});
 
 
@@ -1674,6 +1677,8 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
 
         cond.ele('action').att('application', 'bridge').att('data', calling)
             .up()
+            .ele('action').att('application', 'hangup')
+            .up()
 
         cond.end({pretty: true});
 
@@ -1883,6 +1888,9 @@ var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, dest
                 .up()
 
         });
+
+        cond.ele('action').att('application', 'hangup')
+            .up()
 
         cond.end({pretty: true});
 

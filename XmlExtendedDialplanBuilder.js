@@ -147,7 +147,7 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
     }
 };
 
-var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context, numLimitInfo, companyId, tenantId, appId)
+var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context, numLimitInfo, companyId, tenantId, appId, dvpCallDirection)
 {
     try
     {
@@ -182,6 +182,12 @@ var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context,
         if(appId)
         {
             cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+                .up()
+        }
+
+        if(dvpCallDirection)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 
@@ -235,7 +241,7 @@ var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context,
 
 };
 
-var CreateConferenceDialplan = function(reqId, epList, context, destinationPattern, ignoreEarlyMedia, confName, domain, pin, mode, companyId, tenantId, appId)
+var CreateConferenceDialplan = function(reqId, epList, context, destinationPattern, ignoreEarlyMedia, confName, domain, pin, mode, companyId, tenantId, appId, dvpCallDirection)
 {
     try
     {
@@ -287,6 +293,11 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
             cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
                 .up()
         }
+        if(dvpCallDirection)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+                .up()
+        }
 
         if(epList)
         {
@@ -310,9 +321,9 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
                     destinationGroup = util.format('gateway/%s', ep.Profile);
 
                     if (ep.LegStartDelay > 0)
-                        option = util.format("['leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s,DVP_OPERATION_CAT=%s, DVP_ACTION_CAT=%s, companyid=%s,tenantid=%s,dvp_app_id=%s,DVP_CONFERENCE_NAME=%s']", ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl, 'GATEWAY', 'CONFERENCE', companyId, tenantId, appId, confName);
+                        option = util.format("['leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s,DVP_OPERATION_CAT=%s, DVP_ACTION_CAT=%s, companyid=%s,tenantid=%s,dvp_app_id=%s,DVP_CONFERENCE_NAME=%s,DVP_CALL_DIRECTION=outbound']", ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl, 'GATEWAY', 'CONFERENCE', companyId, tenantId, appId, confName);
                     else
-                        option = util.format("['leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s,DVP_OPERATION_CAT=%s, DVP_ACTION_CAT=%s, companyid=%s,tenantid=%s,dvp_app_id=%s,DVP_CONFERENCE_NAME=%s']", ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl, 'GATEWAY', 'CONFERENCE', companyId, tenantId, appId, confName);
+                        option = util.format("['leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s,DVP_OPERATION_CAT=%s, DVP_ACTION_CAT=%s, companyid=%s,tenantid=%s,dvp_app_id=%s,DVP_CONFERENCE_NAME=%s,DVP_CALL_DIRECTION=outbound']", ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.IpUrl, 'GATEWAY', 'CONFERENCE', companyId, tenantId, appId, confName);
 
                 }
                 else
@@ -320,9 +331,9 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
                     destinationGroup = 'user';
 
                     if (ep.LegStartDelay > 0)
-                        option = util.format("['leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,DVP_OPERATION_CAT=%s, DVP_ACTION_CAT=%s, companyid=%s,tenantid=%s,dvp_app_id=%s,DVP_CONFERENCE_NAME=%s']", ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, 'USER', 'CONFERENCE', companyId, tenantId, appId, confName);
+                        option = util.format("['leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,DVP_OPERATION_CAT=%s, DVP_ACTION_CAT=%s, companyid=%s,tenantid=%s,dvp_app_id=%s,DVP_CONFERENCE_NAME=%s,DVP_CALL_DIRECTION=outbound']", ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, 'USER', 'CONFERENCE', companyId, tenantId, appId, confName);
                     else
-                        option = util.format("['leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,DVP_OPERATION_CAT=%s, DVP_ACTION_CAT=%s, companyid=%s,tenantid=%s,dvp_app_id=%s,DVP_CONFERENCE_NAME=%s']", ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, 'USER', 'CONFERENCE', companyId, tenantId, appId, confName);
+                        option = util.format("['leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,DVP_OPERATION_CAT=%s, DVP_ACTION_CAT=%s, companyid=%s,tenantid=%s,dvp_app_id=%s,DVP_CONFERENCE_NAME=%s,DVP_CALL_DIRECTION=outbound']", ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, 'USER', 'CONFERENCE', companyId, tenantId, appId, confName);
 
                 }
 
@@ -385,7 +396,7 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
 
 };
 
-var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia, numLimitInfo, transferLegInfo, appId)
+var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia, numLimitInfo, transferLegInfo, dvpCallDirection)
 {
     try
     {
@@ -467,7 +478,7 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
 
         if(ep.Action)
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_ACTION_CAT=' + ep.Action)
+            cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=' + ep.Action)
             .up()
         }
 
@@ -489,17 +500,17 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
         {
             cond.ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=PUBLIC_USER')
                 .up()
-                .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=PUBLIC_USER')
+                .ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=PUBLIC_USER')
                 .up()
         }
         else if(ep.Type === 'GROUP')
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=GROUP')
+            cond.ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=GROUP')
                 .up()
         }
         else
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=PRIVATE_USER')
+            cond.ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=PRIVATE_USER')
                 .up()
         }
 
@@ -516,6 +527,12 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
         if(ep.AppId)
         {
             cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + ep.AppId)
+                .up()
+        }
+
+        if(dvpCallDirection)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 
@@ -1023,7 +1040,7 @@ var CreateReceiveFaxDialplan = function(reqId, context, profile, destinationPatt
 
 };
 
-var CreatePickUpDialplan = function(reqId, extension, context, destinationPattern, appId, companyId, tenantId)
+var CreatePickUpDialplan = function(reqId, extension, context, destinationPattern, appId, companyId, tenantId, dvpCallDirection)
 {
     try
     {
@@ -1063,6 +1080,12 @@ var CreatePickUpDialplan = function(reqId, extension, context, destinationPatter
         if(appId)
         {
             cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+                .up()
+        }
+
+        if(dvpCallDirection)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 
@@ -1128,7 +1151,7 @@ var CreateVoicemailDialplan = function(reqId, extension, context, destinationPat
 
 };
 
-var CreateInterceptDialplan = function(reqId, uuid, context, destinationPattern, companyId, tenantId, appId)
+var CreateInterceptDialplan = function(reqId, uuid, context, destinationPattern, companyId, tenantId, appId, dvpCallDirection)
 {
     try
     {
@@ -1172,6 +1195,11 @@ var CreateInterceptDialplan = function(reqId, uuid, context, destinationPattern,
             cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
                 .up()
         }
+        if(dvpCallDirection)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+                .up()
+        }
 
         cond.end({pretty: true});
 
@@ -1187,7 +1215,7 @@ var CreateInterceptDialplan = function(reqId, uuid, context, destinationPattern,
 
 };
 
-var CreateParkDialplan = function(reqId, extension, context, destinationPattern, parkId, companyId, tenantId, appId)
+var CreateParkDialplan = function(reqId, extension, context, destinationPattern, parkId, companyId, tenantId, appId, dvpCallDirection)
 {
     try
     {
@@ -1230,6 +1258,12 @@ var CreateParkDialplan = function(reqId, extension, context, destinationPattern,
             cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
                 .up()
         }
+        if(dvpCallDirection)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+                .up()
+        }
+
 
         cond.end({pretty: true});
 
@@ -1297,7 +1331,7 @@ var CreateBargeDialplan = function(reqId, uuid, context, destinationPattern, cal
 
 };
 
-var CreateForwardingDialplan = function(reqId, endpoint, context, profile, destinationPattern, ignoreEarlyMedia, fwdKey, numLimitInfo, transferLegInfo)
+var CreateForwardingDialplan = function(reqId, endpoint, context, profile, destinationPattern, ignoreEarlyMedia, fwdKey, numLimitInfo, transferLegInfo, dvpCallDirection)
 {
     try
     {
@@ -1413,6 +1447,12 @@ var CreateForwardingDialplan = function(reqId, endpoint, context, profile, desti
                 .up()
         }
 
+        if(dvpCallDirection)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+                .up()
+        }
+
 
         if(transferLegInfo && transferLegInfo.TransferCode)
         {
@@ -1490,7 +1530,7 @@ var CreateForwardingDialplan = function(reqId, endpoint, context, profile, desti
 
 };
 
-var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia, transferLegInfo)
+var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinationPattern, ignoreEarlyMedia, transferLegInfo, dvpCallDirection)
 {
     try
     {
@@ -1572,6 +1612,11 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
         if(ep.Action)
         {
             cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=' + ep.Action)
+                .up()
+        }
+        if(dvpCallDirection)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 
@@ -1695,7 +1740,7 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
 
 };
 
-var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, destinationPattern, ignoreEarlyMedia, numLimitInfo, companyId, tenantId, appId)
+var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, destinationPattern, ignoreEarlyMedia, numLimitInfo, companyId, tenantId, appId, dvpCallDirection)
 {
     try
     {
@@ -1754,6 +1799,11 @@ var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, dest
         if(appId)
         {
             cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+                .up()
+        }
+        if(dvpCallDirection)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 

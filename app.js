@@ -55,7 +55,7 @@ server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
 
-var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, cacheData, res)
+var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, isDialPlanGiven, cacheData, res)
 {
     try
     {
@@ -117,11 +117,14 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
 
                                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
 
-                                var setName = 'CHANNELS:' + contextTenant + ':' + contextCompany;
+                                if(!isDialPlanGiven)
+                                {
+                                    var setName = 'CHANNELS:' + contextTenant + ':' + contextCompany;
 
-                                redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
+                                    redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
 
-                                redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
+                                    redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
+                                }
 
                                 res.end(extDialplan);
                             })
@@ -187,6 +190,31 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                                                         }
 
                                                         var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, callerContext, profile, '[^\\s]*', false);
+
+
+                                                        if(!isDialPlanGiven)
+                                                        {
+                                                            var setName = 'CHANNELS:' + rule.TenantId + ':' + rule.CompanyId;
+
+                                                            redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
+
+                                                            redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
+
+                                                            var chanIncrKey = 'DVP_CHANNEL_COUNT_COMPANY:' + rule.TenantId + ':' + rule.CompanyId;
+
+                                                            redisHandler.IncrementKey(chanIncrKey, function(err, redisResp){});
+
+                                                            redisHandler.AddToHash(varUuid, 'Application-Type', 'EMERGENCY', function(err, redisRes){});
+
+                                                            var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CHANNEL", "CREATE", "", "", varUuid);
+
+                                                            redisHandler.PublishToRedis('events', pubMessage, function(err, redisRes){});
+
+                                                            var pubMessageCalls = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CALL", "CREATE", "", "", varUuid);
+
+                                                            redisHandler.PublishToRedis('events', pubMessageCalls, function(err, redisRes){});
+                                                        }
+
 
                                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
@@ -392,30 +420,36 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                                                     var jsonStr = JSON.stringify(evtData);
                                                     redisHandler.PublishToRedis('DVPEVENTS', jsonStr, function(err, redisResult){});
 
-                                                    var setName = 'CHANNELS:' + rule.TenantId + ':' + rule.CompanyId;
 
-                                                    redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
+                                                    if(!isDialPlanGiven)
+                                                    {
+                                                        var setName = 'CHANNELS:' + rule.TenantId + ':' + rule.CompanyId;
 
-                                                    redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
+                                                        redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
 
-                                                    var chanIncrKey = 'DVP_CHANNEL_COUNT_COMPANY:' + rule.TenantId + ':' + rule.CompanyId;
+                                                        redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
 
-                                                    redisHandler.IncrementKey(chanIncrKey, function(err, redisResp){});
+                                                        var chanIncrKey = 'DVP_CHANNEL_COUNT_COMPANY:' + rule.TenantId + ':' + rule.CompanyId;
+
+                                                        redisHandler.IncrementKey(chanIncrKey, function(err, redisResp){});
 
 
-                                                    var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
+                                                        var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
 
-                                                    redisHandler.AddChannelIdToSet(varUuid, setNameApp, function(err, redisRes){});
+                                                        redisHandler.AddChannelIdToSet(varUuid, setNameApp, function(err, redisRes){});
 
-                                                    redisHandler.AddToHash(varUuid, 'Application-Type', app.ObjType, function(err, redisRes){});
+                                                        redisHandler.AddToHash(varUuid, 'Application-Type', app.ObjType, function(err, redisRes){});
 
-                                                    var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CHANNEL", "CREATE", "", "", varUuid);
+                                                        var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CHANNEL", "CREATE", "", "", varUuid);
 
-                                                    redisHandler.PublishToRedis('events', pubMessage, function(err, redisRes){});
+                                                        redisHandler.PublishToRedis('events', pubMessage, function(err, redisRes){});
 
-                                                    var pubMessageCalls = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CALL", "CREATE", "", "", varUuid);
+                                                        var pubMessageCalls = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CALL", "CREATE", "", "", varUuid);
 
-                                                    redisHandler.PublishToRedis('events', pubMessageCalls, function(err, redisRes){});
+                                                        redisHandler.PublishToRedis('events', pubMessageCalls, function(err, redisRes){});
+                                                    }
+
+
 
                                                 }
                                                 else
@@ -511,6 +545,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
         var dvpOriginationType = data["variable_sip_h_X-DVP-ORIGINATION-TYPE"];
         var dvpDestinationType = data["variable_sip_h_X-DVP-DESTINATION-TYPE"];
         var appType = data["variable_dvp_app_type"];
+        var isDialplanGiven = data["variable_companyid"];
 
         var csId = parseInt(hostname);
 
@@ -1027,29 +1062,34 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                                                         });
 
-                                                                        var setName = 'CHANNELS:' + rule.TenantId + ':' + rule.CompanyId;
+                                                                        if(!isDialplanGiven)
+                                                                        {
+                                                                            var setName = 'CHANNELS:' + rule.TenantId + ':' + rule.CompanyId;
 
-                                                                        redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
+                                                                            redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
 
-                                                                        redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
+                                                                            redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
 
-                                                                        var chanIncrKey = 'DVP_CHANNEL_COUNT_COMPANY:' + rule.TenantId + ':' + rule.CompanyId;
+                                                                            var chanIncrKey = 'DVP_CHANNEL_COUNT_COMPANY:' + rule.TenantId + ':' + rule.CompanyId;
 
-                                                                        redisHandler.IncrementKey(chanIncrKey, function(err, redisResp){});
+                                                                            redisHandler.IncrementKey(chanIncrKey, function(err, redisResp){});
 
-                                                                        var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
+                                                                            var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
 
-                                                                        redisHandler.AddChannelIdToSet(varUuid, setNameApp, function(err, redisRes){});
+                                                                            redisHandler.AddChannelIdToSet(varUuid, setNameApp, function(err, redisRes){});
 
-                                                                        redisHandler.AddToHash(varUuid, 'Application-Type', app.ObjType, function(err, redisRes){});
+                                                                            redisHandler.AddToHash(varUuid, 'Application-Type', app.ObjType, function(err, redisRes){});
 
-                                                                        var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CHANNEL", "CREATE", "", "", varUuid);
+                                                                            var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CHANNEL", "CREATE", "", "", varUuid);
 
-                                                                        redisHandler.PublishToRedis('events', pubMessage, function(err, redisRes){});
+                                                                            redisHandler.PublishToRedis('events', pubMessage, function(err, redisRes){});
 
-                                                                        var pubMessageCalls = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CALL", "CREATE", "", "", varUuid);
+                                                                            var pubMessageCalls = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CALL", "CREATE", "", "", varUuid);
 
-                                                                        redisHandler.PublishToRedis('events', pubMessageCalls, function(err, redisRes){});
+                                                                            redisHandler.PublishToRedis('events', pubMessageCalls, function(err, redisRes){});
+                                                                        }
+
+
 
                                                                     }
                                                                     else
@@ -1310,31 +1350,32 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                                             });
 
-                                                            var setName = 'CHANNELS:' + rule.TenantId + ':' + rule.CompanyId;
+                                                            if(!isDialplanGiven)
+                                                            {
+                                                                var setName = 'CHANNELS:' + rule.TenantId + ':' + rule.CompanyId;
 
-                                                            redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
+                                                                redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
 
-                                                            redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
+                                                                redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
 
-                                                            var chanIncrKey = 'DVP_CHANNEL_COUNT_COMPANY:' + rule.TenantId + ':' + rule.CompanyId;
+                                                                var chanIncrKey = 'DVP_CHANNEL_COUNT_COMPANY:' + rule.TenantId + ':' + rule.CompanyId;
 
-                                                            redisHandler.IncrementKey(chanIncrKey, function(err, redisResp){});
+                                                                redisHandler.IncrementKey(chanIncrKey, function(err, redisResp){});
 
-                                                            var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
+                                                                var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
 
-                                                            redisHandler.AddChannelIdToSet(varUuid, setNameApp, function(err, redisRes){});
+                                                                redisHandler.AddChannelIdToSet(varUuid, setNameApp, function(err, redisRes){});
 
-                                                            redisHandler.AddToHash(varUuid, 'Application-Type', 'C2C', function(err, redisRes){});
+                                                                redisHandler.AddToHash(varUuid, 'Application-Type', 'C2C', function(err, redisRes){});
 
-                                                            var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CHANNEL", "CREATE", "", "", varUuid);
+                                                                var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CHANNEL", "CREATE", "", "", varUuid);
 
-                                                            redisHandler.PublishToRedis('events', pubMessage, function(err, redisRes){});
+                                                                redisHandler.PublishToRedis('events', pubMessage, function(err, redisRes){});
 
-                                                            var pubMessageCalls = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CALL", "CREATE", "", "", varUuid);
+                                                                var pubMessageCalls = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CALL", "CREATE", "", "", varUuid);
 
-                                                            redisHandler.PublishToRedis('events', pubMessageCalls, function(err, redisRes){});
-
-
+                                                                redisHandler.PublishToRedis('events', pubMessageCalls, function(err, redisRes){});
+                                                            }
 
                                                         }
                                                         else
@@ -1380,7 +1421,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                             {
                                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call Direction OUT', reqId);
 
-                                HandleOutRequest(reqId, data, callerIdNum, contextTenant, appType, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, cacheData, res);
+                                HandleOutRequest(reqId, data, callerIdNum, contextTenant, appType, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, isDialplanGiven, cacheData, res);
 
                             }
 

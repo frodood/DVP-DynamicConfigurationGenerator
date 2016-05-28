@@ -915,7 +915,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             }
                                                             else
                                                             {
-                                                                callback(undefined, xmlBuilder.createRejectResponse());
+                                                                callback(new Error('Outbound rule not found'), xmlBuilder.createRejectResponse());
                                                             }
                                                         })
                                                     }
@@ -960,19 +960,19 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 }
                                                                 else
                                                                 {
-                                                                    callback(undefined, xmlBuilder.createRejectResponse());
+                                                                    callback(new Error('Sip user or cloud end user not found'), xmlBuilder.createRejectResponse());
                                                                 }
                                                             }
                                                             else
                                                             {
-                                                                callback(undefined, xmlBuilder.createRejectResponse());
+                                                                callback(new Error('Extension not found'), xmlBuilder.createRejectResponse());
                                                             }
 
                                                         });
                                                     }
                                                     else
                                                     {
-                                                        callback(undefined, xmlBuilder.createRejectResponse());
+                                                        callback(new Error('PBX endpoints not found'), xmlBuilder.createRejectResponse());
                                                     }
                                                 }
                                                 else

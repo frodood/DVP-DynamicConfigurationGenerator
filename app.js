@@ -54,6 +54,37 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
+var RedisOperations = function(callUuid, companyId, tenantId, appId, appType, isDialplanGiven)
+{
+    if(!isDialplanGiven)
+    {
+        var setName = 'CHANNELS:' + tenantId + ':' + companyId;
+
+        redisHandler.AddChannelIdToSet(callUuid, setName, function(err, redisRes){});
+
+        redisHandler.SetObject('CHANNELMAP:' + callUuid, setName, function(err, redisRes){});
+
+        var chanIncrKey = 'DVP_CHANNEL_COUNT_COMPANY:' + tenantId + ':' + companyId;
+
+        redisHandler.IncrementKey(chanIncrKey, function(err, redisResp){});
+
+        var setNameApp = 'CHANNELS_APP:' + appId;
+
+        redisHandler.AddChannelIdToSet(callUuid, setNameApp, function(err, redisRes){});
+
+        redisHandler.AddToHash(varUuid, 'Application-Type', appType, function(err, redisRes){});
+
+        var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", tenantId, companyId, "CALLSERVER", "CHANNEL", "CREATE", "", "", callUuid);
+
+        redisHandler.PublishToRedis('events', pubMessage, function(err, redisRes){});
+
+        var pubMessageCalls = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", tenantId, companyId, "CALLSERVER", "CALL", "CREATE", "", "", callUuid);
+
+        redisHandler.PublishToRedis('events', pubMessageCalls, function(err, redisRes){});
+    }
+
+};
+
 
 var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, isDialPlanGiven, cacheData, res)
 {
@@ -113,20 +144,30 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                                 if(err)
                                 {
                                     logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Error occurred processing extended dialplan for out call', reqId, err);
+
+                                    var xml = xmlGen.createRejectResponse(callerContext);
+
+                                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+                                    res.end(xml);
                                 }
-
-                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
-
-                                if(!isDialPlanGiven)
+                                else
                                 {
-                                    var setName = 'CHANNELS:' + contextTenant + ':' + contextCompany;
+                                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
 
-                                    redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
+                                    if(!isDialPlanGiven)
+                                    {
+                                        var setName = 'CHANNELS:' + contextTenant + ':' + contextCompany;
 
-                                    redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
+                                        redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
+
+                                        redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
+                                    }
+
+                                    res.end(extDialplan);
+
                                 }
 
-                                res.end(extDialplan);
+
                             })
                         }
                         else
@@ -283,6 +324,8 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                                                                     var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, masterUrl, reqId, null, app.id, rule.CompanyId, rule.TenantId, 'outbound');
 
                                                                     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                                                                    RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialPlanGiven);
                                                                     res.end(xml);
                                                                 }
 
@@ -325,6 +368,8 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
 
                                                                     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
+                                                                    RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialPlanGiven);
+
                                                                     res.end(xml);
                                                                 }
 
@@ -339,10 +384,21 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                                                                 if(err)
                                                                 {
                                                                     logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Error occurred processing extended dialplan for out call', reqId, err);
+
+                                                                    var xml = xmlGen.createRejectResponse(callerContext);
+
+                                                                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+                                                                    res.end(xml);
+                                                                }
+                                                                else
+                                                                {
+                                                                    RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialPlanGiven);
+
+                                                                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
+                                                                    res.end(extDialplan);
                                                                 }
 
-                                                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
-                                                                res.end(extDialplan);
+
                                                             })
                                                         }
                                                         else
@@ -365,6 +421,9 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                                                             var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, app.Url, reqId, undefined, app.id, rule.CompanyId, rule.TenantId, 'outbound');
 
                                                             logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                                                            RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialPlanGiven);
+
                                                             res.end(xml);
 
                                                         }
@@ -375,6 +434,8 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                                                             var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, app.Url, reqId, null, app.id, rule.CompanyId, rule.TenantId, 'outbound');
 
                                                             logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                                                            RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialPlanGiven);
 
                                                             res.end(xml);
                                                         }
@@ -387,10 +448,20 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                                                                 if(err)
                                                                 {
                                                                     logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan Error', reqId, err);
+
+                                                                    var xml = xmlGen.createRejectResponse(callerContext);
+
+                                                                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+                                                                    res.end(xml);
+                                                                }
+                                                                else
+                                                                {
+                                                                    RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialPlanGiven);
+                                                                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
+                                                                    res.end(extDialplan);
                                                                 }
 
-                                                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
-                                                                res.end(extDialplan);
+
                                                             })
                                                         }
                                                         else
@@ -419,36 +490,6 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
 
                                                     var jsonStr = JSON.stringify(evtData);
                                                     redisHandler.PublishToRedis('DVPEVENTS', jsonStr, function(err, redisResult){});
-
-
-                                                    if(!isDialPlanGiven)
-                                                    {
-                                                        var setName = 'CHANNELS:' + rule.TenantId + ':' + rule.CompanyId;
-
-                                                        redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
-
-                                                        redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
-
-                                                        var chanIncrKey = 'DVP_CHANNEL_COUNT_COMPANY:' + rule.TenantId + ':' + rule.CompanyId;
-
-                                                        redisHandler.IncrementKey(chanIncrKey, function(err, redisResp){});
-
-
-                                                        var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
-
-                                                        redisHandler.AddChannelIdToSet(varUuid, setNameApp, function(err, redisRes){});
-
-                                                        redisHandler.AddToHash(varUuid, 'Application-Type', app.ObjType, function(err, redisRes){});
-
-                                                        var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CHANNEL", "CREATE", "", "", varUuid);
-
-                                                        redisHandler.PublishToRedis('events', pubMessage, function(err, redisRes){});
-
-                                                        var pubMessageCalls = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CALL", "CREATE", "", "", varUuid);
-
-                                                        redisHandler.PublishToRedis('events', pubMessageCalls, function(err, redisRes){});
-                                                    }
-
 
 
                                                 }
@@ -919,6 +960,9 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                                         var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, masterUrl, reqId, NumLimitInfo, app.id, rule.CompanyId, rule.TenantId, 'inbound');
 
                                                                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                                                                                        RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialplanGiven);
+
                                                                                         res.end(xml);
                                                                                     }
 
@@ -961,6 +1005,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                                                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
+                                                                                        RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialplanGiven);
+
                                                                                         res.end(xml);
                                                                                     }
 
@@ -975,9 +1021,20 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                                     if(err)
                                                                                     {
                                                                                         logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan Error', reqId, err);
+
+                                                                                        var xml = xmlGen.createRejectResponse(callerContext);
+
+                                                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+                                                                                        res.end(xml);
                                                                                     }
-                                                                                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
-                                                                                    res.end(extDialplan);
+                                                                                    else
+                                                                                    {
+                                                                                        RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialplanGiven);
+
+                                                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
+                                                                                        res.end(extDialplan);
+                                                                                    }
+
                                                                                 })
                                                                             }
                                                                             else
@@ -1001,6 +1058,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                                 var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, app.Url, reqId, NumLimitInfo, app.id, rule.CompanyId, rule.TenantId, 'inbound');
 
                                                                                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+                                                                                RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialplanGiven);
                                                                                 res.end(xml);
 
 
@@ -1012,6 +1070,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                                 var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, app.Url, reqId, NumLimitInfo, app.id, rule.CompanyId, rule.TenantId, 'inbound');
 
                                                                                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                                                                                RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialplanGiven);
 
                                                                                 res.end(xml);
                                                                             }
@@ -1026,9 +1086,20 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                                     if(err)
                                                                                     {
                                                                                         logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan Error', reqId, err);
+
+                                                                                        var xml = xmlGen.createRejectResponse(callerContext);
+
+                                                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+                                                                                        res.end(xml);
                                                                                     }
-                                                                                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
-                                                                                    res.end(extDialplan);
+                                                                                    else
+                                                                                    {
+                                                                                        RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialplanGiven);
+                                                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
+                                                                                        res.end(extDialplan);
+                                                                                    }
+
+
 
                                                                                 })
                                                                             }
@@ -1061,35 +1132,6 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                         {
 
                                                                         });
-
-                                                                        if(!isDialplanGiven)
-                                                                        {
-                                                                            var setName = 'CHANNELS:' + rule.TenantId + ':' + rule.CompanyId;
-
-                                                                            redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
-
-                                                                            redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
-
-                                                                            var chanIncrKey = 'DVP_CHANNEL_COUNT_COMPANY:' + rule.TenantId + ':' + rule.CompanyId;
-
-                                                                            redisHandler.IncrementKey(chanIncrKey, function(err, redisResp){});
-
-                                                                            var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
-
-                                                                            redisHandler.AddChannelIdToSet(varUuid, setNameApp, function(err, redisRes){});
-
-                                                                            redisHandler.AddToHash(varUuid, 'Application-Type', app.ObjType, function(err, redisRes){});
-
-                                                                            var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CHANNEL", "CREATE", "", "", varUuid);
-
-                                                                            redisHandler.PublishToRedis('events', pubMessage, function(err, redisRes){});
-
-                                                                            var pubMessageCalls = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CALL", "CREATE", "", "", varUuid);
-
-                                                                            redisHandler.PublishToRedis('events', pubMessageCalls, function(err, redisRes){});
-                                                                        }
-
-
 
                                                                     }
                                                                     else
@@ -1211,6 +1253,9 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                             var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, masterUrl, reqId, null, app.id, rule.CompanyId, rule.TenantId, 'inbound');
 
                                                                             logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                                                                            RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialplanGiven);
+
                                                                             res.end(xml);
                                                                         }
 
@@ -1253,6 +1298,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                                                             logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
+                                                                            RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialplanGiven);
+
                                                                             res.end(xml);
                                                                         }
 
@@ -1267,9 +1314,19 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                         if(err)
                                                                         {
                                                                             logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan Error', reqId, err);
+
+                                                                            var xml = xmlGen.createRejectResponse(callerContext);
+
+                                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+                                                                            res.end(xml);
                                                                         }
-                                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
-                                                                        res.end(extDialplan);
+                                                                        else
+                                                                        {
+                                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
+                                                                            RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialplanGiven);
+                                                                            res.end(extDialplan);
+                                                                        }
+
                                                                     })
                                                                 }
                                                                 else
@@ -1293,6 +1350,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                     var xml = xmlGen.CreateHttpApiDialplan('[^\\s]*', callerContext, app.Url, reqId, null, app.id, rule.CompanyId, rule.TenantId, 'inbound');
 
                                                                     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+                                                                    RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialplanGiven);
                                                                     res.end(xml);
 
                                                                 }
@@ -1303,6 +1361,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                     var xml = xmlGen.CreateSocketApiDialplan('[^\\s]*', callerContext, app.Url, reqId, null, app.id, rule.CompanyId, rule.TenantId, 'inbound');
 
                                                                     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                                                                    RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialplanGiven);
 
                                                                     res.end(xml);
                                                                 }
@@ -1315,9 +1375,20 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                         if(err)
                                                                         {
                                                                             logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Extended dialplan Error', reqId, err);
+
+                                                                            var xml = xmlGen.createRejectResponse(callerContext);
+
+                                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+                                                                            res.end(xml);
                                                                         }
-                                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
-                                                                        res.end(extDialplan);
+                                                                        else
+                                                                        {
+                                                                            RedisOperations(varUuid, rule.CompanyId, rule.TenantId, rule.Application.id, app.ObjType, isDialplanGiven);
+
+                                                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, extDialplan);
+                                                                            res.end(extDialplan);
+                                                                        }
+
                                                                     })
                                                                 }
                                                                 else
@@ -1349,33 +1420,6 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                             {
 
                                                             });
-
-                                                            if(!isDialplanGiven)
-                                                            {
-                                                                var setName = 'CHANNELS:' + rule.TenantId + ':' + rule.CompanyId;
-
-                                                                redisHandler.AddChannelIdToSet(varUuid, setName, function(err, redisRes){});
-
-                                                                redisHandler.SetObject('CHANNELMAP:' + varUuid, setName, function(err, redisRes){});
-
-                                                                var chanIncrKey = 'DVP_CHANNEL_COUNT_COMPANY:' + rule.TenantId + ':' + rule.CompanyId;
-
-                                                                redisHandler.IncrementKey(chanIncrKey, function(err, redisResp){});
-
-                                                                var setNameApp = 'CHANNELS_APP:' + rule.Application.id;
-
-                                                                redisHandler.AddChannelIdToSet(varUuid, setNameApp, function(err, redisRes){});
-
-                                                                redisHandler.AddToHash(varUuid, 'Application-Type', 'C2C', function(err, redisRes){});
-
-                                                                var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CHANNEL", "CREATE", "", "", varUuid);
-
-                                                                redisHandler.PublishToRedis('events', pubMessage, function(err, redisRes){});
-
-                                                                var pubMessageCalls = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", rule.TenantId, rule.CompanyId, "CALLSERVER", "CALL", "CREATE", "", "", varUuid);
-
-                                                                redisHandler.PublishToRedis('events', pubMessageCalls, function(err, redisRes){});
-                                                            }
 
                                                         }
                                                         else

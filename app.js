@@ -602,6 +602,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
         {
             //Dialplan
 
+            var ardsFeaturesPattern = new RegExp('^(ARDSFeatures)[^\s]*');
+
             var destNum = (huntDestNum) ? huntDestNum:cdnum;
 
             if (huntContext == 'PBXFeatures' && huntDestNum == 'att_xfer')
@@ -613,6 +615,31 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
                 res.end(xml);
+            }
+            else if (ardsFeaturesPattern.test(huntContext) && huntDestNum == 'att_xfer')
+            {
+                logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - ARDS Attendant Transfer User ------------', reqId);
+
+                var huntCtxtSplit = huntContext.split('|');
+
+                if(huntCtxtSplit.length === 3)
+                {
+                    var xml = xmlBuilder.CreatePbxFeatures(reqId, huntDestNum, 'user', varDomain, null, null, huntCtxtSplit[2], huntCtxtSplit[1], null);
+
+                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                    res.end(xml);
+                }
+                else
+                {
+                    var xml = xmlGen.createRejectResponse(callerContext);
+
+                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                    res.end(xml);
+                }
+
+
             }
             else if(huntContext == 'PBXFeatures' && huntDestNum == 'att_xfer_outbound')
             {

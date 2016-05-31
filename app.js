@@ -56,32 +56,40 @@ server.use(restify.bodyParser());
 
 var RedisOperations = function(callUuid, companyId, tenantId, appId, appType, isDialplanGiven)
 {
-    if(!isDialplanGiven)
+    try
     {
-        var setName = 'CHANNELS:' + tenantId + ':' + companyId;
+        if(!isDialplanGiven)
+        {
+            var setName = 'CHANNELS:' + tenantId + ':' + companyId;
 
-        redisHandler.AddChannelIdToSet(callUuid, setName, function(err, redisRes){});
+            redisHandler.AddChannelIdToSet(callUuid, setName, function(err, redisRes){});
 
-        redisHandler.SetObject('CHANNELMAP:' + callUuid, setName, function(err, redisRes){});
+            redisHandler.SetObject('CHANNELMAP:' + callUuid, setName, function(err, redisRes){});
 
-        var chanIncrKey = 'DVP_CHANNEL_COUNT_COMPANY:' + tenantId + ':' + companyId;
+            var chanIncrKey = 'DVP_CHANNEL_COUNT_COMPANY:' + tenantId + ':' + companyId;
 
-        redisHandler.IncrementKey(chanIncrKey, function(err, redisResp){});
+            redisHandler.IncrementKey(chanIncrKey, function(err, redisResp){});
 
-        var setNameApp = 'CHANNELS_APP:' + appId;
+            var setNameApp = 'CHANNELS_APP:' + appId;
 
-        redisHandler.AddChannelIdToSet(callUuid, setNameApp, function(err, redisRes){});
+            redisHandler.AddChannelIdToSet(callUuid, setNameApp, function(err, redisRes){});
 
-        redisHandler.AddToHash(varUuid, 'Application-Type', appType, function(err, redisRes){});
+            redisHandler.AddToHash(callUuid, 'Application-Type', appType, function(err, redisRes){});
 
-        var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", tenantId, companyId, "CALLSERVER", "CHANNEL", "CREATE", "", "", callUuid);
+            var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", tenantId, companyId, "CALLSERVER", "CHANNEL", "CREATE", "", "", callUuid);
 
-        redisHandler.PublishToRedis('events', pubMessage, function(err, redisRes){});
+            redisHandler.PublishToRedis('events', pubMessage, function(err, redisRes){});
 
-        var pubMessageCalls = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", tenantId, companyId, "CALLSERVER", "CALL", "CREATE", "", "", callUuid);
+            var pubMessageCalls = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", tenantId, companyId, "CALLSERVER", "CALL", "CREATE", "", "", callUuid);
 
-        redisHandler.PublishToRedis('events', pubMessageCalls, function(err, redisRes){});
+            redisHandler.PublishToRedis('events', pubMessageCalls, function(err, redisRes){});
+        }
     }
+    catch(ex)
+    {
+
+    }
+
 
 };
 

@@ -620,7 +620,9 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - ARDS Attendant Transfer User ------------', reqId);
 
-                var huntCtxtSplit = huntContext.split('|');
+                var tempHuntCtxt = decodeURIComponent(huntContext);
+
+                var huntCtxtSplit = tempHuntCtxt.split('|');
 
                 if(huntCtxtSplit.length === 3)
                 {

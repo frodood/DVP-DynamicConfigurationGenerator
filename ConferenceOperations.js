@@ -136,6 +136,7 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                 var allowAnonymous = false;
                 var conferenceName = '';
                 var conferenceDomain = '';
+                var template = '';
                 var pin = '';
                 var mode = '';
 
@@ -147,6 +148,11 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                 if(ext.Conference.CurrentUsers)
                 {
                     currUsers = ext.Conference.CurrentUsers;
+                }
+
+                if(ext.Conference.ActiveTemplate)
+                {
+                    template = ext.Conference.ActiveTemplate;
                 }
 
                 var allowedCount = maxUsers - currUsers;
@@ -188,7 +194,7 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                             logger.debug('[DVP-DynamicConfigurationGenerator.ConferenceHandlerOperation] - [%s] - ANONYMOUS ALLOWED', reqId);
                             var emptyArr = [];
                              //normal conference dialplan
-                            var xml = xmlBuilder.CreateConferenceDialplan(reqId, emptyArr, context, '[^\\s]*', false, conferenceName, conferenceDomain, pin, '', companyId, tenantId, appId, dvpCallDirection);
+                            var xml = xmlBuilder.CreateConferenceDialplan(reqId, emptyArr, context, '[^\\s]*', false, conferenceName, conferenceDomain, pin, '', companyId, tenantId, appId, dvpCallDirection, template);
 
                             callback(undefined, xml);
 
@@ -246,7 +252,7 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                                         }
                                     }
 
-                                    var xml = xmlBuilder.CreateConferenceDialplan(reqId, epList, context, '[^\\s]*', false, conferenceName, conferenceDomain, pin, mode, companyId, tenantId, appId, dvpCallDirection);
+                                    var xml = xmlBuilder.CreateConferenceDialplan(reqId, epList, context, '[^\\s]*', false, conferenceName, conferenceDomain, pin, mode, companyId, tenantId, appId, dvpCallDirection, template);
 
                                     callback(undefined, xml);
                                 });
@@ -258,7 +264,7 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                                 {
                                     var emptyArr = [];
                                     //normal conference dialplan
-                                    var xml = xmlBuilder.CreateConferenceDialplan(reqId, emptyArr, context, '[^\\s]*', false, conferenceName, conferenceDomain, pin, '', companyId, tenantId, appId, dvpCallDirection);
+                                    var xml = xmlBuilder.CreateConferenceDialplan(reqId, emptyArr, context, '[^\\s]*', false, conferenceName, conferenceDomain, pin, '', companyId, tenantId, appId, dvpCallDirection, template);
 
                                     callback(undefined, xml);
                                 }
@@ -274,7 +280,7 @@ var ConferenceHandlerOperation = function(reqId, ext, direction, fromUserUuid, c
                             {
                                 var emptyArr = [];
                                 //normal conference dialplan
-                                var xml = xmlBuilder.CreateConferenceDialplan(reqId, emptyArr, context, '[^\\s]*', false, conferenceName, conferenceDomain, pin, '', companyId, tenantId, appId, dvpCallDirection);
+                                var xml = xmlBuilder.CreateConferenceDialplan(reqId, emptyArr, context, '[^\\s]*', false, conferenceName, conferenceDomain, pin, '', companyId, tenantId, appId, dvpCallDirection, template);
 
                                 callback(undefined, xml);
                             }

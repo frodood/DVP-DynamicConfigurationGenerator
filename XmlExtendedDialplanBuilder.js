@@ -241,7 +241,7 @@ var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context,
 
 };
 
-var CreateConferenceDialplan = function(reqId, epList, context, destinationPattern, ignoreEarlyMedia, confName, domain, pin, mode, companyId, tenantId, appId, dvpCallDirection)
+var CreateConferenceDialplan = function(reqId, epList, context, destinationPattern, ignoreEarlyMedia, confName, domain, pin, mode, companyId, tenantId, appId, dvpCallDirection, template)
 {
     try
     {
@@ -366,14 +366,14 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
         if(mode)
         {
 
-            var confStr = confName + '@video-mcu-stereo+' + pin + '+flags{' + mode + '}';
+            var confStr = confName + '@' + template + '+' + pin + '+flags{' + mode + '}';
             cond.ele('action').att('application', 'conference').att('data', confStr)
                 .up()
         }
         else
         {
 
-            var confStr = confName + '@video-mcu-stereo+' + pin;
+            var confStr = confName + '@' + template + '+' + pin;
             cond.ele('action').att('application', 'conference').att('data', confStr)
                 .up()
         }

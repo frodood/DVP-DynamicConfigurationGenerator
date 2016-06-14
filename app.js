@@ -1631,7 +1631,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/SMS/Routing', function(req
             }
             else
             {
-                smsCdrOp.SaveSmsCdr(reqId, fromNumber, destNumber, "Trunk number not found", true, direction, -1, message, num.CompanyId, num.TenantId);
+                smsCdrOp.SaveSmsCdr(reqId, fromNumber, destNumber, "Trunk number not found", true, direction, -1, message, -1, -1);
                 logger.error('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - ERROR OCCURRED', reqId, new Error('Trunk number not found'));
                 res.end(404, new Error('Trunk number not found'));
             }

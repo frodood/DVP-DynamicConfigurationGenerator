@@ -1616,7 +1616,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/SMS/Routing', function(req
 
                         redisHandler.SetObject('SMS:' + reqId, JSON.stringify(respData), function(err, redisRes){});
 
-                        res.end('SMS:' + reqId);
+                        res.end(reqId);
 
                     }
                     else

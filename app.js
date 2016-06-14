@@ -1544,16 +1544,17 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/SMS/Routing', function(req
 
     var reqId = nodeUuid.v1();
 
+    logger.debug('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - SMS ROUTE Request Received -------------------------', reqId);
+
+    logger.debug('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - Request Body : %s', reqId, req.body);
+
+    var destNumber = req.body.destination_number;
+    var fromNumber = req.body.from_number;
+    var message = req.body.short_message;
+    var direction = req.body.direction;
+
     try
     {
-        logger.debug('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - SMS ROUTE Request Received -------------------------', reqId);
-
-        logger.debug('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - Request Body : %s', reqId, req.body);
-
-        var destNumber = req.body.destination_number;
-        var fromNumber = req.body.from_number;
-        var message = req.body.short_message;
-        var direction = req.body.direction;
 
         backendHandler.GetPhoneNumberDetails(destNumber, function(err, num, cacheInfo)
         {
@@ -1562,7 +1563,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/SMS/Routing', function(req
             {
                 smsCdrOp.SaveSmsCdr(reqId, fromNumber, destNumber, 'SERVER ERROR', false, direction, -1, message, -1, -1);
                 logger.error('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - ERROR OCCURRED', reqId, err);
-                res.end(500, new Error('Error getting phone number'));
+                res.send(500, new Error('Error getting phone number'));
+                res.end();
 
             }
             else if(num)
@@ -1578,7 +1580,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/SMS/Routing', function(req
                         smsCdrOp.SaveSmsCdr(reqId, fromNumber, destNumber, 'SERVER ERROR', false, direction, -1, message, num.CompanyId, num.TenantId);
 
                         logger.error('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - ERROR OCCURRED', reqId, err);
-                        res.end(500, new Error('Error getting sms call rule'));
+                        res.send(500, new Error('Error getting sms call rule'));
+                        res.end();
                     }
                     else if(rule)
                     {
@@ -1613,7 +1616,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/SMS/Routing', function(req
 
                         redisHandler.SetObject('SMS:' + reqId, JSON.stringify(respData), function(err, redisRes){});
 
-                        res.end(reqId);
+                        res.end('SMS:' + reqId);
 
                     }
                     else
@@ -1622,7 +1625,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/SMS/Routing', function(req
 
                         logger.error('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - ERROR OCCURRED', reqId, new Error('Rule not found'));
 
-                        res.end(404, new Error('Rule not found'));
+                        res.send(404, new Error('Rule not found'));
+                        res.end();
 
                     }
                 })
@@ -1633,7 +1637,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/SMS/Routing', function(req
             {
                 smsCdrOp.SaveSmsCdr(reqId, fromNumber, destNumber, "Trunk number not found", true, direction, -1, message, -1, -1);
                 logger.error('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - ERROR OCCURRED', reqId, new Error('Trunk number not found'));
-                res.end(404, new Error('Trunk number not found'));
+                res.send(404, new Error('Trunk number not found'));
+                res.end();
             }
         });
 
@@ -1643,7 +1648,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/SMS/Routing', function(req
     {
         smsCdrOp.SaveSmsCdr(reqId, fromNumber, destNumber, "SERVER ERROR", true, direction, -1, message, -1, -1);
         logger.error('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - ERROR OCCURRED', reqId, ex);
-        res.end(500, new Error('Exception occurred'));
+        res.send(500, new Error('Exception occurred'));
+        res.end();
     }
 
     return next();

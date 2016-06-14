@@ -15,7 +15,7 @@ var SaveSmsCdr = function(reqId, fromNumber, toNumber, errorReason, isSuccess, d
             ErrorReason: errorReason,
             IsSuccess: isSuccess,
             Direction: direction,
-            HandledTime: Date.Now(),
+            HandledTime: new Date(),
             AppId: appId,
             Message: message,
             CompanyId: companyId,

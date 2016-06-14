@@ -12,6 +12,7 @@ var Buffer = require('buffer');
 var util = require('util');
 var xmlBuilder = require('./XmlExtendedDialplanBuilder.js');
 var ipValidator = require('./IpValidator');
+var smsCdrOp = require('./SMSCDROp.js');
 
 var backendHandler;
 
@@ -1226,7 +1227,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                             if(splitVals.length === 4)
                                             {
-                                                ruleHandler.PickClickToCallRuleInbound(reqId, callerIdNum, splitVals[3], callerContext, splitVals[2], splitVals[1], function(err, rule)
+                                                ruleHandler.PickCallRuleInboundByCat(reqId, callerIdNum, splitVals[3], callerContext, 'C2C', splitVals[2], splitVals[1], function(err, rule)
                                                 {
                                                     if(err)
                                                     {
@@ -1532,6 +1533,117 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
         res.end(xml);
+    }
+
+    return next();
+
+});
+
+server.post('/DVP/API/:version/DynamicConfigGenerator/SMS/Routing', function(req,res,next)
+{
+
+    var reqId = nodeUuid.v1();
+
+    try
+    {
+        logger.debug('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - SMS ROUTE Request Received -------------------------', reqId);
+
+        logger.debug('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - Request Body : %s', reqId, req.body);
+
+        var destNumber = req.body.destination_number;
+        var fromNumber = req.body.from_number;
+        var message = req.body.short_message;
+        var direction = req.body.direction;
+
+        backendHandler.GetPhoneNumberDetails(destNumber, function(err, num, cacheInfo)
+        {
+            var cacheData = cacheInfo;
+            if(err)
+            {
+                smsCdrOp.SaveSmsCdr(reqId, fromNumber, destNumber, 'SERVER ERROR', false, direction, -1, message, -1, -1);
+                logger.error('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - ERROR OCCURRED', reqId, err);
+                res.end(500, new Error('Error getting phone number'));
+
+            }
+            else if(num)
+            {
+                logger.debug('DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - TrunkNumber found', reqId);
+
+                logger.debug('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, destNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, fromNumber, destNumber, '', num.CompanyId, num.TenantId);
+
+                ruleHandler.PickCallRuleInboundByCat(reqId, fromNumber, destNumber, '', 'SMS', num.CompanyId, num.TenantId, cacheData, function(err, rule)
+                {
+                    if(err)
+                    {
+                        smsCdrOp.SaveSmsCdr(reqId, fromNumber, destNumber, 'SERVER ERROR', false, direction, -1, message, num.CompanyId, num.TenantId);
+
+                        logger.error('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - ERROR OCCURRED', reqId, err);
+                        res.end(500, new Error('Error getting sms call rule'));
+                    }
+                    else if(rule)
+                    {
+
+                        logger.debug('DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - PickCallRuleInbound returned rule : %s', reqId, JSON.stringify(rule));
+
+                        //check dnis is a emergency number
+                        var respData =
+                        {
+                            DestinationNumber: destNumber,
+                            FromNumber: fromNumber,
+                            Message: message,
+                            Direction: direction,
+                            CompanyId: num.CompanyId,
+                            TenantId: num.TenantId
+                        };
+
+                        var appId = -1;
+
+                        if(rule.Application && rule.Application.Availability && rule.Application.Url)
+                        {
+                            respData.Url = rule.Application.Url;
+                            appId = rule.Application.id;
+                        }
+
+                        logger.info('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - OPERATION SUCCESS - API RESPONSE : %s', reqId, reqId);
+
+
+
+                        //Add CDR
+                        smsCdrOp.SaveSmsCdr(reqId, fromNumber, destNumber, null, true, direction, appId, message, num.CompanyId, num.TenantId);
+
+                        redisHandler.SetObject('SMS:' + reqId, JSON.stringify(respData), function(err, redisRes){});
+
+                        res.end(reqId);
+
+                    }
+                    else
+                    {
+                        smsCdrOp.SaveSmsCdr(reqId, fromNumber, destNumber, "Rule not found", true, direction, -1, message, num.CompanyId, num.TenantId);
+
+                        logger.error('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - ERROR OCCURRED', reqId, new Error('Rule not found'));
+
+                        res.end(404, new Error('Rule not found'));
+
+                    }
+                })
+
+
+            }
+            else
+            {
+                smsCdrOp.SaveSmsCdr(reqId, fromNumber, destNumber, "Trunk number not found", true, direction, -1, message, num.CompanyId, num.TenantId);
+                logger.error('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - ERROR OCCURRED', reqId, new Error('Trunk number not found'));
+                res.end(404, new Error('Trunk number not found'));
+            }
+        });
+
+
+    }
+    catch(ex)
+    {
+        smsCdrOp.SaveSmsCdr(reqId, fromNumber, destNumber, "SERVER ERROR", true, direction, -1, message, -1, -1);
+        logger.error('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - ERROR OCCURRED', reqId, ex);
+        res.end(500, new Error('Exception occurred'));
     }
 
     return next();

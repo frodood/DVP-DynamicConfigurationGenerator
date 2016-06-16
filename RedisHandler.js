@@ -107,7 +107,7 @@ var SetObject = function(key, value, callback)
             }
             else
             {
-                logger.error('[DVP-DynamicConfigurationGenerator.SetObjectWithExpire] - REDIS SUCCESS', err)
+                logger.debug('[DVP-DynamicConfigurationGenerator.SetObjectWithExpire] - REDIS SUCCESS')
             }
             callback(err, response);
         });
@@ -175,6 +175,36 @@ var GetFromSet = function(setName, callback)
     }
 };
 
+var IncrementKey = function(key, callback)
+{
+    try
+    {
+        if(client.connected)
+        {
+            client.incr(key, function (err, reply)
+            {
+                if(err)
+                {
+                    logger.error('[DVP-DynamicConfigurationGenerator.IncrementKey] - [%s] - REDIS ERROR', err);
+                }
+                else
+                {
+                    logger.debug('[DVP-DynamicConfigurationGenerator.IncrementKey] - [%s] - REDIS SUCCESS');
+
+                }
+
+
+            });
+        }
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.IncrementKey] - [%s] - REDIS ERROR', ex);
+    }
+}
+
 var AddChannelIdToSet = function(uuid, setName)
 {
     try
@@ -211,6 +241,36 @@ var AddChannelIdToSet = function(uuid, setName)
 
 }
 
+var AddToHash = function(hashId, key, value, callback)
+{
+    try
+    {
+        if(client.connected)
+        {
+            client.hset(hashId, key, value, function (err, reply)
+            {
+                if(err)
+                {
+                    logger.error('[DVP-DynamicConfigurationGenerator.AddToHash] - [%s] - REDIS ERROR', err);
+                }
+                else
+                {
+                    logger.debug('[DVP-DynamicConfigurationGenerator.AddToHash] - [%s] - REDIS SUCCESS');
+
+                }
+
+                callback(err, reply);
+
+            });
+        }
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.AddToHash] - [%s] - REDIS ERROR', ex);
+    }
+};
+
 client.on('error', function(msg)
 {
 
@@ -223,3 +283,5 @@ module.exports.SetObjectWithExpire = SetObjectWithExpire;
 module.exports.GetObject = GetObject;
 module.exports.AddChannelIdToSet = AddChannelIdToSet;
 module.exports.GetObjectParseJson = GetObjectParseJson;
+module.exports.IncrementKey = IncrementKey;
+module.exports.AddToHash = AddToHash;

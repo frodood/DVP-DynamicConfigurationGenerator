@@ -24,6 +24,43 @@ var createNotFoundResponse = function()
 
 }
 
+var createRejectResponse = function(context)
+{
+    try
+    {
+        var tempContext = 'public';
+
+        if(context)
+        {
+            tempContext = context;
+        }
+
+        var doc = xmlBuilder.create('document');
+
+        var cond = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', tempContext)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', '[^\\s]*')
+
+        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=REJECTED')
+            .up()
+        cond.ele('action').att('application', 'hangup').att('data', 'CALL_REJECTED')
+            .up()
+
+            .end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', ex);
+        return createNotFoundResponse();
+    }
+}
+
 var CreateUserGroupDirectoryProfile = function(grp, reqId)
 {
     try
@@ -298,7 +335,7 @@ var createDirectoryProfile = function(extName, ext, domain, email, password, con
 
 };
 
-var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, reqId, numLimitInfo, appId)
+var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, reqId, numLimitInfo, appId, companyId, tenantId, dvpCallDirection)
 {
     try
     {
@@ -349,9 +386,31 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, req
 
         }
 
-        cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+        if(companyId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
+                .up()
+        }
+        if(tenantId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
+                .up()
+        }
+        if(appId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+                .up()
+        }
+        if(dvpCallDirection)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+                .up()
+        }
+
+        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=HTTAPI')
             .up()
-            .ele('action').att('application', 'export').att('data', 'dvp_app_type=HTTAPI')
+
+        cond.ele('action').att('application', 'export').att('data', 'dvp_app_type=HTTAPI')
             .up()
             .ele('action').att('application', 'answer')
             .up()
@@ -374,7 +433,7 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, req
 
 };
 
-var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl, reqId, numLimitInfo, appId)
+var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl, reqId, numLimitInfo, appId, companyId, tenantId, dvpCallDirection)
 {
     try
     {
@@ -421,9 +480,31 @@ var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl, r
 
         }
 
-        cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+        if(companyId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
+                .up()
+        }
+        if(tenantId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
+                .up()
+        }
+        if(appId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+                .up()
+        }
+        if(dvpCallDirection)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+                .up()
+        }
+
+        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=SOCKET')
             .up()
-            .ele('action').att('application', 'answer')
+
+        cond.ele('action').att('application', 'answer')
             .up()
             .ele('action').att('application', 'socket').att('data', socketUrl + ' async full')
             .up()
@@ -530,3 +611,4 @@ module.exports.CreateHttpApiDialplan = CreateHttpApiDialplan;
 module.exports.CreateUserGroupDirectoryProfile = CreateUserGroupDirectoryProfile;
 module.exports.CreateSocketApiDialplan = CreateSocketApiDialplan;
 module.exports.CreateRouteGatewayDialplan = CreateRouteGatewayDialplan;
+module.exports.createRejectResponse = createRejectResponse;

@@ -1293,7 +1293,7 @@ var GetCloudForIncomingRequest = function(toNumber, fromIp, data, callback)
                         var companyId = phnInfo.CompanyId;
                         var tenantId = phnInfo.TenantId;
 
-                        if(phnInfo.InboundLimitId)
+                        if(phnInfo.InboundLimitId != null)
                         {
                             incomingRequest.InboundLimit = phnInfo.InboundLimitId;
                         }

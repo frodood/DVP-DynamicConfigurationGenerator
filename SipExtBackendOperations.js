@@ -264,7 +264,7 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
 
         if(extType === 'USER')
         {
-            dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}], include: [{model: dbModel.SipUACEndpoint, as:'SipUACEndpoint', include: [{model: dbModel.CloudEndUser, as:'CloudEndUser'},{model: dbModel.UserGroup, as:'UserGroup', include: [{model: dbModel.Extension, as:'Extension'}]}]}]})
+            dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{CompanyId: companyId},{ObjCategory: extType}], include: [{model: dbModel.SipUACEndpoint, as:'SipUACEndpoint', include: [{model: dbModel.CloudEndUser, as:'CloudEndUser'},{model: dbModel.UserGroup, as:'UserGroup', include: [{model: dbModel.Extension, as:'Extension'}]}]}]})
                 .then(function (extData)
                 {
                     if(extData && extData.SipUACEndpoint)
@@ -327,7 +327,7 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
         }
         else if(extType === 'GROUP')
         {
-            dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}], include: [{model: dbModel.UserGroup, as:'UserGroup'}]})
+            dbModel.Extension.find({where: [{Extension: extension},{CompanyId: companyId},{TenantId: tenantId},{ObjCategory: extType}], include: [{model: dbModel.UserGroup, as:'UserGroup'}]})
                 .then(function (extData)
                 {
                     callback(undefined, extData);
@@ -338,7 +338,7 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
         }
         else if(extType === 'CONFERENCE')
         {
-            dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}], include: [{model: dbModel.Conference, as:'Conference', include : [{model: dbModel.ConferenceUser, as : 'ConferenceUser', include:[{model: dbModel.SipUACEndpoint, as: 'SipUACEndpoint', include:[{model: dbModel.CloudEndUser, as: 'CloudEndUser'}]}]},{model: dbModel.CloudEndUser, as: 'CloudEndUser'}]}]})
+            dbModel.Extension.find({where: [{Extension: extension},{CompanyId: companyId},{TenantId: tenantId},{ObjCategory: extType}], include: [{model: dbModel.Conference, as:'Conference', include : [{model: dbModel.ConferenceUser, as : 'ConferenceUser', include:[{model: dbModel.SipUACEndpoint, as: 'SipUACEndpoint', include:[{model: dbModel.CloudEndUser, as: 'CloudEndUser'}]}]},{model: dbModel.CloudEndUser, as: 'CloudEndUser'}]}]})
                 .then(function (extData)
                 {
                     callback(undefined, extData);
@@ -349,7 +349,7 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
         }
         else if(extType === 'VOICE_PORTAL')
         {
-            dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}]})
+            dbModel.Extension.find({where: [{Extension: extension},{CompanyId: companyId},{TenantId: tenantId},{ObjCategory: extType}]})
                 .then(function (extData)
                 {
                     callback(undefined, extData);

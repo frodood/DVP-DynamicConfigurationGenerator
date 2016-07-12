@@ -2302,6 +2302,10 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         }
                                                                     })
                                                                 }
+                                                                else
+                                                                {
+                                                                    callback(new Error('No '), xmlBuilder.createRejectResponse());
+                                                                }
                                                             }
                                                             else if(pbxObj.OperationType === 'FORWARD')
                                                             {
@@ -3000,8 +3004,16 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             }
                                                             else
                                                             {
-                                                                var xml = xmlBuilder.CreateVoicemailDialplan(reqId, extraData, context, '[^\\s]*', extDetails.SipUACEndpoint.CloudEndUser.Domain);
-                                                                callback(undefined, xml);
+                                                                if(fromUserUuid === extDetails.SipUACEndpoint.SipUserUuid)
+                                                                {
+                                                                    var xml = xmlBuilder.CreateVoicemailDialplan(reqId, extraData, context, '[^\\s]*', extDetails.SipUACEndpoint.CloudEndUser.Domain);
+                                                                    callback(undefined, xml);
+                                                                }
+                                                                else
+                                                                {
+                                                                    callback(new Error('Cannot listen to other peoples voicemails'), xmlBuilder.createRejectResponse());
+                                                                }
+
                                                             }
                                                         });
 

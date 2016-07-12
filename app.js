@@ -181,7 +181,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                         }
                         else
                         {
-                            backendHandler.GetTransferCodesForTenantDB(reqId, contextTenant, data, function(err, resTrans)
+                            backendHandler.GetTransferCodesForTenantDB(reqId, contextCompany, contextTenant, data, function(err, resTrans)
                             {
                                 if(resTrans)
                                 {

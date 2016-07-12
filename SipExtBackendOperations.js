@@ -157,12 +157,12 @@ var GetUserByNameTenantDB = function(reqId, extName, companyId, tenantId, ignore
 
 };
 
-var GetTransferCodesForTenantDB = function(reqId, tenantId, data, callback)
+var GetTransferCodesForTenantDB = function(reqId, companyId, tenantId, data, callback)
 {
     try
     {
         dbModel.TransferCode
-            .find({where: [{TenantId: tenantId}]})
+            .find({where: [{TenantId: tenantId, CompanyId: companyId}]})
             .then(function (transCode)
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.GetTransferCodesForTenantDB] - [%s] - PGSQL get transfer codes for tenant success', reqId);
@@ -270,7 +270,7 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
                     if(extData && extData.SipUACEndpoint)
                     {
 
-                        GetTransferCodesForTenantDB(reqId, extData.SipUACEndpoint.TenantId, data, function(err, resTrans)
+                        GetTransferCodesForTenantDB(reqId, companyId, tenantId, data, function(err, resTrans)
                         {
                             if(resTrans)
                             {

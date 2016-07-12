@@ -107,7 +107,7 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
 
         if(pbxType == 'gateway')
         {
-            cond.ele('action').att('application', 'read').att('data', "9 10 'tone_stream://%(10000,0,350,440)' digits 30000 #")
+            cond.ele('action').att('application', 'read').att('data', "9 15 'tone_stream://%(10000,0,350,440)' digits 30000 #")
                 .up()
                 .ele('action').att('application', 'set').att('data', 'origination_cancel_key=#')
                 .up()

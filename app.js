@@ -189,7 +189,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                                 }
 
                                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, destNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, callerIdNum, destNum, domain, contextCompany, contextTenant);
-                                ruleHandler.PickCallRuleInbound(reqId, callerIdNum, destNum, domain, tempCallerContext, contextCompany, contextTenant, cacheData, function(err, rule)
+                                ruleHandler.PickCallRuleInbound(reqId, callerIdNum, destNum, '', domain, tempCallerContext, 'CALL', contextCompany, contextTenant, cacheData, function(err, rule)
                                 {
                                     if(err)
                                     {
@@ -933,7 +933,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                                             logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, destNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, aniNum, destNum, domain, num.CompanyId, num.TenantId);
 
-                                                            ruleHandler.PickCallRuleInbound(reqId, callerIdNum, destNum, domain, callerContext, num.CompanyId, num.TenantId, cacheData, function(err, rule)
+                                                            ruleHandler.PickCallRuleInbound(reqId, callerIdNum, destNum, '', domain, callerContext, 'CALL', num.CompanyId, num.TenantId, cacheData, function(err, rule)
                                                             {
                                                                 if(err)
                                                                 {
@@ -1227,7 +1227,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                             if(splitVals.length === 4)
                                             {
-                                                ruleHandler.PickCallRuleInboundByCat(reqId, callerIdNum, splitVals[3], callerContext, 'C2C', splitVals[2], splitVals[1], function(err, rule)
+                                                ruleHandler.PickCallRuleInbound(reqId, callerIdNum, splitVals[3], '', callerContext, 'C2C', splitVals[2], splitVals[1], function(err, rule)
                                                 {
                                                     if(err)
                                                     {
@@ -1548,10 +1548,15 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/SMS/Routing', function(req
 
     logger.debug('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - Request Body : %s', reqId, req.body);
 
-    var destNumber = req.body.destination_number;
-    var fromNumber = req.body.from_number;
-    var message = req.body.short_message;
-    var direction = req.body.direction;
+    //var destNumber = req.body.destination_number;
+    //var fromNumber = req.body.from_number;
+    //var message = req.body.short_message;
+    //var direction = req.body.direction;
+
+    var destNumber = '94777900900';
+    var fromNumber = '4477665544';
+    var message = 'Hello dinusha this is a test message';
+    var direction = 'inbound';
 
     try
     {
@@ -1573,7 +1578,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/SMS/Routing', function(req
 
                 logger.debug('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, destNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, fromNumber, destNumber, '', num.CompanyId, num.TenantId);
 
-                ruleHandler.PickCallRuleInboundByCat(reqId, fromNumber, destNumber, '', 'SMS', num.CompanyId, num.TenantId, cacheData, function(err, rule)
+                ruleHandler.PickCallRuleInbound(reqId, fromNumber, destNumber, message, '', 'SMS', num.CompanyId, num.TenantId, cacheData, function(err, rule)
                 {
                     if(err)
                     {

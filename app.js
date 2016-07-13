@@ -1578,7 +1578,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/SMS/Routing', function(req
 
                 logger.debug('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, destNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, fromNumber, destNumber, '', num.CompanyId, num.TenantId);
 
-                ruleHandler.PickCallRuleInbound(reqId, fromNumber, destNumber, message, '', 'SMS', num.CompanyId, num.TenantId, cacheData, function(err, rule)
+                ruleHandler.PickCallRuleInbound(reqId, fromNumber, destNumber, message, '', '', 'SMS', num.CompanyId, num.TenantId, cacheData, function(err, rule)
                 {
                     if(err)
                     {

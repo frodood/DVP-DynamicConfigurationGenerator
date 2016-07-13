@@ -1548,15 +1548,10 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/SMS/Routing', function(req
 
     logger.debug('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - Request Body : %s', reqId, req.body);
 
-    //var destNumber = req.body.destination_number;
-    //var fromNumber = req.body.from_number;
-    //var message = req.body.short_message;
-    //var direction = req.body.direction;
-
-    var destNumber = '94777900900';
-    var fromNumber = '4477665544';
-    var message = 'Hello dinusha this is a test message';
-    var direction = 'inbound';
+    var destNumber = req.body.destination_number;
+    var fromNumber = req.body.from_number;
+    var message = req.body.short_message;
+    var direction = req.body.direction;
 
     try
     {

@@ -944,7 +944,6 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                 }
                                                                 else if(rule)
                                                                 {
-
                                                                     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - PickCallRuleInbound returned rule : %s', reqId, JSON.stringify(rule));
 
                                                                     //check dnis is a emergency number

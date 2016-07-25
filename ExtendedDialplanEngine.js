@@ -2916,6 +2916,10 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         }
 
                                                     }
+                                                    else if(operationType === 'DIALPLAN')
+                                                    {
+                                                        callback(undefined, pbxObj.Dialplan);
+                                                    }
                                                     else
                                                     {
                                                         logger.error('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Unsupported Operation Type Returned From Extended App', reqId);

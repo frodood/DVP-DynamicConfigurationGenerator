@@ -1277,7 +1277,6 @@ var GetCloudForIncomingRequest = function(toNumber, fromIp, data, callback)
         LoadBalanceType: ""
     };
 
-
     redisHandler.GetObjectParseJson(null, 'TRUNKNUMBER:' + toNumber, function(err, phnInfo)
     {
         if (phnInfo && phnInfo.TrunkId && (phnInfo.ObjCategory === 'INBOUND' || phnInfo.ObjCategory === 'BOTH'))

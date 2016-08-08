@@ -148,7 +148,7 @@ var GetUserByNameTenantDB = function(reqId, extName, companyId, tenantId, ignore
 
 //Done
 //OK
-var GetTransferCodesForTenantDB = function(reqId, tenantId, data, callback)
+var GetTransferCodesForTenantDB = function(reqId, companyId, tenantId, data, callback)
 {
     try
     {
@@ -370,7 +370,7 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
 
                         }
 
-                        GetTransferCodesForTenantDB(reqId, extData.SipUACEndpoint.TenantId, data, function(err, resTrans)
+                        GetTransferCodesForTenantDB(reqId, extData.SipUACEndpoint.CompanyId, extData.SipUACEndpoint.TenantId, data, function(err, resTrans)
                         {
                             if(resTrans)
                             {

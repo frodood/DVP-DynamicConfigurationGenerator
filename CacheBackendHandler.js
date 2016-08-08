@@ -1,45 +1,9 @@
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var dbModel = require('dvp-dbmodels');
 var underscore = require('underscore');
-var redisHandler = require('./RedisHandler.js');
+var async = require('async');
+var redisHandler = require('./DataCachingRedisHandler.js');
 var ipValidator = require('./IpValidator.js');
-
-var data =
-{
-    SipUACEndpoint:
-    {
-        "User1": {"id": 1, "SipUsername":"User1", "Password": "123", "ExtensionId":1},
-        "User2": {"id": 2, "SipUsername":"User2", "Password": "123", "ExtensionId":null}
-    },
-    Extension:
-    {
-        "1000": {"id": 1, "Extension":"1000"},
-        "1001": {"id": 2, "Extension":"1001"}
-    },
-    TransferCode:
-    {"id":1},
-    CloudEndUser:
-    {
-        1: {"id": 1, "Domain":"192.168.1.23"},
-        2: {"id": 1, "Domain":"192.168.1.23"}
-    },
-    UserGroup:
-        [
-            {
-                "GroupName": "TestGrp",
-                "ExtensionId": "1001",
-                "SipUACEndpoint":
-                {
-                    "User1": {"id": 1, "SipUsername": "User1", "Password": "123", "ExtensionId": 1},
-                    "User2": {"id": 2, "SipUsername": "User2", "Password": "123", "ExtensionId": null}
-                }
-            }
-        ],
-    NumberBlacklist:
-    {
-        "0112300566": {"PhoneNumber": "0112300566"}
-    }
-};
 
 
 var GetUserBy_Ext_Domain = function(extension, domain, data, callback)
@@ -161,26 +125,9 @@ var GetUserByNameTenantDB = function(reqId, extName, companyId, tenantId, ignore
 
         redisHandler.GetObjectParseJson(null, usrKey, function(err1, usr)
         {
-            if(usr && usr.ExtensionId)
+            if(usr && usr.Extension)
             {
-
-                var extByIdKey = 'EXTENSIONBYID:' + usr.TenantId + ':' + usr.CompanyId + ':' + usr.ExtensionId;
-
-                redisHandler.GetObjectParseJson(null, extByIdKey, function(err2, ext)
-                {
-                    if(ext)
-                    {
-                        usr.Extension = ext;
-
-                        callback(null, usr);
-                    }
-                    else
-                    {
-                        callback(err2, null);
-                    }
-
-                });
-
+                callback(null, usr);
             }
             else
             {
@@ -193,7 +140,7 @@ var GetUserByNameTenantDB = function(reqId, extName, companyId, tenantId, ignore
     }
     catch(ex)
     {
-        callback(ex, undefined);
+        callback(ex, null);
     }
 
 
@@ -316,60 +263,80 @@ var GetPresenceDB = function(reqId, username, data, callback)
 
 };
 
-var ManageGroupIds = function(reqId, grpIdArr, companyId, tenantId, callback)
+var AppendConferenceUser = function(confUser, companyId, tenantId, data, callback)
 {
-    var grpArr = [];
+    if(confUser.SipUACEndpointId)
+    {
+        var usrKey = 'SIPUSERBYID:' + tenantId + ':' + companyId + ':' + confUser.SipUACEndpointId;
+
+        redisHandler.GetObjectParseJson(null, usrKey, function(err, usr)
+        {
+            if(usr && usr.Extension)
+            {
+                if(data.CloudEndUser && usr.CloudEndUserId && data.CloudEndUser[usr.CloudEndUserId])
+                {
+                    usr.CloudEndUser = data.CloudEndUser[usr.CloudEndUserId];
+                };
+
+                confUser.SipUACEndpoint = usr;
+            }
+
+
+            callback(null, confUser);
+
+        });
+    }
+    else
+    {
+        callback(null, confUser);
+    }
+};
+
+var ManageConfUserIds = function(reqId, confUserArr, companyId, tenantId, data, callback)
+{
+    var usrArr = [];
     var count = 0;
+
+    var length = Object.keys(confUserArr).length;
 
     try
     {
-        for(i=0; i<grpIdArr.length; i++)
+        for (var key in confUserArr)
         {
-            var grpKey = 'USERGROUP:' + tenantId + ':' + companyId + ':' + grpIdArr[i];
-
-            redisHandler.GetObjectParseJson(null, grpKey, function(err, grp)
+            if (confUserArr.hasOwnProperty(key))
             {
-                if(grp.ExtensionId)
+                var confUser = confUserArr[key];
+
+                if(confUser)
                 {
-                    var extByIdKey = 'EXTENSIONBYID:' + tenantId + ':' + companyId + ':' + grp.ExtensionId;
-
-                    redisHandler.GetObjectParseJson(null, extByIdKey, function(err, extById)
+                    AppendConferenceUser(confUser, companyId, tenantId, data, function(err, appendResp)
                     {
-                        if(extById)
-                        {
-                            grp.Extension = extById;
-                            grpArr.push(grp);
+                        usrArr.push(appendResp);
 
+                        if(count < length)
+                        {
+                            callback(null, usrArr);
                         }
 
-                        if(count < grpIdArr.length)
-                        {
-                            callback(null, grpArr);
-                        }
-
-                        count++;
-
-                    });
+                    })
 
                 }
-                else
+
+            }
+            else
+            {
+                if(count < length)
                 {
-                    if(count < grpIdArr.length)
-                    {
-                        callback(null, grpArr);
-                    }
-
-                    count++;
+                    callback(null, usrArr);
                 }
-
-            });
+            }
         }
     }
     catch(ex)
     {
-        if(count < grpIdArr.length)
+        if(count < length)
         {
-            callback(null, grpArr);
+            callback(null, usrArr);
         }
     }
 };
@@ -380,170 +347,155 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
     try
     {
 
-        if(extType === 'USER')
+        var extKey = 'EXTENSION:' + tenantId + ':' + companyId + ':' + extension;
+
+        redisHandler.GetObjectParseJson(null, extKey, function(err, extData)
         {
-            var extKey = 'EXTENSION:' + tenantId + ':' + companyId + ':' + extension;
-
-            redisHandler.GetObjectParseJson(null, extKey, function(err, extData)
+            if(extData)
             {
-                if(extData && extData.MappingID)
+                extType = extData.ObjCategory;
+
+                if(extType === 'USER')
                 {
-                    var userKey = 'SIPUSERBYID:' + tenantId + ':' + companyId + ':' + extData.MappingID;
-
-                    redisHandler.GetObjectParseJson(null, userKey, function(err, usr)
+                    if(extData.SipUACEndpoint && extData.SipUACEndpoint.CloudEndUserId)
                     {
-                        if(usr)
+                        if (data.CloudEndUser)
                         {
-                            extData.SipUACEndpoint = usr;
+                            var ceTemp = data.CloudEndUser[extData.SipUACEndpoint.CloudEndUserId];
 
-                            if (data.CloudEndUser)
+                            if (ceTemp)
                             {
-                                var ceTemp = data.CloudEndUser[usr.CloudEndUserId];
-
-                                if (ceTemp)
-                                {
-                                    usr.CloudEndUser = ceTemp;
-                                }
-
+                                extData.SipUACEndpoint.CloudEndUser = ceTemp;
                             }
 
-                            GetTransferCodesForTenantDB(reqId, extData.SipUACEndpoint.TenantId, data, function(err, resTrans)
-                            {
-                                if(resTrans)
-                                {
-                                    extData.SipUACEndpoint.TransferCode = resTrans;
-                                }
+                        }
 
-                                GetPresenceDB(reqId, extData.SipUACEndpoint.SipUsername, data, function(err, presInf)
+                        GetTransferCodesForTenantDB(reqId, extData.SipUACEndpoint.TenantId, data, function(err, resTrans)
+                        {
+                            if(resTrans)
+                            {
+                                extData.SipUACEndpoint.TransferCode = resTrans;
+                            }
+
+                            GetPresenceDB(reqId, extData.SipUACEndpoint.SipUsername, data, function(err, presInf)
+                            {
+                                if(presInf && presInf.Status === 'Available')
                                 {
-                                    if(presInf && presInf.Status === 'Available')
+                                    extData.SipUACEndpoint.UsePublic = false;
+                                    callback(err, extData);
+                                }
+                                else
+                                {
+                                    if(extData.SipUACEndpoint.UsePublic)
                                     {
-                                        extData.SipUACEndpoint.UsePublic = false;
-                                        callback(err, extData);
+                                        GetCallServerClusterDetailsDB(callServerId, data, function(err, cloudInfo)
+                                        {
+                                            if(cloudInfo && cloudInfo.Cloud && cloudInfo.Cloud.LoadBalancer)
+                                            {
+                                                extData.SipUACEndpoint.Domain = cloudInfo.Cloud.LoadBalancer.MainIP;
+                                                extData.SipUACEndpoint.UsePublic = true;
+                                            }
+
+                                            callback(err, extData);
+
+                                        })
                                     }
                                     else
                                     {
-                                        if(extData.SipUACEndpoint.UsePublic)
+                                        extData.SipUACEndpoint.UsePublic = false;
+
+                                        if(extData.SipUACEndpoint.GroupId)
                                         {
-                                            GetCallServerClusterDetailsDB(callServerId, data, function(err, cloudInfo)
+                                            var grpKey = 'USERGROUP:' + tenantId + ':' + companyId + ':' + extData.SipUACEndpoint.GroupId;
+                                            redisHandler.GetObjectParseJson(null, grpKey, function(err, groupInfo)
                                             {
-                                                if(cloudInfo && cloudInfo.Cloud && cloudInfo.Cloud.LoadBalancer)
+                                                if(groupInfo)
                                                 {
-                                                    extData.SipUACEndpoint.Domain = cloudInfo.Cloud.LoadBalancer.MainIP;
-                                                    extData.SipUACEndpoint.UsePublic = true;
+                                                    extData.SipUACEndpoint.UserGroup = groupInfo;
                                                 }
+                                                callback(null, extData);
 
-                                                callback(err, extData);
+                                            });
 
-                                            })
+
                                         }
                                         else
                                         {
-                                            extData.SipUACEndpoint.UsePublic = false;
-
-                                            if(usr.GroupIDs && usr.GroupIDs.length)
-                                            {
-                                                ManageGroupIds(reqId, usr.GroupIDs, companyId, tenantId, function(err, grpArr)
-                                                {
-                                                    if(grpArr && grpArr.length)
-                                                    {
-                                                        extData.SipUACEndpoint.UserGroup = grpArr;
-                                                    }
-
-                                                    callback(err, extData);
-                                                })
-
-
-                                            }
-                                            else
-                                            {
-                                                callback(err, extData);
-                                            }
-
+                                            callback(err, extData);
                                         }
-                                    }
 
-                                })
+                                    }
+                                }
 
                             })
 
-                        }
-                        else
-                        {
-                            callback(new Error('Extension not mapped to user'), null);
-                        }
-
-
-                    });
-                }
-                else
-                {
-                    callback(new Error('Extension data or mapping id not found'), null);
-                }
-
-            });
-
-
-        }
-        else if(extType === 'GROUP')
-        {
-
-            var extKey = 'EXTENSION:' + tenantId + ':' + companyId + ':' + extension;
-
-            redisHandler.GetObjectParseJson(null, extKey, function(err, extData)
-            {
-                if (extData && extData.MappingID)
-                {
-                    var grpKey = 'USERGROUP:' + tenantId + ':' + companyId + ':' + extData.MappingID;
-
-                    redisHandler.GetObjectParseJson(null, grpKey, function (err, grp)
+                        })
+                    }
+                    else
                     {
-                        if(grp)
-                        {
-                            extData.UserGroup = grp;
+                        callback(new Error('User not tagged to extension'), null);
+                    }
 
-                            callback(null, extData);
-                        }
-                        else
-                        {
-                            callback(new Error('Group data not found'), null);
-                        }
+                }
+                else if(extType === 'GROUP')
+                {
 
-                    })
+                    if(extData.UserGroup)
+                    {
+                        callback(null, extData);
+                    }
+                    else
+                    {
+                        callback(new Error('Group not tagged to extension'), null);
+                    }
+
+                }
+                else if(extType === 'CONFERENCE')
+                {
+                    if(extData.Conference)
+                    {
+                        var confKey = 'CONFERENCE:' + tenantId + ':' + companyId + ':' + extData.Conference.ConferenceName;
+                        redisHandler.GetObjectParseJson(null, confKey, function(err, confInfo)
+                        {
+                            if(confInfo)
+                            {
+                                ManageConfUserIds(reqId, confInfo, companyId, tenantId, data, function(err, usrList)
+                                {
+                                    extData.Conference.ConferenceUser = usrList;
+
+                                    callback(null, extData);
+
+                                });
+                            }
+                            else
+                            {
+                                callback(null, extData);
+                            }
+
+
+                        });
+                    }
+                    else
+                    {
+                        callback(new Error('Conference not tagged to extension'), null);
+                    }
+
+                }
+                else if(extType === 'VOICE_PORTAL')
+                {
+
+                    callback(null, extData);
                 }
                 else
                 {
-                    callback(new Error('Extension data or mapping id not found'), null);
+                    logger.error('[DVP-DynamicConfigurationGenerator.GetAllDataForExt] - [%s] - Unsupported extension type', reqId);
+                    callback(new Error('Unsupported extension type'), null);
                 }
-            });
+            }
 
-        }
-        else if(extType === 'CONFERENCE')
-        {
-            dbModel.Extension.find({where: [{Extension: extension},{TenantId: tenantId},{ObjCategory: extType}], include: [{model: dbModel.Conference, as:'Conference', include : [{model: dbModel.ConferenceUser, as : 'ConferenceUser', include:[{model: dbModel.SipUACEndpoint, as: 'SipUACEndpoint', include:[{model: dbModel.CloudEndUser, as: 'CloudEndUser'}]}]},{model: dbModel.CloudEndUser, as: 'CloudEndUser'}]}]})
-                .then(function (extData)
-                {
-                    callback(undefined, extData);
-                }).catch(function(err)
-                {
-                    callback(err, undefined);
-                });
-        }
-        else if(extType === 'VOICE_PORTAL')
-        {
+        });
 
-            var extKey = 'EXTENSION:' + tenantId + ':' + companyId + ':' + extension;
 
-            redisHandler.GetObjectParseJson(null, extKey, function(err, extData)
-            {
-                callback(undefined, extData);
-            });
-        }
-        else
-        {
-            logger.error('[DVP-DynamicConfigurationGenerator.GetAllDataForExt] - [%s] - Unsupported extension type', reqId);
-            callback(new Error('Unsupported extension type'), undefined);
-        }
 
     }
     catch(ex)
@@ -793,13 +745,8 @@ var GetEmergencyNumber = function(numb, companyId, tenantId, data, callback)
     {
         var eNum = null;
 
-        redisHandler.GetObjectParseJson(null, 'EMERGENCYNUMBER:' + tenantId + ':' + companyId, function(err, eNumList)
+        redisHandler.GetObjectParseJson(null, 'EMERGENCYNUMBER:' + tenantId + ':' + companyId + ':' + numb, function(err, eNum)
         {
-            if(eNumList)
-            {
-                eNum = eNumList[numb];
-            }
-
             callback(err, eNum);
         });
 
@@ -811,7 +758,7 @@ var GetEmergencyNumber = function(numb, companyId, tenantId, data, callback)
 };
 
 //Done
-var GetPhoneNumberDetails = function(phnNum, callback)
+var GetPhoneNumberDetails = function(phnNum, cb)
 {
     try
     {
@@ -823,64 +770,80 @@ var GetPhoneNumberDetails = function(phnNum, callback)
 
                 if(!phnInfo.Enable)
                 {
-                    callback(undefined, undefined, null);
+                    cb(undefined, undefined, null);
                 }
                 else
                 {
+                    var arr = [];
 
-                    redisHandler.GetObjectParseJson(null, 'DVPCACHE:' + phnInfo.TenantId + ':' + phnInfo.CompanyId, function(err, data)
+                    arr.push(function(callback)
                     {
-                        if(data)
+                        redisHandler.GetObjectParseJson(null, 'DVPCACHE:' + phnInfo.TenantId + ':' + phnInfo.CompanyId, function(err, data)
                         {
+                            callback(null, data);
+                        })
+                    });
 
-                            if(data && data.LimitInfo)
+                    arr.push(function(callback)
+                    {
+                        redisHandler.GetObjectParseJson(null, 'TRUNK:' + phnInfo.TrunkId, function(err, tr)
+                        {
+                            callback(null, tr);
+                        })
+                    });
+
+                    if(phnInfo.InboundLimitId)
+                    {
+                        arr.push(function(callback)
+                        {
+                            redisHandler.GetObjectParseJson(null, 'LIMIT:' + phnInfo.TenantId + ':' + phnInfo.CompanyId + ':' + phnInfo.InboundLimitId, function(err, inbLimInfo)
                             {
+                                callback(null, inbLimInfo);
+                            });
+                        })
+
+                    }
+
+                    if(phnInfo.BothLimitId)
+                    {
+                        arr.push(function(callback)
+                        {
+                            redisHandler.GetObjectParseJson(null, 'LIMIT:' + phnInfo.TenantId + ':' + phnInfo.CompanyId + ':' + phnInfo.BothLimitId, function(err, bothLimInfo)
+                            {
+                                callback(null, bothLimInfo);
+                            });
+                        })
+
+                    }
+
+                    async.parallel(arr, function(err, results)
+                    {
+                        if(err)
+                        {
+                            cb(undefined, undefined, null);
+                        }
+                        else
+                        {
+                            if(results && results.length > 0)
+                            {
+                                var dt = results[0];
+                                phnInfo.Trunk = results[1];
+
                                 if(phnInfo.InboundLimitId)
                                 {
-                                    var inbLim = data.LimitInfo[phnInfo.InboundLimitId];
+                                    phnInfo.LimitInfoInbound = results[2];
 
-                                    if(inbLim)
-                                    {
-                                        phnInfo.LimitInfoInbound = inbLim;
-                                    }
                                 }
 
                                 if(phnInfo.BothLimitId)
                                 {
-                                    var bothLim = data.LimitInfo[phnInfo.BothLimitId];
-
-                                    if(bothLim)
-                                    {
-                                        phnInfo.LimitInfoBoth = bothLim;
-                                    }
+                                    phnInfo.LimitInfoBoth = results[3];
                                 }
 
-                            }
-
-                            if(phnInfo.TrunkId)
-                            {
-
-                                redisHandler.GetObjectParseJson(null, 'TRUNK:' + phnInfo.TrunkId, function(err, tr)
-                                {
-
-                                    if(tr)
-                                    {
-                                        phnInfo.Trunk = tr;
-                                    }
-                                    callback(undefined, phnInfo, data);
-                                });
-
-
-                            }
-                            else
-                            {
-                                callback(undefined, phnInfo, data);
+                                cb(undefined, phnInfo, dt);
                             }
                         }
-                        else
-                        {
-                            callback(undefined, undefined, data);
-                        }
+
                     });
 
 
@@ -888,7 +851,7 @@ var GetPhoneNumberDetails = function(phnNum, callback)
             }
             else
             {
-                callback(undefined, undefined, null);
+                cb(undefined, undefined, null);
             }
 
         });
@@ -896,7 +859,7 @@ var GetPhoneNumberDetails = function(phnNum, callback)
     }
     catch(ex)
     {
-        callback(ex, undefined, null);
+        cb(ex, undefined, null);
     }
 };
 

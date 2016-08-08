@@ -1,3 +1,7 @@
+/**
+ * Created by dinusha on 8/4/2016.
+ */
+
 var redis = require("redis");
 var Config = require('config');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
@@ -5,13 +9,15 @@ var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var redisIp = Config.Redis.ip;
 var redisPort = Config.Redis.port;
 var redisPassword = Config.Redis.password;
-
+var db = Config.Redis.db;
 
 var client = redis.createClient(redisPort, redisIp);
 
 client.auth(redisPassword, function (err) {
     console.log("Error Authenticating Redis : " + err);
 });
+
+client.select(db, function() {});
 
 
 var SetObjectWithExpire = function(key, value, timeout, callback)

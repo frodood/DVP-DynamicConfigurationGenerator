@@ -426,9 +426,9 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                             domain = extDetails.SipUACEndpoint.CloudEndUser.Domain;
                                         }
 
-                                        if(extDetails.SipUACEndpoint.UserGroup && extDetails.SipUACEndpoint.UserGroup.length > 0 && extDetails.SipUACEndpoint.UserGroup[0].Extension)
+                                        if(extDetails.SipUACEndpoint.UserGroup && extDetails.SipUACEndpoint.UserGroup.Extension)
                                         {
-                                            grp = extDetails.SipUACEndpoint.UserGroup[0].Extension.Extension;
+                                            grp = extDetails.SipUACEndpoint.UserGroup.Extension.Extension;
                                         }
 
                                         var ringTout = 60;
@@ -601,9 +601,9 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         toUsrDomain = extDetails.SipUACEndpoint.CloudEndUser.Domain;
                                     }
 
-                                    if(extDetails.SipUACEndpoint.UserGroup && extDetails.SipUACEndpoint.UserGroup.length > 0 && extDetails.SipUACEndpoint.UserGroup[0].Extension)
+                                    if(extDetails.SipUACEndpoint.UserGroup && extDetails.SipUACEndpoint.UserGroup.Extension)
                                     {
-                                        grp = extDetails.SipUACEndpoint.UserGroup[0].Extension.Extension;
+                                        grp = extDetails.SipUACEndpoint.UserGroup.Extension.Extension;
                                     }
 
                                     if(url)
@@ -984,9 +984,9 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             domain = extDetails.SipUACEndpoint.CloudEndUser.Domain;
                                                         }
 
-                                                        if(extDetails.SipUACEndpoint.UserGroup.length > 0 && extDetails.SipUACEndpoint.UserGroup[0].Extension)
+                                                        if(extDetails.SipUACEndpoint.UserGroup && extDetails.SipUACEndpoint.UserGroup.Extension)
                                                         {
-                                                            grp = extDetails.SipUACEndpoint.UserGroup[0].Extension.Extension;
+                                                            grp = extDetails.SipUACEndpoint.UserGroup.Extension.Extension;
                                                         }
 
                                                         var ep =
@@ -1271,9 +1271,9 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 toUsrDomain = extDetails.SipUACEndpoint.CloudEndUser.Domain;
                                             }
 
-                                            if(extDetails.SipUACEndpoint.UserGroup && extDetails.SipUACEndpoint.UserGroup.length > 0 && extDetails.SipUACEndpoint.UserGroup[0].Extension)
+                                            if(extDetails.SipUACEndpoint.UserGroup && extDetails.SipUACEndpoint.UserGroup.Extension)
                                             {
-                                                grp = extDetails.SipUACEndpoint.UserGroup[0].Extension.Extension;
+                                                grp = extDetails.SipUACEndpoint.UserGroup.Extension.Extension;
                                             }
 
                                             if(url)
@@ -2002,9 +2002,9 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     toUsrDomain = extDetails.SipUACEndpoint.CloudEndUser.Domain;
                                                 }
 
-                                                if(extDetails.SipUACEndpoint.UserGroup && extDetails.SipUACEndpoint.UserGroup.length > 0 && extDetails.SipUACEndpoint.UserGroup[0].Extension)
+                                                if(extDetails.SipUACEndpoint.UserGroup && extDetails.SipUACEndpoint.UserGroup.Extension)
                                                 {
-                                                    grp = extDetails.SipUACEndpoint.UserGroup[0].Extension.Extension;
+                                                    grp = extDetails.SipUACEndpoint.UserGroup.Extension.Extension;
                                                 }
 
                                                 if(url)

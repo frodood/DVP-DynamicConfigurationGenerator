@@ -3,7 +3,6 @@ var config = require('config');
 var nodeUuid = require('node-uuid');
 var fsMediaFormatter = require('./FreeSwitchMediaFormatter.js');
 var xmlGen = require('./XmlResponseGenerator.js');
-var ruleHandler;
 var redisHandler = require('./RedisHandler.js');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var extDialplanEngine = require('./ExtendedDialplanEngine.js');
@@ -13,9 +12,11 @@ var util = require('util');
 var xmlBuilder = require('./XmlExtendedDialplanBuilder.js');
 var ipValidator = require('./IpValidator');
 var smsCdrOp = require('./SMSCDROp.js');
+var backendFactory = require('./BackendFactory.js');
 
 
-var backendHandler;
+/*var backendHandler;
+var ruleHandler;
 
 var useCache = config.UseCache;
 
@@ -28,7 +29,7 @@ else
 {
     backendHandler = require('./SipExtBackendOperations.js');
     ruleHandler = require('dvp-ruleservice/CallRuleBackendOperations.js');
-}
+}*/
 
 var hostIp = config.Host.Ip;
 var hostPort = config.Host.Port;
@@ -101,7 +102,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
     try
     {
         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to find from user for outbound call', reqId);
-        backendHandler.GatherFromUserDetails(reqId, callerIdNum, contextCompany, contextTenant, true, cacheData, function(err, fromUsr)
+        backendFactory.getBackendHandler().GatherFromUserDetails(reqId, callerIdNum, contextCompany, contextTenant, true, cacheData, function(err, fromUsr)
         {
             var dodActive = false;
             var dodNumber = '';
@@ -133,7 +134,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
 
             if(contextCompany && contextTenant)
             {
-                backendHandler.GetCacheObject(contextTenant, contextCompany, function(err, cacheInfo)
+                backendFactory.getBackendHandler().GetCacheObject(contextTenant, contextCompany, function(err, cacheInfo)
                 {
                     if(err)
                     {
@@ -182,7 +183,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                         }
                         else
                         {
-                            backendHandler.GetTransferCodesForTenantDB(reqId, contextCompany, contextTenant, data, function(err, resTrans)
+                            backendFactory.getBackendHandler().GetTransferCodesForTenantDB(reqId, contextCompany, contextTenant, data, function(err, resTrans)
                             {
                                 if(resTrans)
                                 {
@@ -190,7 +191,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                                 }
 
                                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, destNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, callerIdNum, destNum, domain, contextCompany, contextTenant);
-                                ruleHandler.PickCallRuleInbound(reqId, callerIdNum, destNum, '', domain, tempCallerContext, 'CALL', contextCompany, contextTenant, cacheData, function(err, rule)
+                                backendFactory.getRuleHandler().PickCallRuleInbound(reqId, callerIdNum, destNum, '', domain, tempCallerContext, 'CALL', contextCompany, contextTenant, cacheData, function(err, rule)
                                 {
                                     if(err)
                                     {
@@ -205,7 +206,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                                     {
                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - PickCallRuleInbound returned rule : %s', reqId, JSON.stringify(rule));
 
-                                        backendHandler.GetEmergencyNumber(destNum, rule.CompanyId, rule.TenantId, cacheData, function(err, emNum)
+                                        backendFactory.getBackendHandler().GetEmergencyNumber(destNum, rule.CompanyId, rule.TenantId, cacheData, function(err, emNum)
                                         {
                                             if(emNum)
                                             {
@@ -565,6 +566,35 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
 
 };
 
+server.post('/DVP/API/:version/DynamicConfigGenerator/Factory/:factory', function(req,res,next)
+{
+
+    try
+    {
+        var factory = req.params.factory;
+
+        if(factory === 'CACHE' || factory === 'DB')
+        {
+            backendFactory.changeBackendHandler(factory);
+
+            res.end('SUCCESS');
+        }
+        else
+        {
+            res.end('FAIL');
+        }
+
+
+    }
+    catch(ex)
+    {
+        res.end('FAIL');
+    }
+
+    return next();
+
+});
+
 server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res,next)
 {
 
@@ -651,11 +681,11 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to get context : %s', reqId, callerContext);
 
-                backendHandler.GetContext(varUsrContext, function(err, ctxt)
+                backendFactory.getBackendHandler().GetContext(varUsrContext, function(err, ctxt)
                 {
                     if(ctxt)
                     {
-                        backendHandler.GetCacheObject(ctxt.TenantId, ctxt.CompanyId, function(err, cacheInfo)
+                        backendFactory.getBackendHandler().GetCacheObject(ctxt.TenantId, ctxt.CompanyId, function(err, cacheInfo)
                         {
                             if(err)
                             {
@@ -667,7 +697,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                             }
                             else
                             {
-                                ruleHandler.PickCallRuleOutboundComplete(reqId, callerIdNum, destNum, '', callerContext, ctxt.CompanyId, ctxt.TenantId, true, cacheInfo, function (err, outRule)
+                                backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, callerIdNum, destNum, '', callerContext, ctxt.CompanyId, ctxt.TenantId, true, cacheInfo, function (err, outRule)
                                 {
                                     if(outRule)
                                     {
@@ -712,7 +742,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                 var cacheData = null;
 
-                backendHandler.GetContext(callerContext, function(err, ctxt)
+                backendFactory.getBackendHandler().GetContext(callerContext, function(err, ctxt)
                 {
                     if(err)
                     {
@@ -802,7 +832,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                 dodNumber = '';
                             }
 
-                            backendHandler.GetCacheObject(tenantId, companyId, function(err, cacheInfo)
+                            backendFactory.getBackendHandler().GetCacheObject(tenantId, companyId, function(err, cacheInfo)
                             {
                                 if(err)
                                 {
@@ -846,7 +876,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Validating trunk number for inbound call - TrunkNumber : %s', reqId, destNum);
 
-                                backendHandler.GetPhoneNumberDetails(destNum, function(err, num, cacheInfo)
+                                backendFactory.getBackendHandler().GetPhoneNumberDetails(destNum, function(err, num, cacheInfo)
                                 {
                                     cacheData = cacheInfo;
                                     if(err)
@@ -861,7 +891,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                     {
                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - TrunkNumber found', reqId);
 
-                                        backendHandler.ValidateBlacklistNumber(callerIdNum, num.CompanyId, num.TenantId, cacheData, function(err, blackListNum)
+                                        backendFactory.getBackendHandler().ValidateBlacklistNumber(callerIdNum, num.CompanyId, num.TenantId, cacheData, function(err, blackListNum)
                                         {
 
                                             if(err || blackListNum)
@@ -934,7 +964,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                                             logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, destNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, aniNum, destNum, domain, num.CompanyId, num.TenantId);
 
-                                                            ruleHandler.PickCallRuleInbound(reqId, callerIdNum, destNum, '', domain, callerContext, 'CALL', num.CompanyId, num.TenantId, cacheData, function(err, rule)
+                                                            backendFactory.getRuleHandler().PickCallRuleInbound(reqId, callerIdNum, destNum, '', domain, callerContext, 'CALL', num.CompanyId, num.TenantId, cacheData, function(err, rule)
                                                             {
                                                                 if(err)
                                                                 {
@@ -1227,7 +1257,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                                             if(splitVals.length === 4)
                                             {
-                                                ruleHandler.PickCallRuleInbound(reqId, callerIdNum, splitVals[3], '', callerContext, 'C2C', splitVals[2], splitVals[1], function(err, rule)
+                                                backendFactory.getRuleHandler().PickCallRuleInbound(reqId, callerIdNum, splitVals[3], '', callerContext, 'C2C', splitVals[2], splitVals[1], function(err, rule)
                                                 {
                                                     if(err)
                                                     {
@@ -1556,7 +1586,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/SMS/Routing', function(req
     try
     {
 
-        backendHandler.GetPhoneNumberDetails(destNumber, function(err, num, cacheInfo)
+        backendFactory.getBackendHandler().GetPhoneNumberDetails(destNumber, function(err, num, cacheInfo)
         {
             var cacheData = cacheInfo;
             if(err)
@@ -1573,7 +1603,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/SMS/Routing', function(req
 
                 logger.debug('[DVP-DynamicConfigurationGenerator.SMSRouting] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, destNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, fromNumber, destNumber, '', num.CompanyId, num.TenantId);
 
-                ruleHandler.PickCallRuleInbound(reqId, fromNumber, destNumber, message, '', '', 'SMS', num.CompanyId, num.TenantId, cacheData, function(err, rule)
+                backendFactory.getRuleHandler().PickCallRuleInbound(reqId, fromNumber, destNumber, message, '', '', 'SMS', num.CompanyId, num.TenantId, cacheData, function(err, rule)
                 {
                     if(err)
                     {
@@ -1670,7 +1700,7 @@ server.get('/DVP/API/:version/DynamicConfigGenerator/PublicUserRequestController
         logger.debug('[DVP-DynamicConfigurationGenerator.PublicUserRequestController] - [%s] - Request Params - username : %s , clusterId : %s', reqId, username, clusterId);
 
         logger.info('[DVP-DynamicConfigurationGenerator.PublicUserRequestController] - [%s] - call direction is IN', reqId);
-        backendHandler.GetCloudForUser(username, clusterId, null, function(err, cb)
+        backendFactory.getBackendHandler().GetCloudForUser(username, clusterId, null, function(err, cb)
         {
             if(err || !cb)
             {
@@ -1722,7 +1752,7 @@ server.get('/DVP/API/:version/DynamicConfigGenerator/LbRequestController/:direct
         if(direction === "in")
         {
             logger.info('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - call direction is IN', reqId);
-            backendHandler.GetCloudForIncomingRequest(number, ip, null, function(err, cb)
+            backendFactory.getBackendHandler().GetCloudForIncomingRequest(number, ip, null, function(err, cb)
             {
                 if(err || !cb)
                 {
@@ -1750,7 +1780,7 @@ server.get('/DVP/API/:version/DynamicConfigGenerator/LbRequestController/:direct
         else if(direction === "out")
         {
             logger.info('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - call direction is OUT', reqId);
-            backendHandler.GetGatewayForOutgoingRequest(number, 0, null, function(err, cb)
+            backendFactory.getBackendHandler().GetGatewayForOutgoingRequest(number, 0, null, function(err, cb)
             {
                 if(err || !cb)
                 {
@@ -1779,7 +1809,7 @@ server.get('/DVP/API/:version/DynamicConfigGenerator/LbRequestController/:direct
         else if(direction === "public_user")
         {
             logger.info('[DVP-DynamicConfigurationGenerator.LbRequestController] - [%s] - call direction is public_user', reqId);
-            backendHandler.GetCloudForIncomingRequest(number, ip, null, function(err, cb)
+            backendFactory.getBackendHandler().GetCloudForIncomingRequest(number, ip, null, function(err, cb)
             {
                 if(err || !cb)
                 {
@@ -1837,7 +1867,7 @@ server.get('/DVP/API/:version/DynamicConfigGenerator/CallServers/:companyId/:ten
 
         logger.debug('[DVP-DynamicConfigurationGenerator.CallServers] - [%s] - Request Params - companyId : %s, tenantId : %s', reqId, companyId, tenantId);
 
-        backendHandler.GetCallServersForEndUserDB(reqId, companyId, tenantId, null, function(err, csList)
+        backendFactory.getBackendHandler().GetCallServersForEndUserDB(reqId, companyId, tenantId, null, function(err, csList)
         {
             var state = true;
             if(err)
@@ -1893,7 +1923,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
 
             logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - Sip Auth Realm Set to : %s', reqId, tempAuthRealm);
 
-            backendHandler.GetGroupBy_Name_Domain(group, tempAuthRealm, null, function(err, result)
+            backendFactory.getBackendHandler().GetGroupBy_Name_Domain(group, tempAuthRealm, null, function(err, result)
             {
                 if(err)
                 {
@@ -1938,7 +1968,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
 
             logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - Sip Auth Realm Set to : %s', tempAuthRealm);
 
-            backendHandler.GetUserBy_Name_Domain(user, tempAuthRealm, null, function(err, usr)
+            backendFactory.getBackendHandler().GetUserBy_Name_Domain(user, tempAuthRealm, null, function(err, usr)
             {
                 if(err)
                 {
@@ -2001,7 +2031,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
 
             logger.debug('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - Sip Auth Realm Set to : %s', tempAuthRealm);
 
-            backendHandler.GetUserBy_Ext_Domain(user, tempAuthRealm, null, function(err, usr){
+            backendFactory.getBackendHandler().GetUserBy_Ext_Domain(user, tempAuthRealm, null, function(err, usr){
 
                 if(!err && usr)
                 {
@@ -2043,7 +2073,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/DirectoryProfile', functio
         {
             logger.info('[DVP-DynamicConfigurationGenerator.DirectoryProfile] - [%s] - ACTION TYPE GATEWAYS', reqId);
             var csId = parseInt(hostname);
-            backendHandler.GetGatewayListForCallServerProfile(profile, csId, reqId, null, function(err, result)
+            backendFactory.getBackendHandler().GetGatewayListForCallServerProfile(profile, csId, reqId, null, function(err, result)
             {
                 if (!err && result && result.length > 0)
                 {

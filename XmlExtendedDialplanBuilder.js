@@ -494,12 +494,14 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
 
             var fileSavePath = '$${base_dir}/recordings/${uuid}.wav';
 
+            var playFileDetails = 'record_post_process_exec_api=curl_sendfile:' + fileUploadUrl + ' file=${dvpRecFile} class=CALLSERVER&type=CALL&category=CONVERSATION&referenceid=${uuid}&mediatype=audio&filetype=wav&sessionid=${uuid}&display=' + ep.Destination + '-${origination_caller_id_number}';
+
 
             cond.ele('action').att('application', 'set').att('data', 'dvpRecFile=' + fileSavePath)
                 .up()
                 .ele('action').att('application', 'export').att('data', 'execute_on_answer=record_session ${dvpRecFile}')
                 .up()
-                .ele('action').att('application', 'set').att('data', 'record_post_process_exec_api=curl_sendfile:' + fileUploadUrl + ' file=${dvpRecFile} class=CALLSERVER&type=CALL&category=CONVERSATION&referenceid=${uuid}&mediatype=audio&filetype=wav&sessionid=${uuid}&display=' + ep.Destination + '-${origination_caller_id_number}')
+                .ele('action').att('application', 'set').att('data', playFileDetails)
                 .up()
 
         }
@@ -630,9 +632,11 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
 
         cond.end({pretty: true});
 
+        var xmlStr = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
 
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+        var decoded = xmlStr.replace(/&amp;/g, '&');
 
+        return decoded;
 
 
     }
@@ -1594,11 +1598,13 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
             }
             var fileSavePath = '$${base_dir}/recordings/${uuid}.wav';
 
+            var playFileDetails = 'record_post_process_exec_api=curl_sendfile:' + fileUploadUrl + ' file=${dvpRecFile} class=CALLSERVER&type=CALL&category=CONVERSATION&referenceid=${uuid}&mediatype=audio&filetype=wav&sessionid=${uuid}&display=' + ep.Destination + '-${origination_caller_id_number}';
+
             cond.ele('action').att('application', 'set').att('data', 'dvpRecFile=' + fileSavePath)
                 .up()
                 .ele('action').att('application', 'export').att('data', 'execute_on_answer=record_session ${dvpRecFile}')
                 .up()
-                .ele('action').att('application', 'set').att('data', 'record_post_process_exec_api=curl_sendfile:' + fileUploadUrl + ' file=${dvpRecFile} class=CALLSERVER&type=CALL&category=CONVERSATION&referenceid=${uuid}&mediatype=audio&filetype=wav&sessionid=${uuid}&display=' + ep.Destination + '-${origination_caller_id_number}')
+                .ele('action').att('application', 'set').att('data', playFileDetails)
                 .up()
 
         }
@@ -1739,7 +1745,11 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
         cond.end({pretty: true});
 
 
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+        var xmlStr = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+        var decoded = xmlStr.replace(/&amp;/g, '&');
+
+        return decoded;
 
 
     }

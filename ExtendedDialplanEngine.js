@@ -43,7 +43,7 @@ var CreateFMEndpointList = function(reqId, aniNum, context, companyId, tenantId,
                 if (fm.ObjCategory === 'GATEWAY')
                 {
                     //pick outbound rule
-                    ruleHandler.PickCallRuleOutboundComplete(reqId, aniNum, fm.DestinationNumber, '', context, companyId, tenantId, false, cacheData, function (err, rule)
+                    backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, aniNum, fm.DestinationNumber, '', context, companyId, tenantId, false, cacheData, function (err, rule)
                     {
                         if (!err && rule)
                         {
@@ -344,7 +344,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                         {
                             logger.debug('DVP-DynamicConfigurationGenerator.ProcessCallForwarding] - [%s] - Gateway Forward', reqId);
                             //pick outbound rule
-                            ruleHandler.PickCallRuleOutboundComplete(reqId, origNum, fwdRule.DestinationNumber, '', context, companyId, tenantId, false, cacheData, function(err, rule)
+                            backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, origNum, fwdRule.DestinationNumber, '', context, companyId, tenantId, false, cacheData, function(err, rule)
                             {
                                 if(err)
                                 {
@@ -890,7 +890,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         if (pbxObj.Endpoints && pbxObj.Endpoints.ObjCategory === 'GATEWAY')
                                                         {
                                                             //pick outbound rule
-                                                            ruleHandler.PickCallRuleOutboundComplete(reqId, ani, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, cacheData, function (err, rule)
+                                                            backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, ani, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, cacheData, function (err, rule)
                                                             {
                                                                 if (!err && rule)
                                                                 {
@@ -1570,7 +1570,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 if (pbxObj.Endpoints && pbxObj.Endpoints.ObjCategory === 'GATEWAY')
                                                                 {
                                                                     //pick outbound rule
-                                                                    ruleHandler.PickCallRuleOutboundComplete(reqId, ani, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, cacheData, function (err, rule)
+                                                                    backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, ani, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, cacheData, function (err, rule)
                                                                     {
                                                                         if (!err && rule)
                                                                         {
@@ -1927,7 +1927,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                             }
                             else
                             {
-                                ruleHandler.PickCallRuleOutboundComplete(reqId, ani, dnis, '', context, companyId, tenantId, true, cacheData, function(err, rule)
+                                backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, ani, dnis, '', context, companyId, tenantId, true, cacheData, function(err, rule)
                                 {
                                     if(err)
                                     {
@@ -2411,7 +2411,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     if (pbxObj.Endpoints && pbxObj.Endpoints.ObjCategory === 'GATEWAY')
                                                                     {
                                                                         //pick outbound rule
-                                                                        ruleHandler.PickCallRuleOutboundComplete(reqId, ani, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, cacheData, function (err, rule)
+                                                                        backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, ani, pbxObj.Endpoints.DestinationNumber, '', context, companyId, tenantId, false, cacheData, function (err, rule)
                                                                         {
                                                                             if (!err && rule)
                                                                             {
@@ -2834,7 +2834,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     if(operationType === 'GATEWAY')
                                                     {
                                                         //xml DND response
-                                                        ruleHandler.PickCallRuleOutboundComplete(reqId, ani, dnis, '', context, companyId, tenantId, true, cacheData, function(err, rule)
+                                                        backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, ani, dnis, '', context, companyId, tenantId, true, cacheData, function(err, rule)
                                                         {
                                                             if(err)
                                                             {
@@ -3094,7 +3094,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 }
                                                 else
                                                 {
-                                                    ruleHandler.PickCallRuleOutboundComplete(reqId, ani, dnis, '', context, companyId, tenantId, true, cacheData, function(err, rule)
+                                                    backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, ani, dnis, '', context, companyId, tenantId, true, cacheData, function(err, rule)
                                                     {
                                                         if(err)
                                                         {
@@ -3186,7 +3186,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                     }
                                     else
                                     {
-                                        ruleHandler.PickCallRuleOutboundComplete(reqId, ani, dnis, '', context, companyId, tenantId, true, cacheData, function(err, rule)
+                                        backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, ani, dnis, '', context, companyId, tenantId, true, cacheData, function(err, rule)
                                         {
                                             if(err)
                                             {

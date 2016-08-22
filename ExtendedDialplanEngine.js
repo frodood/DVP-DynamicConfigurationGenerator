@@ -525,7 +525,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
 };
 
 
-var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, extraData, fromUserData, companyId, tenantId, securityToken, numLimitInfo, dvpCallDirection, cacheData, callback)
+var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, extraData, fromUserData, companyId, tenantId, securityToken, numLimitInfo, dvpCallDirection, ctxt, cacheData, callback)
 {
 
     try
@@ -538,10 +538,16 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
         var uuid = '';
         var toFaxType = undefined;
         var fromFaxType = undefined;
+        var ctxtRecordingEnabled = false;
         var url = '';
         var appId = '';
         var csId = -1;
         var appType = '';
+
+        if(ctxt && ctxt.RecordingEnabled)
+        {
+            ctxtRecordingEnabled = ctxt.RecordingEnabled;
+        }
 
         if(extraData)
         {
@@ -1933,6 +1939,24 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         {
                                             toFaxType = rule.FaxType;
                                         }
+
+                                        var recEnabled = false;
+
+                                        if(ctxtRecordingEnabled)
+                                        {
+                                            recEnabled = true;
+                                        }
+                                        else
+                                        {
+                                            if(fromUserData && fromUserData.Extension.RecordingEnabled)
+                                            {
+                                                recEnabled = true;
+                                            }
+                                            else
+                                            {
+                                                recEnabled = false;
+                                            }
+                                        }
                                         var ep =
                                         {
                                             Profile: rule.GatewayCode,
@@ -1952,7 +1976,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             TenantId: rule.TenantId,
                                             Action: 'DEFAULT',
                                             AppId: appId,
-                                            RecordEnable: false
+                                            RecordEnable: recEnabled
                                         };
 
                                         if(dodActive && dodNumber)
@@ -2064,14 +2088,24 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             else
                                                             {
                                                                 var recEnabled = false;
-                                                                if(fromUserData.Extension.RecordingEnabled)
+
+                                                                if(ctxtRecordingEnabled)
                                                                 {
                                                                     recEnabled = true;
                                                                 }
                                                                 else
                                                                 {
-                                                                    recEnabled = extDetails.RecordingEnabled;
+                                                                    if(fromUserData.Extension.RecordingEnabled)
+                                                                    {
+                                                                        recEnabled = true;
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        recEnabled = false;
+                                                                    }
                                                                 }
+
+
 
                                                                 var ep =
                                                                 {
@@ -2154,13 +2188,21 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 else if(pbxObj.OperationType === 'USER_DIAL')
                                                                 {
                                                                     var recEnabled = false;
-                                                                    if(fromUserData.Extension.RecordingEnabled)
+
+                                                                    if(ctxtRecordingEnabled)
                                                                     {
                                                                         recEnabled = true;
                                                                     }
                                                                     else
                                                                     {
-                                                                        recEnabled = extDetails.RecordingEnabled;
+                                                                        if(fromUserData.Extension.RecordingEnabled)
+                                                                        {
+                                                                            recEnabled = true;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            recEnabled = false;
+                                                                        }
                                                                     }
 
 
@@ -2298,13 +2340,21 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     else
                                                                     {
                                                                         var recEnabled = false;
-                                                                        if(fromUserData.Extension.RecordingEnabled)
+
+                                                                        if(ctxtRecordingEnabled)
                                                                         {
                                                                             recEnabled = true;
                                                                         }
                                                                         else
                                                                         {
-                                                                            recEnabled = extDetails.RecordingEnabled;
+                                                                            if(fromUserData.Extension.RecordingEnabled)
+                                                                            {
+                                                                                recEnabled = true;
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                recEnabled = false;
+                                                                            }
                                                                         }
                                                                         //Do Normal User Dial
                                                                         var ep =
@@ -2470,13 +2520,21 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 {
 
                                                                     var recEnabled = false;
-                                                                    if(fromUserData.Extension.RecordingEnabled)
+
+                                                                    if(ctxtRecordingEnabled)
                                                                     {
                                                                         recEnabled = true;
                                                                     }
                                                                     else
                                                                     {
-                                                                        recEnabled = extDetails.RecordingEnabled;
+                                                                        if(fromUserData.Extension.RecordingEnabled)
+                                                                        {
+                                                                            recEnabled = true;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            recEnabled = false;
+                                                                        }
                                                                     }
 
                                                                     var ep =
@@ -2540,13 +2598,21 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     else
                                                     {
                                                         var recEnabled = false;
-                                                        if(fromUserData.Extension.RecordingEnabled)
+
+                                                        if(ctxtRecordingEnabled)
                                                         {
                                                             recEnabled = true;
                                                         }
                                                         else
                                                         {
-                                                            recEnabled = extDetails.RecordingEnabled;
+                                                            if(fromUserData.Extension.RecordingEnabled)
+                                                            {
+                                                                recEnabled = true;
+                                                            }
+                                                            else
+                                                            {
+                                                                recEnabled = false;
+                                                            }
                                                         }
 
                                                         var ep =
@@ -2795,6 +2861,25 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                     {
                                                                         toFaxType = rule.FaxType;
                                                                     }
+
+                                                                    var recEnabled = false;
+
+                                                                    if(ctxtRecordingEnabled)
+                                                                    {
+                                                                        recEnabled = true;
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        if(fromUserData && fromUserData.Extension.RecordingEnabled)
+                                                                        {
+                                                                            recEnabled = true;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            recEnabled = false;
+                                                                        }
+                                                                    }
+
                                                                     var ep =
                                                                     {
                                                                         Profile: rule.GatewayCode,
@@ -2814,7 +2899,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         TenantId: rule.TenantId,
                                                                         AppId: appId,
                                                                         Action: 'DEFAULT',
-                                                                        RecordEnabled: fromUserData.Extension.RecordingEnabled
+                                                                        RecordEnabled: recEnabled
                                                                     };
 
                                                                     if(dodActive && dodNumber)
@@ -3021,6 +3106,24 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             {
                                                                 toFaxType = rule.FaxType;
                                                             }
+
+                                                            var recEnabled = false;
+
+                                                            if(ctxtRecordingEnabled)
+                                                            {
+                                                                recEnabled = true;
+                                                            }
+                                                            else
+                                                            {
+                                                                if(fromUserData && fromUserData.Extension.RecordingEnabled)
+                                                                {
+                                                                    recEnabled = true;
+                                                                }
+                                                                else
+                                                                {
+                                                                    recEnabled = false;
+                                                                }
+                                                            }
                                                             var ep =
                                                             {
                                                                 Profile: rule.GatewayCode,
@@ -3040,7 +3143,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 TenantId: rule.TenantId,
                                                                 AppId: appId,
                                                                 Action: 'DEFAULT',
-                                                                RecordEnable: fromUserData.Extension.RecordingEnabled
+                                                                RecordEnable: recEnabled
                                                             };
 
                                                             if(dodActive && dodNumber)
@@ -3095,6 +3198,25 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 {
                                                     toFaxType = rule.FaxType;
                                                 }
+
+                                                var recEnabled = false;
+
+                                                if(ctxtRecordingEnabled)
+                                                {
+                                                    recEnabled = true;
+                                                }
+                                                else
+                                                {
+                                                    if(fromUserData && fromUserData.Extension.RecordingEnabled)
+                                                    {
+                                                        recEnabled = true;
+                                                    }
+                                                    else
+                                                    {
+                                                        recEnabled = false;
+                                                    }
+                                                }
+
                                                 var ep =
                                                 {
                                                     Profile: rule.GatewayCode,
@@ -3114,7 +3236,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     TenantId: rule.TenantId,
                                                     AppId: appId,
                                                     Action: 'DEFAULT',
-                                                    RecordEnable: fromUserData.Extension.RecordingEnabled
+                                                    RecordEnable: recEnabled
                                                 };
 
                                                 if(dodActive && dodNumber)

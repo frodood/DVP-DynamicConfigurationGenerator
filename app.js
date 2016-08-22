@@ -97,7 +97,7 @@ var RedisOperations = function(callUuid, companyId, tenantId, appId, appType, is
 };
 
 
-var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, isDialPlanGiven, cacheData, res)
+var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, isDialPlanGiven, ctxt, cacheData, res)
 {
     try
     {
@@ -150,7 +150,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
 
                         if(appType && appType === 'HTTAPI')
                         {
-                            extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, null, contextCompany, contextTenant, null, null, null, cacheData, function(err, extDialplan)
+                            extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, null, contextCompany, contextTenant, null, null, null, ctxt, cacheData, function(err, extDialplan)
                             {
                                 if(err)
                                 {
@@ -390,7 +390,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                                                         {
                                                             data.DVPAppUrl = masterApp.Url;
                                                             data.AppId = masterApp.id;
-                                                            extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, fromUsr, rule.CompanyId, rule.TenantId, securityToken, undefined, 'outbound', cacheData, function(err, extDialplan)
+                                                            extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, fromUsr, rule.CompanyId, rule.TenantId, securityToken, undefined, 'outbound', ctxt, cacheData, function(err, extDialplan)
                                                             {
                                                                 if(err)
                                                                 {
@@ -454,7 +454,7 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                                                         {
                                                             data.DVPAppUrl = app.Url;
                                                             data.AppId = app.id;
-                                                            extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, fromUsr, rule.CompanyId, rule.TenantId, securityToken, undefined, 'outbound', cacheData, function(err, extDialplan)
+                                                            extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, 'OUT', data, fromUsr, rule.CompanyId, rule.TenantId, securityToken, undefined, 'outbound', ctxt, cacheData, function(err, extDialplan)
                                                             {
                                                                 if(err)
                                                                 {
@@ -1084,7 +1084,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                             {
                                                                                 data.DVPAppUrl = masterApp.Url;
                                                                                 data.AppId = masterApp.id;
-                                                                                extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, 'inbound', null, function(err, extDialplan)
+                                                                                extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, 'inbound', ctxt, null, function(err, extDialplan)
                                                                                 {
                                                                                     if(err)
                                                                                     {
@@ -1148,7 +1148,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                                 data.DVPAppUrl = app.Url;
                                                                                 data.AppId = app.id;
 
-                                                                                extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, 'inbound', cacheData, function(err, extDialplan)
+                                                                                extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, 'inbound', ctxt, cacheData, function(err, extDialplan)
                                                                                 {
 
                                                                                     if(err)
@@ -1377,7 +1377,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                 {
                                                                     data.DVPAppUrl = masterApp.Url;
                                                                     data.AppId = masterApp.id;
-                                                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, 'inbound', null, function(err, extDialplan)
+                                                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, 'inbound', ctxt, null, function(err, extDialplan)
                                                                     {
                                                                         if(err)
                                                                         {
@@ -1438,7 +1438,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                 {
                                                                     data.DVPAppUrl = app.Url;
                                                                     data.AppId = app.id;
-                                                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, 'inbound', null, function(err, extDialplan)
+                                                                    extDialplanEngine.ProcessExtendedDialplan(reqId, callerIdNum, destNum, callerContext, direction, data, undefined, rule.CompanyId, rule.TenantId, securityToken, NumLimitInfo, 'inbound', ctxt, null, function(err, extDialplan)
                                                                     {
                                                                         if(err)
                                                                         {
@@ -1533,7 +1533,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                             {
                                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Call Direction OUT', reqId);
 
-                                HandleOutRequest(reqId, data, callerIdNum, contextTenant, appType, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, isDialplanGiven, cacheData, res);
+                                HandleOutRequest(reqId, data, callerIdNum, contextTenant, appType, contextCompany, dvpOriginationType, destNum, domain, callerContext, profile, varUuid, isDialplanGiven, ctxt, cacheData, res);
 
                             }
 

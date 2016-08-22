@@ -3143,7 +3143,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 TenantId: rule.TenantId,
                                                                 AppId: appId,
                                                                 Action: 'DEFAULT',
-                                                                RecordEnable: recEnabled
+                                                                RecordEnabled: recEnabled
                                                             };
 
                                                             if(dodActive && dodNumber)
@@ -3236,7 +3236,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     TenantId: rule.TenantId,
                                                     AppId: appId,
                                                     Action: 'DEFAULT',
-                                                    RecordEnable: recEnabled
+                                                    RecordEnabled: recEnabled
                                                 };
 
                                                 if(dodActive && dodNumber)

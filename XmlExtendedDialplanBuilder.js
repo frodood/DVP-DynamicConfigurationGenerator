@@ -3,6 +3,7 @@ var config = require('config');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var util = require('util');
 var sf = require('stringformat');
+var validator = require('validator');
 
 var fileServiceIp = config.Services.fileServiceHost;
 var fileServicePort = config.Services.fileServicePort;
@@ -484,8 +485,15 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
 
         if(ep.RecordEnabled)
         {
-            var fileSavePath = '$${base_dir}/recordings/${uuid}.wav';
             var fileUploadUrl = 'http://' + fileServiceIp + ':' + fileServicePort + '/DVP/API/' + fileServiceVersion + '/InternalFileService/File/Upload';
+
+            if(!validator.isIP(fileServiceIp))
+            {
+                fileUploadUrl = 'http://' + fileServiceIp + '/DVP/API/' + fileServiceVersion + '/InternalFileService/File/Upload';
+            }
+
+            var fileSavePath = '$${base_dir}/recordings/${uuid}.wav';
+
 
             cond.ele('action').att('application', 'set').att('data', 'dvpRecFile=' + fileSavePath)
                 .up()
@@ -1577,8 +1585,14 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
 
         if(ep.RecordEnabled)
         {
-            var fileSavePath = '$${base_dir}/recordings/${uuid}.wav';
+
             var fileUploadUrl = 'http://' + fileServiceIp + ':' + fileServicePort + '/DVP/API/' + fileServiceVersion + '/InternalFileService/File/Upload';
+
+            if(!validator.isIP(fileServiceIp))
+            {
+                fileUploadUrl = 'http://' + fileServiceIp + '/DVP/API/' + fileServiceVersion + '/InternalFileService/File/Upload';
+            }
+            var fileSavePath = '$${base_dir}/recordings/${uuid}.wav';
 
             cond.ele('action').att('application', 'set').att('data', 'dvpRecFile=' + fileSavePath)
                 .up()

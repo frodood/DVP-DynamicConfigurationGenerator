@@ -701,7 +701,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                 {
                                     if(outRule)
                                     {
-                                        var xml = xmlBuilder.CreatePbxFeatures(reqId, huntDestNum, 'gateway', null, outRule.TrunkNumber, outRule.GatewayCode, ctxt.CompanyId, ctxt.TenantId, null, varUsrContext);
+                                        var xml = xmlBuilder.CreatePbxFeatures(reqId, huntDestNum, 'gateway', null, outRule.TrunkNumber, outRule.GatewayCode, ctxt.CompanyId, ctxt.TenantId, null, huntContext);
 
                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
@@ -710,7 +710,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                     else
                                     {
                                         logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Outbound Rule Not Found', reqId, err);
-                                        var xml = xmlGen.createRejectResponse(callerContext);
+                                        var xml = xmlGen.createRejectResponse(huntContext);
 
                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
@@ -762,7 +762,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                 {
                                     if(outRule)
                                     {
-                                        var xml = xmlBuilder.CreatePbxFeatures(reqId, huntDestNum, 'gateway', null, outRule.TrunkNumber, outRule.GatewayCode, ctxt.CompanyId, ctxt.TenantId, null, varUsrContext);
+                                        var xml = xmlBuilder.CreatePbxFeatures(reqId, huntDestNum, 'gateway', null, outRule.TrunkNumber, outRule.GatewayCode, ctxt.CompanyId, ctxt.TenantId, null, huntContext);
 
                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
@@ -771,7 +771,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                     else
                                     {
                                         logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Outbound Rule Not Found', reqId, err);
-                                        var xml = xmlGen.createRejectResponse(varUsrContext);
+                                        var xml = xmlGen.createRejectResponse(huntContext);
 
                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 

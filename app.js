@@ -679,7 +679,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Attendant Transfer Gateway ------------', reqId);
 
-                logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to get context : %s', reqId, callerContext);
+                logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to get context : %s', reqId, varUsrContext);
 
                 backendFactory.getBackendHandler().GetContext(varUsrContext, function(err, ctxt)
                 {
@@ -697,11 +697,11 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                             }
                             else
                             {
-                                backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, callerIdNum, destNum, '', callerContext, ctxt.CompanyId, ctxt.TenantId, true, cacheInfo, function (err, outRule)
+                                backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, callerIdNum, destNum, '', varUsrContext, ctxt.CompanyId, ctxt.TenantId, true, cacheInfo, function (err, outRule)
                                 {
                                     if(outRule)
                                     {
-                                        var xml = xmlBuilder.CreatePbxFeatures(reqId, huntDestNum, 'gateway', null, outRule.TrunkNumber, outRule.GatewayCode, ctxt.CompanyId, ctxt.TenantId, null, huntContext);
+                                        var xml = xmlBuilder.CreatePbxFeatures(reqId, huntDestNum, 'gateway', null, outRule.TrunkNumber, outRule.GatewayCode, ctxt.CompanyId, ctxt.TenantId, null, varUsrContext);
 
                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
@@ -726,7 +726,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                     else
                     {
                         logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Context not found', reqId, err);
-                        var xml = xmlGen.createRejectResponse(callerContext);
+                        var xml = xmlGen.createRejectResponse(varUsrContext);
 
                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
@@ -740,7 +740,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Attendant Transfer Gateway ------------', reqId);
 
-                logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to get context : %s', reqId, callerContext);
+                logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to get context : %s', reqId, varUsrContext);
 
                 backendFactory.getBackendHandler().GetContext(varUsrContext, function(err, ctxt)
                 {
@@ -750,7 +750,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                         {
                             if(err)
                             {
-                                var xml = xmlGen.createRejectResponse(callerContext);
+                                var xml = xmlGen.createRejectResponse(varUsrContext);
 
                                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
@@ -758,11 +758,11 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                             }
                             else
                             {
-                                backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, callerIdNum, destNum, '', callerContext, ctxt.CompanyId, ctxt.TenantId, true, cacheInfo, function (err, outRule)
+                                backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, callerIdNum, destNum, '', varUsrContext, ctxt.CompanyId, ctxt.TenantId, true, cacheInfo, function (err, outRule)
                                 {
                                     if(outRule)
                                     {
-                                        var xml = xmlBuilder.CreatePbxFeatures(reqId, huntDestNum, 'gateway', null, outRule.TrunkNumber, outRule.GatewayCode, ctxt.CompanyId, ctxt.TenantId, null, huntContext);
+                                        var xml = xmlBuilder.CreatePbxFeatures(reqId, huntDestNum, 'gateway', null, outRule.TrunkNumber, outRule.GatewayCode, ctxt.CompanyId, ctxt.TenantId, null, varUsrContext);
 
                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
@@ -771,7 +771,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                     else
                                     {
                                         logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Outbound Rule Not Found', reqId, err);
-                                        var xml = xmlGen.createRejectResponse(callerContext);
+                                        var xml = xmlGen.createRejectResponse(varUsrContext);
 
                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 

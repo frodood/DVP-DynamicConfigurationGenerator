@@ -492,7 +492,7 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
                 fileUploadUrl = 'http://' + fileServiceIp + '/DVP/API/' + fileServiceVersion + '/InternalFileService/File/Upload/' + ep.TenantId + '/' + ep.CompanyId;
             }
 
-            var fileSavePath = '$${base_dir}/recordings/${uuid}.wav';
+            var fileSavePath = '$${base_dir}/recordings/${uuid}.mp3';
 
             var playFileDetails = 'record_post_process_exec_api=curl_sendfile:' + fileUploadUrl + ' file=${dvpRecFile} class=CALLSERVER&type=CALL&category=CONVERSATION&referenceid=${uuid}&mediatype=audio&filetype=wav&sessionid=${uuid}&display=' + ep.Destination + '-${origination_caller_id_number}';
 
@@ -1598,7 +1598,7 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
                 fileUploadUrl = 'http://' + fileServiceIp + '/DVP/API/' + fileServiceVersion + '/InternalFileService/File/Upload/' + ep.TenantId + '/' + ep.CompanyId;
             }
 
-            var fileSavePath = '$${base_dir}/recordings/${uuid}.wav';
+            var fileSavePath = '$${base_dir}/recordings/${uuid}.mp3';
 
             var playFileDetails = 'record_post_process_exec_api=curl_sendfile:' + fileUploadUrl + ' file=${dvpRecFile} class=CALLSERVER&type=CALL&category=CONVERSATION&referenceid=${uuid}&mediatype=audio&filetype=wav&sessionid=${uuid}&display=' + ep.Destination + '-${origination_caller_id_number}';
 

@@ -1199,6 +1199,37 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                     callback(err, confXml);
                                 })
                             }
+                            else if(extDetails.ObjCategory === 'AUTO_ATTENDANT')
+                            {
+
+                                var ep =
+                                {
+                                    Profile: profile,
+                                    Type: 'AUTO_ATTENDANT',
+                                    LegStartDelay: 0,
+                                    BypassMedia: false,
+                                    LegTimeout: 60,
+                                    Origination: callerIdName,
+                                    OriginationCallerIdNumber: callerIdNum,
+                                    Destination: extDetails.Extension,
+                                    CompanyId: companyId,
+                                    TenantId: tenantId,
+                                    AppId: appId,
+                                    Action: 'AUTO_ATTENDANT'
+                                };
+
+                                var toContext = '';
+
+                                if(extDetails.Context)
+                                {
+                                    toContext = extDetails.Context.Context;
+                                }
+
+                                var xml = xmlBuilder.CreateAutoAttendantDialplan(reqId, ep, context, toContext, '[^\\s]*', false, dvpCallDirection);
+
+                                callback(undefined, xml);
+
+                            }
                             else
                             {
                                 callback(err, xmlBuilder.createRejectResponse());
@@ -1902,6 +1933,37 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             }
 
                                         });
+
+                                    }
+                                    else if(extDetails.ObjCategory === 'AUTO_ATTENDANT')
+                                    {
+
+                                        var ep =
+                                        {
+                                            Profile: profile,
+                                            Type: 'AUTO_ATTENDANT',
+                                            LegStartDelay: 0,
+                                            BypassMedia: false,
+                                            LegTimeout: 60,
+                                            Origination: callerIdName,
+                                            OriginationCallerIdNumber: callerIdNum,
+                                            Destination: extDetails.Extension,
+                                            CompanyId: companyId,
+                                            TenantId: tenantId,
+                                            AppId: appId,
+                                            Action: 'AUTO_ATTENDANT'
+                                        };
+
+                                        var toContext = '';
+
+                                        if(extDetails.Context)
+                                        {
+                                            toContext = extDetails.Context.Context;
+                                        }
+
+                                        var xml = xmlBuilder.CreateAutoAttendantDialplan(reqId, ep, context, toContext, '[^\\s]*', false, dvpCallDirection);
+
+                                        callback(undefined, xml);
 
                                     }
                                     else

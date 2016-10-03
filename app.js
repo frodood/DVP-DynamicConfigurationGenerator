@@ -626,7 +626,10 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
         var dvpOriginationType = data["variable_sip_h_X-DVP-ORIGINATION-TYPE"];
         var dvpDestinationType = data["variable_sip_h_X-DVP-DESTINATION-TYPE"];
         var appType = data["variable_dvp_app_type"];
+        var opCat = data["variable_DVP_OPERATION_CAT"];
         var isDialplanGiven = data["variable_companyid"];
+
+
 
         var csId = parseInt(hostname);
 

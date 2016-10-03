@@ -562,7 +562,16 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
             appId = extraData['AppId'];
             csId = parseInt(extraData['hostname']);
             appType = extraData['variable_dvp_app_type'];
+
+            var opCat = extraData["variable_DVP_OPERATION_CAT"];
+
+            if(opCat === 'AUTO_ATTENDANT')
+            {
+                appType = 'AUTO_ATTENDANT';
+            }
         }
+
+
 
         //Get ANI DNIS Context
 
@@ -1266,7 +1275,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
         else
         {
             //Get From User
-                if(appType && appType === 'HTTAPI')
+                if(appType && (appType === 'HTTAPI' || appType === 'AUTO_ATTENDANT'))
                 {
 
                     var fromUserUuid = '';

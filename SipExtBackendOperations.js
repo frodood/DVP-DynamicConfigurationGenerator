@@ -213,7 +213,7 @@ var GetExtensionDB = function(reqId, ext, companyId, tenantId, data, callback)
 {
     try
     {
-        dbModel.Extension.find({where: [{Extension: ext},{TenantId: tenantId}]})
+        dbModel.Extension.find({where: [{Extension: ext},{CompanyId: companyId},{TenantId: tenantId}]})
             .then(function (extDetails)
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.GetExtensionForDid] - [%s] - PGSQL get did number and related extension for company query success', reqId);
@@ -347,12 +347,22 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
                     callback(err, undefined);
                 });
         }
-        else if(extType === 'VOICE_PORTAL')
+        else if(extType === 'VOICE_PORTAL' || extType === 'AUTO_ATTENDANT')
         {
             dbModel.Extension.find({where: [{Extension: extension},{CompanyId: companyId},{TenantId: tenantId},{ObjCategory: extType}]})
                 .then(function (extData)
                 {
-                    callback(undefined, extData);
+                    dbModel.Context.find({where: [{CompanyId: companyId},{TenantId: tenantId},{ContextCat: 'INTERNAL'}]})
+                        .then(function (ctxt)
+                        {
+                            extData.Context = ctxt;
+                            callback(undefined, extData);
+
+                        }).catch(function(err)
+                        {
+                            callback(err, undefined);
+                        });
+
                 }).catch(function(err)
                 {
                     callback(err, undefined);

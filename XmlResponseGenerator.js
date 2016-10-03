@@ -268,7 +268,7 @@ var CreateGatewayProfile = function(gwList, reqId)
 
 }
 
-var createDirectoryProfile = function(extName, ext, domain, email, password, context, reqId)
+var createDirectoryProfile = function(extName, ext, domain, email, password, context, sendEmail, reqId)
 {
     try {
 
@@ -295,7 +295,42 @@ var createDirectoryProfile = function(extName, ext, domain, email, password, con
 
         var doc = xmlBuilder.create('document');
 
-        doc.att('type', 'freeswitch/xml')
+        var tempDoc = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'directory')
+            .ele('domain').att('name', domain)
+            .ele('user').att('id', extName).att('cacheable', 'false').att('number-alias', ext)
+            .ele('params')
+                .ele('param').att('name', 'dial-string').att('value', '{sip_invite_domain=${domain_name},presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}')
+                .up()
+                .ele('param').att('name', 'password').att('value', password)
+                .up();
+
+        if(sendEmail)
+        {
+            tempDoc.ele('param').att('name', 'vm-email-all-messages').att('value', 'true')
+                .up()
+                .ele('param').att('name', 'vm-attach-file').att('value', 'true')
+                .up()
+                .ele('param').att('name', 'vm-mailto').att('value', email)
+                .up()
+
+        }
+
+        tempDoc.up()
+            .ele('variables')
+            .ele('variable').att('name', 'domain').att('value', domain)
+            .up()
+            .ele('variable').att('name', 'user_context').att('value', context)
+            .up()
+            .ele('variable').att('name', 'user_id').att('value', extName)
+            .up()
+            .up()
+            .up()
+            .up()
+            .up()
+            .end({pretty: true});
+
+        /*doc.att('type', 'freeswitch/xml')
             .ele('section').att('name', 'directory')
                 .ele('domain').att('name', domain)
                     .ele('user').att('id', extName).att('cacheable', 'false').att('number-alias', ext)
@@ -322,7 +357,7 @@ var createDirectoryProfile = function(extName, ext, domain, email, password, con
                 .up()
             .up()
         .up()
-        .end({pretty: true});
+        .end({pretty: true});*/
 
 
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});

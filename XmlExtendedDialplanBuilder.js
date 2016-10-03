@@ -1343,6 +1343,104 @@ var CreateBargeDialplan = function(reqId, uuid, context, destinationPattern, cal
 
 };
 
+var CreateAutoAttendantDialplan = function(reqId, endpoint, context, toContext, destinationPattern, ignoreEarlyMedia, dvpCallDirection)
+{
+    try
+    {
+        if (!destinationPattern) {
+            destinationPattern = "";
+        }
+
+        if (!context) {
+            context = "";
+        }
+
+        var bypassMedia = "bypass_media=true";
+        if (!endpoint.BypassMedia)
+        {
+            bypassMedia = "bypass_media=false";
+        }
+
+        var ignoreEarlyM = "ignore_early_media=false";
+        if (ignoreEarlyMedia)
+        {
+            ignoreEarlyM = "ignore_early_media=true";
+        }
+
+        //var httpUrl = Config.Services.HttApiUrl;
+
+        var luaParams = util.format('AutoAttendant.lua \'%s\' \'%s\' \'%s\' \'%s\' \'%s\'', endpoint.CompanyId, endpoint.TenantId, endpoint.Destination, toContext, context);
+
+        var doc = xmlBuilder.create('document');
+
+        var cond = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern);
+
+
+        cond.ele('action').att('application', 'set').att('data', 'ringback=${us-ring}')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'continue_on_fail=true')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'hangup_after_bridge=true')
+            .up()
+            .ele('action').att('application', 'set').att('data', ignoreEarlyM)
+            .up()
+            .ele('action').att('application', 'set').att('data', bypassMedia)
+            .up();
+
+        if(endpoint.Action)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=AUTO_ATTENDANT')
+                .up()
+        }
+
+        cond.ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=AUTO_ATTENDANT')
+            .up()
+
+        if(endpoint.CompanyId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + endpoint.CompanyId)
+                .up()
+        }
+        if(endpoint.TenantId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + endpoint.TenantId)
+                .up()
+        }
+        if(endpoint.AppId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + endpoint.AppId)
+                .up()
+        }
+
+        if(dvpCallDirection)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+                .up()
+        }
+
+
+
+        cond.ele('action').att('application', 'lua').att('data', luaParams)
+            .up();
+
+        cond.end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
 var CreateForwardingDialplan = function(reqId, endpoint, context, profile, destinationPattern, ignoreEarlyMedia, fwdKey, numLimitInfo, transferLegInfo, dvpCallDirection)
 {
     try
@@ -1972,3 +2070,4 @@ module.exports.CreateConferenceDialplan = CreateConferenceDialplan;
 module.exports.CreateReceiveFaxDialplan = CreateReceiveFaxDialplan;
 module.exports.CreatePbxFeatures = CreatePbxFeatures;
 module.exports.createRejectResponse = createRejectResponse;
+module.exports.CreateAutoAttendantDialplan = CreateAutoAttendantDialplan;

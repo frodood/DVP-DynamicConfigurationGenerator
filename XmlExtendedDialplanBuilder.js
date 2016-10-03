@@ -1369,7 +1369,7 @@ var CreateAutoAttendantDialplan = function(reqId, endpoint, context, toContext, 
 
         //var httpUrl = Config.Services.HttApiUrl;
 
-        var luaParams = util.format('AutoAttendant.lua \'%s\' \'%s\' \'%s\' \'%s\' \'%s\'', endpoint.CompanyId, endpoint.TenantId, endpoint.Destination, toContext, context);
+        var luaParams = util.format('AutoAttendant.lua \'%s\' \'%s\' \'%s\' \'%s\' \'%s\'', endpoint.CompanyId, endpoint.TenantId, endpoint.Destination, context, toContext);
 
         var doc = xmlBuilder.create('document');
 

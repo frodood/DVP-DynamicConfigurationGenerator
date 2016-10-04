@@ -61,7 +61,7 @@ var GetObjectParseJson = function(reqId, key, callback)
 
         }
     })
-}
+};
 
 var GetObject = function(reqId, key, callback)
 {
@@ -176,6 +176,17 @@ var GetFromSet = function(setName, callback)
     }
 };
 
+var ExpireKey = function(key, seconds)
+{
+    client.expire(key, seconds, function(err, reply)
+    {
+        if (err)
+        {
+            logger.error('[DVP-DynamicConfigurationGenerator.IncrementKey] - [%s] - REDIS ERROR', err);
+        }
+    });
+};
+
 var IncrementKey = function(key, callback)
 {
     try
@@ -286,3 +297,4 @@ module.exports.AddChannelIdToSet = AddChannelIdToSet;
 module.exports.GetObjectParseJson = GetObjectParseJson;
 module.exports.IncrementKey = IncrementKey;
 module.exports.AddToHash = AddToHash;
+module.exports.ExpireKey = ExpireKey;

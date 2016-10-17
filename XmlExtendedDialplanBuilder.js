@@ -188,7 +188,7 @@ var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context,
 
         if(dvpCallDirection)
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+            cond.ele('action').att('application', 'export').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 
@@ -296,7 +296,7 @@ var CreateConferenceDialplan = function(reqId, epList, context, destinationPatte
         }
         if(dvpCallDirection)
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+            cond.ele('action').att('application', 'export').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 
@@ -542,7 +542,7 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
 
         if(dvpCallDirection)
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+            cond.ele('action').att('application', 'export').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 
@@ -1097,7 +1097,7 @@ var CreatePickUpDialplan = function(reqId, extension, context, destinationPatter
 
         if(dvpCallDirection)
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+            cond.ele('action').att('application', 'export').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 
@@ -1209,7 +1209,7 @@ var CreateInterceptDialplan = function(reqId, uuid, context, destinationPattern,
         }
         if(dvpCallDirection)
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+            cond.ele('action').att('application', 'export').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 
@@ -1272,7 +1272,7 @@ var CreateParkDialplan = function(reqId, extension, context, destinationPattern,
         }
         if(dvpCallDirection)
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+            cond.ele('action').att('application', 'export').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 
@@ -1418,7 +1418,7 @@ var CreateAutoAttendantDialplan = function(reqId, endpoint, context, toContext, 
 
         if(dvpCallDirection)
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+            cond.ele('action').att('application', 'export').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 
@@ -1559,7 +1559,7 @@ var CreateForwardingDialplan = function(reqId, endpoint, context, profile, desti
 
         if(dvpCallDirection)
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+            cond.ele('action').att('application', 'export').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 
@@ -1733,7 +1733,7 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
         }
         if(dvpCallDirection)
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+            cond.ele('action').att('application', 'export').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 
@@ -1924,7 +1924,7 @@ var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, dest
         }
         if(dvpCallDirection)
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+            cond.ele('action').att('application', 'export').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 

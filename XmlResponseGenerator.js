@@ -438,7 +438,7 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, req
         }
         if(dvpCallDirection)
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+            cond.ele('action').att('application', 'export').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 
@@ -532,7 +532,7 @@ var CreateSocketApiDialplan = function(destinationPattern, context, socketUrl, r
         }
         if(dvpCallDirection)
         {
-            cond.ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+            cond.ele('action').att('application', 'export').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
                 .up()
         }
 

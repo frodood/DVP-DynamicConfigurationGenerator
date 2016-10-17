@@ -88,7 +88,7 @@ var RedisOperations = function(callUuid, companyId, tenantId, appId, appType, is
                 redisHandler.ExpireKey(callUuid, 86400);
             });
 
-            var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", tenantId, companyId, "CALLSERVER", "CHANNEL", "CREATE", callDirection, "", callUuid);
+            var pubMessage = util.format("EVENT:%s:%s:%s:%s:%s:%s:%s:%s:YYYY", tenantId, companyId, "CALLSERVER", "CHANNEL", "CREATE", "", "", callUuid);
 
             redisHandler.PublishToRedis('events', pubMessage, function(err, redisRes){});
 

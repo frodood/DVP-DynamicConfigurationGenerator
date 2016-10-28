@@ -8,7 +8,7 @@
     "buffer": "^4.5.0",
     "config": "^1.15.0",
     "dvp-common": "^0.4.5",
-    "dvp-dbmodels": "^0.5.0",
+    "dvp-dbmodels": "^0.4.5",
     "dvp-ruleservice": "^1.1.5",
     "ip": "^1.1.0",
     "libphonenumber": "0.0.9",

@@ -1674,6 +1674,8 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
             .up()
             .ele('action').att('application', 'set').att('data', 'continue_on_fail=true')
             .up()
+            .ele('action').att('application', 'set').att('data', 'my_uuid=${create_uuid}').att('inline=true')
+            .up()
             .ele('action').att('application', 'set').att('data', 'hangup_after_bridge=true')
             .up()
             .ele('action').att('application', 'set').att('data', ignoreEarlyM)
@@ -1696,9 +1698,9 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
                 fileUploadUrl = 'http://' + fileServiceIp + '/DVP/API/' + fileServiceVersion + '/InternalFileService/File/Upload/' + ep.TenantId + '/' + ep.CompanyId;
             }
 
-            var fileSavePath = '$${base_dir}/recordings/${uuid}.mp3';
+            var fileSavePath = '$${base_dir}/recordings/${my_uuid}.mp3';
 
-            var playFileDetails = 'record_post_process_exec_api=curl_sendfile:' + fileUploadUrl + ' file=${dvpRecFile} class=CALLSERVER&type=CALL&category=CONVERSATION&referenceid=${uuid}&mediatype=audio&filetype=wav&sessionid=${uuid}&display=' + ep.Destination + '-${origination_caller_id_number}';
+            var playFileDetails = 'record_post_process_exec_api=curl_sendfile:' + fileUploadUrl + ' file=${dvpRecFile} class=CALLSERVER&type=CALL&category=CONVERSATION&referenceid=${my_uuid}&mediatype=audio&filetype=wav&sessionid=${my_uuid}&display=' + ep.Destination + '-${origination_caller_id_number}';
 
             cond.ele('action').att('application', 'set').att('data', 'dvpRecFile=' + fileSavePath)
                 .up()
@@ -1748,9 +1750,9 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
         }
 
         if (ep.LegStartDelay > 0)
-            option = util.format('[leg_delay_start=%d,leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain);
+            option = util.format('[leg_delay_start=%d, origination_uuid=${my_uuid}, leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain);
         else
-            option = util.format('[leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain);
+            option = util.format('[leg_timeout=%d, origination_uuid=${my_uuid}, origination_caller_id_name=%s,origination_caller_id_number=%s,sip_h_X-Gateway=%s]', ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber, ep.Domain);
 
 
         var dnis = '';

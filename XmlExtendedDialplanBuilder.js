@@ -1674,7 +1674,7 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
             .up()
             .ele('action').att('application', 'set').att('data', 'continue_on_fail=true')
             .up()
-            .ele('action').att('application', 'set').att('data', 'my_uuid=${create_uuid}').att('inline', 'true')
+            .ele('action').att('application', 'set').att('data', 'my_uuid=${create_uuid()}').att('inline', 'true')
             .up()
             .ele('action').att('application', 'set').att('data', 'hangup_after_bridge=true')
             .up()

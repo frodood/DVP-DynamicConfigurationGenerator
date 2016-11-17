@@ -1678,6 +1678,8 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
             .up()
             .ele('action').att('application', 'set').att('data', 'hangup_after_bridge=true')
             .up()
+            .ele('action').att('application', 'log').att('data', 'CUSTOM UUID[${my_uuid}]')
+            .up()
             .ele('action').att('application', 'set').att('data', ignoreEarlyM)
             .up()
             .ele('action').att('application', 'set').att('data', bypassMed)

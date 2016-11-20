@@ -202,7 +202,11 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                             {
                                 if(resTrans)
                                 {
-                                    fromUsr.TransferCode = resTrans;
+                                    if(fromUsr)
+                                    {
+                                        fromUsr.TransferCode = resTrans;
+                                    }
+
                                 }
 
                                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to pick inbound rule - Params - aniNum : %s, destNum : %s, domain : %s, companyId : %s, tenantId : %s', reqId, callerIdNum, destNum, domain, contextCompany, contextTenant);

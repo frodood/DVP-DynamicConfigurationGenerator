@@ -564,10 +564,16 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
             appType = extraData['variable_dvp_app_type'];
 
             var opCat = extraData["variable_DVP_OPERATION_CAT"];
+            var currentApp = extraData["variable_current_application"];
 
             if(opCat === 'AUTO_ATTENDANT')
             {
                 appType = 'AUTO_ATTENDANT';
+            }
+
+            if(currentApp === 'voicemail')
+            {
+                appType = 'VOICEMAIL';
             }
         }
 
@@ -2567,7 +2573,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
             }
             else
             {
-                if(appType && (appType === 'HTTAPI' || appType === 'AUTO_ATTENDANT'))
+                if(appType && (appType === 'HTTAPI' || appType === 'AUTO_ATTENDANT' || appType === 'VOICEMAIL'))
                 {
 
                     var fromUserUuid = '';

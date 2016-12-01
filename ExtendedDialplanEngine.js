@@ -3410,3 +3410,4 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
 module.exports.ProcessExtendedDialplan = ProcessExtendedDialplan;
 module.exports.ProcessCallForwarding = ProcessCallForwarding;
+module.exports.AttendantTransferLegInfoHandler = AttendantTransferLegInfoHandler;

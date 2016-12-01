@@ -67,7 +67,7 @@ var createNotFoundResponse = function()
 
 };
 
-var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, trunkCode, companyId, tenantId, appId, context)
+var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, trunkCode, companyId, tenantId, appId, context, transferCodes)
 {
     try
     {
@@ -132,9 +132,38 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
                 .up()
                 .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=ATT_XFER_USER')
                 .up()
-                .ele('action').att('application', 'bind_meta_app').att('data', '2 b s execute_extension::att_xfer XML PBXFeatures')
-                .up()
-                .ele('action').att('application', 'att_xfer').att('data', '{companyid=' + companyId + ',tenantid=' + tenantId + ',dvp_app_id=' + appId + '}' + pbxType + '/${digits}@' + domain)
+
+            if(transferCodes)
+            {
+                if(transferCodes.InternalTransfer != null && transferCodes.InternalTransfer != undefined)
+                {
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.InternalTransfer + ' b s execute_extension::att_xfer XML PBXFeatures')
+                        .up()
+                }
+
+                if(transferCodes.ExternalTransfer != null && transferCodes.ExternalTransfer != undefined)
+                {
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.ExternalTransfer + ' b s execute_extension::att_xfer_outbound XML PBXFeatures')
+                        .up()
+                }
+
+                if(transferCodes.GroupTransfer != null && transferCodes.GroupTransfer != undefined)
+                {
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.GroupTransfer + ' b s execute_extension::att_xfer_group XML PBXFeatures')
+                        .up()
+                }
+
+                if(transferCodes.ConferenceTransfer != null && transferCodes.ConferenceTransfer != undefined)
+                {
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.ConferenceTransfer + ' b s execute_extension::att_xfer_conference XML PBXFeatures')
+                        .up()
+                }
+
+            }
+
+
+
+            cond.ele('action').att('application', 'att_xfer').att('data', '{companyid=' + companyId + ',tenantid=' + tenantId + ',dvp_app_id=' + appId + '}' + pbxType + '/${digits}@' + domain)
                 .up()
                 .end({pretty: true});
         }

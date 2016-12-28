@@ -710,7 +710,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                         {
                             backendFactory.getBackendHandler().GetTransferCodesForTenantDB(reqId, huntCtxtSplit[2], huntCtxtSplit[1], cacheInfo, function(err, transCodes)
                             {
-                                var xml = xmlBuilder.CreatePbxFeatures(reqId, huntDestNum, 'user', varDomain, null, null, huntCtxtSplit[2], huntCtxtSplit[1], null, huntContext, transCodes);
+                                var xml = xmlBuilder.CreatePbxFeatures(reqId, huntDestNum, 'user', varDomain, null, null, huntCtxtSplit[2], huntCtxtSplit[1], null, tempHuntCtxt, transCodes);
 
                                 logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 

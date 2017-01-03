@@ -443,14 +443,15 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, req
         }
 
         cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=HTTAPI')
-            .up()
+            .up();
+
 
         cond.ele('action').att('application', 'export').att('data', 'dvp_app_type=HTTAPI')
             .up()
             .ele('action').att('application', 'answer')
             .up()
             .ele('action').att('application', 'httapi').att('data', httpApiUrl)
-            .up()
+            .up();
 
 
         cond.end({pretty: true});

@@ -4,6 +4,7 @@ var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var config = require('config');
 var extApi = require('./ExternalApiAccess.js');
 var xmlBuilder = require('./XmlExtendedDialplanBuilder.js');
+var xmlRespBuilder = require('./XmlResponseGenerator.js');
 var transHandler = require('dvp-ruleservice/TranslationHandler.js');
 var redisHandler = require('./RedisHandler.js');
 var conferenceHandler = require('./ConferenceOperations.js');
@@ -2043,6 +2044,66 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         }
 
                                     });
+
+                                }
+                                else if(extDetails.ObjCategory === 'IVR')
+                                {
+                                    if(extDetails.Application && extDetails.Application.Availability)
+                                    {
+                                        var app = extDetails.Application;
+
+                                        if(extDetails.Application.MasterApplication && extDetails.Application.MasterApplication.Availability && extDetails.Application.MasterApplication.Url)
+                                        {
+                                            var masterUrl = '';
+                                            var masterApp = extDetails.Application.MasterApplication;
+
+                                            if(masterApp.ObjType === "HTTAPI")
+                                            {
+                                                logger.info('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Master App Type is HTTAPI for Extension IVR', reqId);
+                                                //add to redis
+                                                masterUrl = masterApp.Url;
+                                                var sessionData =
+                                                {
+                                                    path: app.Url,
+                                                    company: companyId,
+                                                    tenant: tenantId,
+                                                    app: app.AppName,
+                                                    appid: app.id
+                                                };
+
+                                                var jsonString = JSON.stringify(sessionData);
+
+                                                logger.debug('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Session Data Object created for HTTAPI : %s', reqId, jsonString);
+
+                                                redisHandler.SetObject(uuid + "_data", jsonString, function(err, result)
+                                                {
+                                                    if(err)
+                                                    {
+                                                        callback(new Error('Exception in setting sessionData'), xmlBuilder.createRejectResponse());
+                                                    }
+                                                    else
+                                                    {
+                                                        redisHandler.ExpireKey(uuid + "_data", 86400);
+                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session data added to redis successfully - Key : %s_data', reqId, uuid);
+
+                                                        var xml = xmlRespBuilder.CreateHttpApiDialplan('[^\\s]*', context, masterUrl, reqId, null, app.id, companyId, tenantId, 'outbound');
+
+                                                        callback(null, xml);
+                                                    }
+
+                                                });
+
+                                            }
+                                        }
+                                        else
+                                        {
+                                            callback(new Error('Master application not found for IVR extension'), xmlBuilder.createRejectResponse());
+                                        }
+                                    }
+                                    else
+                                    {
+                                        callback(new Error('Application not found for IVR extension'), xmlBuilder.createRejectResponse());
+                                    }
 
                                 }
                                 else if(extDetails.ObjCategory === 'AUTO_ATTENDANT')

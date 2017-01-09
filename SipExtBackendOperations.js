@@ -368,6 +368,27 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
                     callback(err, undefined);
                 });
         }
+        else if(extType === 'IVR')
+        {
+            dbModel.Extension.find({where: [{Extension: extension},{CompanyId: companyId},{TenantId: tenantId},{ObjCategory: extType}]})
+                .then(function (extData)
+                {
+                    dbModel.Application.find({where: [{CompanyId: companyId},{TenantId: tenantId},{id: extData.ExtraData}], include : [{model: dbModel.Application, as: "MasterApplication"}]})
+                        .then(function (appData)
+                        {
+                            extData.Application = appData;
+                            callback(undefined, extData);
+
+                        }).catch(function(err)
+                        {
+                            callback(err, undefined);
+                        });
+
+                }).catch(function(err)
+                {
+                    callback(err, undefined);
+                });
+        }
         else
         {
             logger.error('[DVP-DynamicConfigurationGenerator.GetAllDataForExt] - [%s] - Unsupported extension type', reqId);

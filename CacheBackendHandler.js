@@ -481,8 +481,34 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
                     }
 
                 }
-                else if(extType === 'VOICE_PORTAL')
+                else if(extType === 'VOICE_PORTAL' || extType === 'AUTO_ATTENDANT')
                 {
+
+                    callback(null, extData);
+                }
+                else if(extType === 'IVR')
+                {
+                    if(data.Application)
+                    {
+                        var app = data.Application[extData.ExtraData];
+
+                        if(app)
+                        {
+                            extData.Application = app;
+
+                            if(app.MasterApplicationId)
+                            {
+                                var masterApp = data.Application[app.MasterApplicationId];
+
+                                if(masterApp)
+                                {
+                                    app.MasterApplication = masterApp
+                                }
+                            }
+
+
+                        }
+                    }
 
                     callback(null, extData);
                 }

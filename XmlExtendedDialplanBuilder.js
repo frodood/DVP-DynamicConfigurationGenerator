@@ -668,7 +668,7 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
 
                 if(transferLegInfo.IVRLegs && transferLegInfo.TransferCode.IVRTransfer)
                 {
-                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.IVRTransfer + ' ' + transferLegInfo.IVRTransfer + ' s execute_extension::att_xfer_ivr XML PBXFeatures')
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.IVRTransfer + ' ' + transferLegInfo.IVRLegs + ' s execute_extension::att_xfer_ivr XML PBXFeatures')
                         .up()
                 }
             }

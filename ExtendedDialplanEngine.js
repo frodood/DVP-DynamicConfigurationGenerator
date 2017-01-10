@@ -648,6 +648,10 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
             {
                 appType = 'AUTO_ATTENDANT';
             }
+            else if(opCat === 'ATT_XFER_IVR')
+            {
+                appType = 'IVR_TRANSFER';
+            }
 
             if(currentApp === 'voicemail')
             {
@@ -2681,7 +2685,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
             }
             else
             {
-                if(appType && (appType === 'HTTAPI' || appType === 'AUTO_ATTENDANT' || appType === 'VOICEMAIL'))
+                if(appType && (appType === 'HTTAPI' || appType === 'AUTO_ATTENDANT' || appType === 'VOICEMAIL' || appType === 'IVR_TRANSFER'))
                 {
 
                     var fromUserUuid = '';

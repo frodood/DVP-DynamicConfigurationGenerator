@@ -3385,6 +3385,21 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         callback(undefined, xml);
 
                                     }
+                                    else if(extDetails.ObjCategory === 'IVR')
+                                    {
+
+                                        handleIVRExt(reqId, companyId, tenantId, uuid, context, extDetails)
+                                            .then(function(ivrResp)
+                                            {
+                                                callback(null, ivrResp);
+
+                                            })
+                                            .catch(function(err)
+                                            {
+                                                callback(err, xmlBuilder.createRejectResponse());
+                                            });
+
+                                    }
                                     else
                                     {
                                         callback(new Error('Unsupported extension category'), xmlBuilder.createRejectResponse());

@@ -703,7 +703,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                     }
                     else
                     {
-                        var xml = xmlBuilder.CreatePbxFeatures(reqId, huntDestNum, 'user', varDomain, null, null, null, null, null, huntContext, null);
+                        var xml = xmlBuilder.CreatePbxFeatures(reqId, huntDestNum, 'ivr', varDomain, null, null, null, null, null, huntContext, null);
 
                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 

@@ -122,6 +122,19 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
                 .up()
                 .end({pretty: true});
         }
+        else if(pbxType === 'ivr')
+        {
+            cond.ele('action').att('application', 'read').att('data', "3 6 'tone_stream://%(10000,0,350,440)' digits 30000 #")
+                .up()
+                .ele('action').att('application', 'set').att('data', 'origination_cancel_key=#')
+                .up()
+                .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=ATT_XFER_IVR')
+                .up()
+                .ele('action').att('application', 'transfer').att('data', '${digits} XML ' + context)
+                .up()
+                .end({pretty: true});
+
+        }
         else
         {
             cond.ele('action').att('application', 'read').att('data', "3 6 'tone_stream://%(10000,0,350,440)' digits 30000 #")
@@ -156,6 +169,12 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
                 if(transferCodes.ConferenceTransfer != null && transferCodes.ConferenceTransfer != undefined)
                 {
                     cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.ConferenceTransfer + ' b s execute_extension::att_xfer_conference XML PBXFeatures')
+                        .up()
+                }
+
+                if(transferCodes.IVRTransfer != null && transferCodes.IVRTransfer != undefined)
+                {
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.IVRTransfer + ' b s execute_extension::att_xfer_ivr XML PBXFeatures')
                         .up()
                 }
 
@@ -646,6 +665,12 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
                     cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.ConferenceTransfer + ' ' + transferLegInfo.ConferenceLegs + ' s execute_extension::att_xfer_conference XML PBXFeatures')
                         .up()
                 }
+
+                if(transferLegInfo.IVRLegs && transferLegInfo.TransferCode.IVRTransfer)
+                {
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.IVRTransfer + ' ' + transferLegInfo.IVRTransfer + ' s execute_extension::att_xfer_ivr XML PBXFeatures')
+                        .up()
+                }
             }
 
 
@@ -803,6 +828,8 @@ var CreateRouteFaxGatewayDialplan = function(reqId, ep, context, profile, destin
             .up()
             .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
             .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '9 ab s execute_extension::att_xfer_ivr XML PBXFeatures')
+            .up()
 
 
         var option = '';
@@ -827,7 +854,7 @@ var CreateRouteFaxGatewayDialplan = function(reqId, ep, context, profile, destin
 
         cond.ele('action').att('application', 'set').att('data', bypassMed)
             .up()
-        ele('action').att('application', 'set').att('data', calling)
+            .ele('action').att('application', 'set').att('data', calling)
             .up()
 
         return cond.end({pretty: true});
@@ -956,6 +983,8 @@ var CreateRouteFaxUserDialplan = function(reqId, ep, context, profile, destinati
             .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
             .up()
             .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '9 ab s execute_extension::att_xfer_ivr XML PBXFeatures')
             .up()
 
         if(numLimitInfo && numLimitInfo.CheckLimit)
@@ -1663,6 +1692,12 @@ var CreateForwardingDialplan = function(reqId, endpoint, context, profile, desti
                 cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.ConferenceTransfer + ' ' + transferLegInfo.ConferenceLegs + ' s execute_extension::att_xfer_conference XML PBXFeatures')
                     .up()
             }
+
+            if(transferLegInfo.IVRLegs && transferLegInfo.TransferCode.IVRTransfer)
+            {
+                cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.IVRTransfer + ' ' + transferLegInfo.IVRLegs + ' s execute_extension::att_xfer_ivr XML PBXFeatures')
+                    .up()
+            }
         }
 
         if(numLimitInfo && numLimitInfo.CheckLimit)
@@ -1904,6 +1939,12 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
                 cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.ConferenceTransfer + ' ' + transferLegInfo.ConferenceLegs + ' s execute_extension::att_xfer_conference XML PBXFeatures')
                     .up()
             }
+
+            if(transferLegInfo.IVRLegs && transferLegInfo.TransferCode.IVRTransfer)
+            {
+                cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.IVRTransfer + ' ' + transferLegInfo.IVRLegs + ' s execute_extension::att_xfer_ivr XML PBXFeatures')
+                    .up()
+            }
         }
 
         if(ep.CheckLimit)
@@ -2017,6 +2058,8 @@ var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, dest
             .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
             .up()
             .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '9 ab s execute_extension::att_xfer_ivr XML PBXFeatures')
             .up()
 
         cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=FOLLOW_ME')

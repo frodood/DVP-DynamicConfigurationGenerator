@@ -601,6 +601,8 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
             .up()
             .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
             .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '9 ab s execute_extension::att_xfer_ivr XML PBXFeatures')
+            .up()
 
 
         var option = '';

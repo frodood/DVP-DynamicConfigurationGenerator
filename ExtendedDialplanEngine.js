@@ -204,7 +204,8 @@ var AttendantTransferLegInfoHandler = function(reqId, fromUser, toUser)
             InternalLegs: '',
             ExternalLegs: '',
             GroupLegs: '',
-            ConferenceLegs: ''
+            ConferenceLegs: '',
+            IVRLegs: ''
         };
         if(fromUser)
         {
@@ -225,6 +226,10 @@ var AttendantTransferLegInfoHandler = function(reqId, fromUser, toUser)
             if(fromUser.TransConferenceEnable)
             {
                 AttTransLegInfo.ConferenceLegs = 'a';
+            }
+            if(fromUser.TransIVREnable)
+            {
+                AttTransLegInfo.IVRLegs = 'a';
             }
 
         }
@@ -248,6 +253,10 @@ var AttendantTransferLegInfoHandler = function(reqId, fromUser, toUser)
             if(toUser.TransConferenceEnable)
             {
                 AttTransLegInfo.ConferenceLegs = AttTransLegInfo.ConferenceLegs + 'b';
+            }
+            if(toUser.TransIVREnable)
+            {
+                AttTransLegInfo.IVRLegs = AttTransLegInfo.IVRLegs + 'b';
             }
         }
 

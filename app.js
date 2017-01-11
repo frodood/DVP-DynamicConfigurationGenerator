@@ -720,6 +720,35 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                 });
 
             }
+            else if (ardsFeaturesPattern.test(huntContext) && huntDestNum == 'att_xfer_ivr')
+            {
+                logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - ARDS Attendant Transfer User ------------', reqId);
+
+                var tempHuntCtxt = decodeURIComponent(huntContext);
+
+                var huntCtxtSplit = tempHuntCtxt.split('|');
+
+                if(huntCtxtSplit.length === 3)
+                {
+                    var xml = xmlBuilder.CreatePbxFeatures(reqId, huntDestNum, 'ivr', varDomain, null, null, huntCtxtSplit[2], huntCtxtSplit[1], null, tempHuntCtxt, null);
+
+                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                    res.end(xml);
+
+
+                }
+                else
+                {
+                    var xml = xmlGen.createRejectResponse(callerContext);
+
+                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                    res.end(xml);
+                }
+
+
+            }
             else if (ardsFeaturesPattern.test(huntContext) && huntDestNum == 'att_xfer')
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - ARDS Attendant Transfer User ------------', reqId);

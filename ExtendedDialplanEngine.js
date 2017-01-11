@@ -544,7 +544,7 @@ var handleIVRExt = function(reqId, companyId, tenantId, uuid, context, extDetail
         {
             var app = extDetails.Application;
 
-            if(extDetails.Application.MasterApplication && extDetails.Application.MasterApplication.Availability && extDetails.Application.MasterApplication.Url)
+            if(extDetails.Application.Master5Application && extDetails.Application.MasterApplication.Availability && extDetails.Application.MasterApplication.Url)
             {
                 var masterUrl = '';
                 var masterApp = extDetails.Application.MasterApplication;
@@ -657,7 +657,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
             {
                 appType = 'AUTO_ATTENDANT';
             }
-            else if(opCat === 'ATT_XFER_IVR')
+            else if(opCat === 'ATT_XFER_IVR' || extraData['IsIVRTransfer'])
             {
                 appType = 'IVR_TRANSFER';
             }

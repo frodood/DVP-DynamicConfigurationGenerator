@@ -897,6 +897,8 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                 var tempHuntCtxt = decodeURIComponent(huntContext);
 
+                data['IsIVRTransfer'] = true;
+
                 var huntCtxtSplit = tempHuntCtxt.split('|');
 
                 if(huntCtxtSplit.length === 3)

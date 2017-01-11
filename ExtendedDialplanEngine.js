@@ -582,11 +582,11 @@ var handleIVRExt = function(reqId, companyId, tenantId, uuid, context, extDetail
 
                             if(isTransfer)
                             {
-                                xmlRespBuilder.CreateHttpApiDialplanTransfer('[^\\s]*', context, masterUrl, reqId, null, app.id, companyId, tenantId, 'outbound');
+                                xml = xmlRespBuilder.CreateHttpApiDialplanTransfer('[^\\s]*', context, masterUrl, reqId, null, app.id, companyId, tenantId, 'outbound');
                             }
                             else
                             {
-                                xmlRespBuilder.CreateHttpApiDialplan('[^\\s]*', context, masterUrl, reqId, null, app.id, companyId, tenantId, 'outbound');
+                                xml = xmlRespBuilder.CreateHttpApiDialplan('[^\\s]*', context, masterUrl, reqId, null, app.id, companyId, tenantId, 'outbound');
                             }
 
                             fulfill(xml);

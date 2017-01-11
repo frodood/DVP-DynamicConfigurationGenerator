@@ -130,7 +130,7 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
                 .up()
                 .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=ATT_XFER_IVR')
                 .up()
-                .ele('action').att('application', 'transfer').att('data', '${digits} XML PBXFeatures|' + tenantId + '|' + companyId)
+                .ele('action').att('application', 'transfer').att('data', '-aleg ${digits} XML PBXFeatures|' + tenantId + '|' + companyId)
                 .up()
                 .end({pretty: true});
 

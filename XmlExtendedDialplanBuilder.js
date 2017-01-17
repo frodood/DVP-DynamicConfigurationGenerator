@@ -1784,11 +1784,11 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
             .ele('action').att('application', 'set').att('data', 'continue_on_fail=true')
             .up()
 
-         if(dvpCallDirection === 'outbound')
-         {
-             cond.ele('action').att('application', 'set').att('data', 'my_uuid=${create_uuid()}').att('inline', 'true')
-             .up()
-         }
+        if(dvpCallDirection === 'outbound')
+        {
+            cond.ele('action').att('application', 'set').att('data', 'my_uuid=${create_uuid()}').att('inline', 'true')
+                .up()
+        }
 
         cond.ele('action').att('application', 'set').att('data', 'hangup_after_bridge=true')
             .up()
@@ -1847,6 +1847,12 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
 
 
 
+        }
+
+        if(ep.Operator)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'veeryoperator=' + ep.Operator)
+                .up()
         }
 
 
@@ -2011,7 +2017,7 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
     }
     catch(ex)
     {
-        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateRouteGatewayDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
         return createNotFoundResponse();
     }
 

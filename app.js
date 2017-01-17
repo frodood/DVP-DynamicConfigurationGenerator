@@ -250,7 +250,8 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                                                             Destination: rule.DNIS,
                                                             Domain: rule.IpUrl,
                                                             Action: 'DEFAULT',
-                                                            RecordEnabled: fromUsr.Extension.RecordingEnabled
+                                                            RecordEnabled: fromUsr.Extension.RecordingEnabled,
+                                                            Operator: rule.Operator
                                                         };
 
                                                         if(dodActive && dodNumber)
@@ -263,14 +264,40 @@ var HandleOutRequest = function(reqId, data, callerIdNum, contextTenant, appType
                                                             ep.Origination = rule.ANI;
                                                             ep.OriginationCallerIdNumber = rule.ANI;
                                                         }
+                                                        externalApi.CheckBalance(reqId, varUuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                                            .then(function(balanceRes)
+                                                            {
+                                                                if (balanceRes && balanceRes.IsSuccess)
+                                                                {
 
-                                                        var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, callerContext, profile, '[^\\s]*', false, null, 'outbound');
+                                                                    var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, callerContext, profile, '[^\\s]*', false, null, 'outbound');
 
-                                                        RedisOperations(varUuid, rule.CompanyId, rule.TenantId, null, 'EMERGENCY', isDialPlanGiven, 'outbound');
+                                                                    RedisOperations(varUuid, rule.CompanyId, rule.TenantId, null, 'EMERGENCY', isDialPlanGiven, 'outbound');
 
-                                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+                                                                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
-                                                        res.end(xml);
+                                                                    res.end(xml);
+                                                                }
+                                                                else
+                                                                {
+                                                                    var xml = xmlGen.createRejectResponse(callerContext);
+
+                                                                    logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, new Error('insufficient balance'));
+
+                                                                    res.end(xml);
+                                                                }
+
+                                                            })
+                                                            .catch(function(err)
+                                                            {
+                                                                var xml = xmlGen.createRejectResponse(callerContext);
+
+                                                                logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, err);
+
+                                                                res.end(xml);
+                                                            });
+
+
                                                     }
                                                     else
                                                     {

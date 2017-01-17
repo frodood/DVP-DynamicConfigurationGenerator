@@ -26,7 +26,10 @@ module.exports = {
 
     "fileServiceHost": "192.168.0.54",
     "fileServicePort": 8081,
-    "fileServiceVersion":"6.0"
+    "fileServiceVersion":"6.0",
+    "dccaclientHost": "127.0.0.1",
+    "dccaclientPort": 4555,
+    "dccaclientVersion": "1.0.0.0"
 
   },
 

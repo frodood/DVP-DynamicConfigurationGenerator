@@ -670,6 +670,10 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
             var pabxFeaturesPattern = new RegExp('^(PBXFeatures)[^\s]*');
 
+            huntDestNum = decodeURIComponent(huntDestNum);
+
+            cdnum = decodeURIComponent(cdnum);
+
             var destNum = (huntDestNum) ? huntDestNum:cdnum;
 
             if (huntContext == 'PBXFeatures' && huntDestNum == 'att_xfer')

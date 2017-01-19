@@ -400,7 +400,7 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                         ep.OriginationCallerIdNumber = dodNumber;
                                     }
 
-                                    externalApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                    extApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
                                         .then(function(balanceRes)
                                         {
                                             if (balanceRes && balanceRes.IsSuccess)
@@ -1041,7 +1041,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                                                     var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
 
-                                                                    externalApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                                                    extApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
                                                                         .then(function(balanceRes)
                                                                         {
                                                                             if (balanceRes && balanceRes.IsSuccess)
@@ -1860,7 +1860,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                                                         var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
 
-                                                                        externalApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                                                        extApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
                                                                             .then(function(balanceRes)
                                                                             {
                                                                                 if (balanceRes && balanceRes.IsSuccess)
@@ -2396,7 +2396,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             {
                                                                 var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
 
-                                                                externalApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                                                extApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
                                                                     .then(function(balanceRes)
                                                                     {
                                                                         if (balanceRes && balanceRes.IsSuccess)
@@ -2661,7 +2661,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     {
                                                         var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
 
-                                                        externalApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                                        extApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
                                                             .then(function(balanceRes)
                                                             {
                                                                 if (balanceRes && balanceRes.IsSuccess)
@@ -2775,7 +2775,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         {
                                             var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
 
-                                            externalApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                            extApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
                                                 .then(function(balanceRes)
                                                 {
                                                     if (balanceRes && balanceRes.IsSuccess)
@@ -3186,7 +3186,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                                                             var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, null);
 
-                                                                            externalApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                                                            extApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
                                                                                 .then(function(balanceRes)
                                                                                 {
                                                                                     if (balanceRes && balanceRes.IsSuccess)
@@ -3640,7 +3640,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         {
                                             var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
 
-                                            externalApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                            extApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
                                                 .then(function(balanceRes)
                                                 {
                                                     if (balanceRes && balanceRes.IsSuccess)

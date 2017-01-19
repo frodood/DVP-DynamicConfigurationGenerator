@@ -9,9 +9,9 @@ var validator = require('validator');
 
 var token = config.Token;
 
-var dccaclientHost = config.Token.dccaclientHost;
-var dccaclientPort = config.Token.dccaclientPort;
-var dccaclientVersion = config.Token.dccaclientVersion;
+var dccaclientHost = config.Services.dccaclientHost;
+var dccaclientPort = config.Services.dccaclientPort;
+var dccaclientVersion = config.Services.dccaclientVersion;
 
 var RemoteGetDialplanConfig = function(reqId, ani, dnis, context, direction, userUuid, fromUserUuid, opType, extExtraData, appId, url, companyId, tenantId, securityToken, callback)
 {

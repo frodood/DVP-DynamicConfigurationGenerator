@@ -38,5 +38,6 @@ module.exports = {
 
     },
 
-    "Token": "HOST_TOKEN"
+    "Token": "HOST_TOKEN",
+    "billingEnabled": "SYS_BILLING_ENABLED"
 };

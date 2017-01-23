@@ -13,6 +13,7 @@ var xmlBuilder = require('./XmlExtendedDialplanBuilder.js');
 var ipValidator = require('./IpValidator');
 var smsCdrOp = require('./SMSCDROp.js');
 var backendFactory = require('./BackendFactory.js');
+var translationHandler = require('dvp-ruleservice/TranslationHandler.js');
 
 
 /*var backendHandler;
@@ -1238,6 +1239,11 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                                                 }
                                                                 else if(rule)
                                                                 {
+                                                                    if(rule.ANITranslation)
+                                                                    {
+                                                                        data["Caller-Caller-ID-Number"] = translationHandler.TranslateHandler(rule.ANITranslation, data["Caller-Caller-ID-Number"]);
+                                                                    }
+
                                                                     logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - PickCallRuleInbound returned rule : %s', reqId, JSON.stringify(rule));
 
                                                                     //check dnis is a emergency number

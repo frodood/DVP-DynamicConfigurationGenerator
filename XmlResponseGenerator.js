@@ -448,6 +448,10 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, req
 
         cond.ele('action').att('application', 'export').att('data', 'dvp_app_type=HTTAPI')
             .up()
+            .ele('action').att('application', 'export').att('data', 'Caller-Orig-Caller-ID-Name=33333333')
+            .up()
+            .ele('action').att('application', 'export').att('data', 'Caller-Caller-ID-Number=33333333')
+            .up()
             .ele('action').att('application', 'answer')
             .up()
             .ele('action').att('application', 'httapi').att('data', httpApiUrl)

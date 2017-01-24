@@ -370,7 +370,7 @@ var createDirectoryProfile = function(extName, ext, domain, email, password, con
 
 };
 
-var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, reqId, numLimitInfo, appId, companyId, tenantId, dvpCallDirection)
+var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, reqId, numLimitInfo, appId, companyId, tenantId, dvpCallDirection, ani)
 {
     try
     {
@@ -442,13 +442,15 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, req
                 .up()
         }
 
+        if(ani)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'effective_caller_id_number=' + ani)
+                .up()
+        }
+
         cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=HTTAPI')
-            .up();
-
-
-        cond.ele('action').att('application', 'export').att('data', 'dvp_app_type=HTTAPI')
             .up()
-            .ele('action').att('application', 'set').att('data', 'effective_caller_id_number=99999999999')
+            .ele('action').att('application', 'export').att('data', 'dvp_app_type=HTTAPI')
             .up()
             .ele('action').att('application', 'answer')
             .up()
@@ -471,7 +473,7 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, req
 
 };
 
-var CreateHttpApiDialplanTransfer = function(destinationPattern, context, httApiUrl, reqId, numLimitInfo, appId, companyId, tenantId, dvpCallDirection)
+var CreateHttpApiDialplanTransfer = function(destinationPattern, context, httApiUrl, reqId, numLimitInfo, appId, companyId, tenantId, dvpCallDirection, ani)
 {
     try
     {
@@ -540,6 +542,12 @@ var CreateHttpApiDialplanTransfer = function(destinationPattern, context, httApi
         if(dvpCallDirection)
         {
             cond.ele('action').att('application', 'export').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+                .up()
+        }
+
+        if(ani)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'effective_caller_id_number=' + ani)
                 .up()
         }
 

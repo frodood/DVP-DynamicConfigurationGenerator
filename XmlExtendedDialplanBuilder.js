@@ -229,25 +229,13 @@ var CreatePbxFeaturesGateway = function(reqId, destNum, trunkNumber, trunkCode, 
     }
 };
 
-var CreateAttendantTransferGW = function(reqId, destNum, gwList, companyId, tenantId, appId, context)
+var CreateAttendantTransferGW = function(reqId, destNum, context)
 {
     try
     {
 
         if (!destNum) {
             destNum = "";
-        }
-
-        if (!companyId) {
-            companyId = -1;
-        }
-
-        if (!tenantId) {
-            tenantId = -1;
-        }
-
-        if (!appId) {
-            appId = -1;
         }
 
 
@@ -257,7 +245,7 @@ var CreateAttendantTransferGW = function(reqId, destNum, gwList, companyId, tena
             .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
             .ele('context').att('name', context)
             .ele('extension').att('name', destNum)
-            .ele('condition').att('field', 'destination_number').att('expression', '^' + destNum + '$')
+            .ele('condition').att('field', 'destination_number').att('expression', '^' + destNum + '$');
 
 
         cond.ele('action').att('application', 'read').att('data', "9 15 'tone_stream://%(10000,0,350,440)' digits 30000 #")
@@ -273,18 +261,7 @@ var CreateAttendantTransferGW = function(reqId, destNum, gwList, companyId, tena
             .ele('action').att('application', 'execute_extension').att('data', 'gwtransfer XML PBXFeatures')
             .up();
 
-            /*gwList.forEach(function(outRule)
-            {
-                if(outRule.DNIS && outRule.TrunkPhoneNumber && outRule.TrunkPhoneNumber.Trunk && outRule.TrunkPhoneNumber.PhoneNumber && outRule.TrunkPhoneNumber.Trunk.TrunkCode)
-                {
-                    cond.ele('condition').att('field', '${digits}').att('expression', outRule.CustomRegEx).att('break', 'on-true')
-                            .ele('action').att('application', 'att_xfer').att('data', '{origination_caller_id_number=' + outRule.TrunkPhoneNumber.PhoneNumber + ',companyid=' + companyId + ',tenantid=' + tenantId + ',dvp_app_id=' + appId + '}sofia/gateway/' + outRule.TrunkPhoneNumber.Trunk.TrunkCode + '/$1')
-                            .up()
-                        .up()
-                }
 
-
-            });*/
             cond.end({pretty: true});
 
 

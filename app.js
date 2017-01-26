@@ -759,58 +759,11 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                             }
                             else
                             {
-                                backendFactory.getBackendHandler().PickGatewayTransferRules(reqId, ctxt.CompanyId, ctxt.TenantId, cacheInfo, function (err, transferRules)
-                                {
-                                    if(transferRules && transferRules.length > 0)
-                                    {
+                                var xml = xmlBuilder.CreateAttendantTransferGW(reqId, huntDestNum, tempHuntCtxt);
 
-                                        var filterRules = underscore.filter(transferRules, function(rule)
-                                        {
-                                            var dnisRegExPattern = new RegExp(rule.DNISRegEx);
-                                            var contextRegExPattern = new RegExp(rule.ContextRegEx);
+                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
-                                            if(dnisRegExPattern.test(destNum) && contextRegExPattern.test(varUsrContext))
-                                            {
-                                                return true;
-                                            }
-                                            else
-                                            {
-                                                return false;
-                                            }
-
-                                        });
-
-                                        var sortedRules = underscore.sortBy(filterRules, 'Priority');
-
-                                        if(sortedRules && sortedRules.length > 0)
-                                        {
-                                            var xml = xmlBuilder.CreateAttendantTransferGW(reqId, huntDestNum, sortedRules, ctxt.CompanyId, ctxt.TenantId, null, tempHuntCtxt);
-
-                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
-
-                                            res.end(xml);
-                                        }
-                                        else
-                                        {
-                                            var xml = xmlGen.createRejectResponse(tempHuntCtxt);
-
-                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
-
-                                            res.end(xml);
-                                        }
-
-
-                                    }
-                                    else
-                                    {
-                                        var xml = xmlGen.createRejectResponse(tempHuntCtxt);
-
-                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
-
-                                        res.end(xml);
-                                    }
-
-                                });
+                                res.end(xml);
 
                                 /*backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, callerIdNum, destNum, '', varUsrContext, ctxt.CompanyId, ctxt.TenantId, true, cacheInfo, function (err, outRule)
                                 {

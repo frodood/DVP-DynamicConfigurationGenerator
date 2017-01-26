@@ -219,9 +219,11 @@ var CreateAttendantTransferGW = function(reqId, destNum, gwList, companyId, tena
             .ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=GATEWAY')
             .up()
             .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=ATT_XFER_GATEWAY')
+            .up()
+            .ele('action').att('application', 'execute_extension').att('data', 'gwtransfer XML PBXFeatures')
             .up();
 
-            gwList.forEach(function(outRule)
+            /*gwList.forEach(function(outRule)
             {
                 if(outRule.DNIS && outRule.TrunkPhoneNumber && outRule.TrunkPhoneNumber.Trunk && outRule.TrunkPhoneNumber.PhoneNumber && outRule.TrunkPhoneNumber.Trunk.TrunkCode)
                 {
@@ -232,7 +234,7 @@ var CreateAttendantTransferGW = function(reqId, destNum, gwList, companyId, tena
                 }
 
 
-            });
+            });*/
             cond.end({pretty: true});
 
 

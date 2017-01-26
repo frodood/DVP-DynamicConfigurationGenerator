@@ -13,6 +13,7 @@ var xmlBuilder = require('./XmlExtendedDialplanBuilder.js');
 var ipValidator = require('./IpValidator');
 var smsCdrOp = require('./SMSCDROp.js');
 var backendFactory = require('./BackendFactory.js');
+var underscore = require('underscore');
 
 
 /*var backendHandler;
@@ -734,7 +735,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
 
             }
-            else if (ardsFeaturesPattern.test(huntContext) && huntDestNum == 'att_xfer_outbound')
+            else if ((ardsFeaturesPattern.test(huntContext) || huntContext == 'PBXFeatures') && huntDestNum == 'att_xfer_outbound')
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Attendant Transfer Gateway ------------', reqId);
 
@@ -758,7 +759,60 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                             }
                             else
                             {
-                                backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, callerIdNum, destNum, '', varUsrContext, ctxt.CompanyId, ctxt.TenantId, true, cacheInfo, function (err, outRule)
+                                backendFactory.getBackendHandler().PickGatewayTransferRules(reqId, ctxt.CompanyId, ctxt.TenantId, cacheInfo, function (err, transferRules)
+                                {
+                                    if(transferRules && transferRules.length > 0)
+                                    {
+
+                                        var filterRules = underscore.filter(transferRules, function(rule)
+                                        {
+                                            var dnisRegExPattern = new RegExp(rule.DNISRegEx);
+                                            var contextRegExPattern = new RegExp(rule.ContextRegEx);
+
+                                            if(dnisRegExPattern.test(destNum) && contextRegExPattern.test(varUsrContext))
+                                            {
+                                                return true;
+                                            }
+                                            else
+                                            {
+                                                return false;
+                                            }
+
+                                        });
+
+                                        var sortedRules = underscore.sortBy(filterRules, 'Priority');
+
+                                        if(sortedRules && sortedRules.length > 0)
+                                        {
+                                            var xml = xmlBuilder.CreateAttendantTransferGW(reqId, huntDestNum, sortedRules, ctxt.CompanyId, ctxt.TenantId, null, tempHuntCtxt);
+
+                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                                            res.end(xml);
+                                        }
+                                        else
+                                        {
+                                            var xml = xmlGen.createRejectResponse(tempHuntCtxt);
+
+                                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                                            res.end(xml);
+                                        }
+
+
+                                    }
+                                    else
+                                    {
+                                        var xml = xmlGen.createRejectResponse(tempHuntCtxt);
+
+                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                                        res.end(xml);
+                                    }
+
+                                });
+
+                                /*backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, callerIdNum, destNum, '', varUsrContext, ctxt.CompanyId, ctxt.TenantId, true, cacheInfo, function (err, outRule)
                                 {
                                     if(outRule)
                                     {
@@ -778,7 +832,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                         res.end(xml);
                                     }
 
-                                });
+                                });*/
                             }
 
                         });
@@ -797,7 +851,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                 });
 
             }
-            else if(huntContext == 'PBXFeatures' && huntDestNum == 'att_xfer_outbound')
+            /*else if(huntContext == 'PBXFeatures' && huntDestNum == 'att_xfer_outbound')
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Attendant Transfer Gateway ------------', reqId);
 
@@ -857,7 +911,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
                 });
 
-            }
+            }*/
             else
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to get context : %s', reqId, callerContext);

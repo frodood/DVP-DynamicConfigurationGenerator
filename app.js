@@ -851,6 +851,67 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                 });
 
             }
+            else if(huntDestNum === 'gwtransfer')
+            {
+                destNum = data["variable_digits"];
+                logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Attendant Transfer Gateway ------------', reqId);
+
+                logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to get context : %s', reqId, varUsrContext);
+
+                backendFactory.getBackendHandler().GetContext(varUsrContext, function(err, ctxt)
+                {
+                    if(ctxt)
+                    {
+                        backendFactory.getBackendHandler().GetCacheObject(ctxt.TenantId, ctxt.CompanyId, function(err, cacheInfo)
+                        {
+                            if(err)
+                            {
+                                var xml = xmlGen.createRejectResponse(varUsrContext);
+
+                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                                res.end(xml);
+                            }
+                            else
+                            {
+                                backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, callerIdNum, destNum, '', varUsrContext, ctxt.CompanyId, ctxt.TenantId, true, cacheInfo, function (err, outRule)
+                                {
+                                    if(outRule)
+                                    {
+                                        var xml = xmlBuilder.CreatePbxFeaturesGateway(reqId, huntDestNum, outRule.TrunkNumber, outRule.GatewayCode, ctxt.CompanyId, ctxt.TenantId, null, huntContext, destNum);
+
+                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                                        res.end(xml);
+                                    }
+                                    else
+                                    {
+                                        logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Outbound Rule Not Found', reqId, err);
+                                        var xml = xmlGen.createRejectResponse(huntContext);
+
+                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                                        res.end(xml);
+                                    }
+
+                                });
+                            }
+
+                        });
+
+                    }
+                    else
+                    {
+                        logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Context not found', reqId, err);
+                        var xml = xmlGen.createRejectResponse(callerContext);
+
+                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                        res.end(xml);
+                    }
+
+                });
+            }
             /*else if(huntContext == 'PBXFeatures' && huntDestNum == 'att_xfer_outbound')
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Attendant Transfer Gateway ------------', reqId);

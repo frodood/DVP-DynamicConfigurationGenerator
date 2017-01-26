@@ -225,7 +225,7 @@ var CreateAttendantTransferGW = function(reqId, destNum, gwList, companyId, tena
             {
                 if(outRule.DNIS && outRule.TrunkPhoneNumber && outRule.TrunkPhoneNumber.Trunk && outRule.TrunkPhoneNumber.PhoneNumber && outRule.TrunkPhoneNumber.Trunk.TrunkCode)
                 {
-                    cond.ele('condition').att('field', '${digits}').att('expression', outRule.CustomRegEx)
+                    cond.ele('condition').att('field', '${digits}').att('expression', outRule.CustomRegEx).att('break', '[on-true]')
                             .ele('action').att('application', 'att_xfer').att('data', '{origination_caller_id_number=' + outRule.TrunkPhoneNumber.PhoneNumber + ',companyid=' + companyId + ',tenantid=' + tenantId + ',dvp_app_id=' + appId + '}sofia/gateway/' + outRule.TrunkPhoneNumber.Trunk.TrunkCode + '/$1')
                             .up()
                         .up()

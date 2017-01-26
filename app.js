@@ -854,6 +854,9 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
             else if(huntDestNum === 'gwtransfer')
             {
                 destNum = data["variable_digits"];
+
+                destNum = decodeURIComponent(destNum);
+
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Attendant Transfer Gateway ------------', reqId);
 
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to get context : %s', reqId, varUsrContext);

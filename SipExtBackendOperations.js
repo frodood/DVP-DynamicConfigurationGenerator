@@ -54,6 +54,27 @@ var GetUserBy_Name_Domain = function(extName, domain, data, callback)
 
 };
 
+var PickGatewayTransferRules = function(reqId, companyId, tenantId, data, callback)
+{
+    try
+    {
+        dbModel.CallRule
+            .findAll({where :[{CompanyId: companyId},{TenantId: tenantId},{Enable: true}, {ObjCategory: 'GW_TRANSFER'}, {Direction: 'OUTBOUND'}], order: ['Priority'], include: [{model: dbModel.TrunkPhoneNumber, as: "TrunkPhoneNumber", include: [{model: dbModel.LimitInfo, as: 'LimitInfoOutbound'},{model: dbModel.LimitInfo, as: 'LimitInfoBoth'},{model: dbModel.Trunk, as: 'Trunk', include: [{model: dbModel.Translation, as: "Translation"}, {model: dbModel.TrunkOperator, as: "TrunkOperator"}]}]}]})
+            .then(function (crList)
+            {
+                callback(null, crList);
+
+            }).catch(function(err)
+            {
+                callback(err, null);
+            })
+    }
+    catch(ex)
+    {
+        callback(ex, null);
+    }
+};
+
 var GetUserDetailsByUsername = function(reqId, username, data, callback)
 {
     try
@@ -1299,4 +1320,5 @@ module.exports.GetCloudForUser = GetCloudForUser;
 module.exports.GetGroupByExtension = GetGroupByExtension;
 module.exports.ValidateBlacklistNumber = ValidateBlacklistNumber;
 module.exports.GetCacheObject = GetCacheObject;
+module.exports.PickGatewayTransferRules = PickGatewayTransferRules;
 

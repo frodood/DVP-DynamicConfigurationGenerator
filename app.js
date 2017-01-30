@@ -14,6 +14,7 @@ var ipValidator = require('./IpValidator');
 var smsCdrOp = require('./SMSCDROp.js');
 var backendFactory = require('./BackendFactory.js');
 var translationHandler = require('dvp-ruleservice/TranslationHandler.js');
+var underscore = require('underscore');
 
 
 /*var backendHandler;
@@ -835,7 +836,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
 
 
             }
-            else if (ardsFeaturesPattern.test(huntContext) && huntDestNum == 'att_xfer_outbound')
+            else if ((ardsFeaturesPattern.test(huntContext) || huntContext == 'PBXFeatures') && huntDestNum == 'att_xfer_outbound')
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Attendant Transfer Gateway ------------', reqId);
 
@@ -859,27 +860,9 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                             }
                             else
                             {
-                                backendFactory.getRuleHandler().PickCallRuleOutboundComplete(reqId, callerIdNum, destNum, '', varUsrContext, ctxt.CompanyId, ctxt.TenantId, true, cacheInfo, function (err, outRule)
-                                {
-                                    if(outRule)
-                                    {
-                                        var xml = xmlBuilder.CreatePbxFeatures(reqId, huntDestNum, 'gateway', null, outRule.TrunkNumber, outRule.GatewayCode, ctxt.CompanyId, ctxt.TenantId, null, tempHuntCtxt);
-
-                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
-
-                                        res.end(xml);
-                                    }
-                                    else
-                                    {
-                                        logger.error('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Outbound Rule Not Found', reqId, err);
-                                        var xml = xmlGen.createRejectResponse(tempHuntCtxt);
-
-                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
-
-                                        res.end(xml);
-                                    }
-
-                                });
+                                var xml = xmlBuilder.CreateAttendantTransferGW(reqId, huntDestNum, tempHuntCtxt);
+                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+                                res.end(xml);
                             }
 
                         });
@@ -898,8 +881,12 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                 });
 
             }
-            else if(huntContext == 'PBXFeatures' && huntDestNum == 'att_xfer_outbound')
+            else if(huntDestNum === 'gwtransfer')
             {
+                destNum = data["variable_digits"];
+
+                destNum = decodeURIComponent(destNum);
+
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Attendant Transfer Gateway ------------', reqId);
 
                 logger.debug('[DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Trying to get context : %s', reqId, varUsrContext);
@@ -924,7 +911,7 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                 {
                                     if(outRule)
                                     {
-                                        var xml = xmlBuilder.CreatePbxFeatures(reqId, huntDestNum, 'gateway', null, outRule.TrunkNumber, outRule.GatewayCode, ctxt.CompanyId, ctxt.TenantId, null, huntContext);
+                                        var xml = xmlBuilder.CreatePbxFeaturesGateway(reqId, huntDestNum, outRule.TrunkNumber, outRule.GatewayCode, ctxt.CompanyId, ctxt.TenantId, null, huntContext, outRule.DNIS);
 
                                         logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
 
@@ -957,7 +944,6 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                     }
 
                 });
-
             }
             else if(pabxFeaturesPattern.test(huntContext) || ardsFeaturesPattern.test(huntContext))
             {

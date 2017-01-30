@@ -532,6 +532,12 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
 
 };
 
+var PickGatewayTransferRules = function(reqId, companyId, tenantId, data, callback)
+{
+    var emptyArr = [];
+    callback(new Error('Caching not implemented'), emptyArr);
+};
+
 //Only Used in Directory Profile - No Need To Cache
 var GetGroupBy_Name_Domain = function(grpName, domain, data, callback)
 {
@@ -1660,3 +1666,4 @@ module.exports.GetGroupByExtension = GetGroupByExtension;
 module.exports.ValidateBlacklistNumber = ValidateBlacklistNumber;
 module.exports.GetCacheObject = GetCacheObject;
 module.exports.GetCloudForPublicUserRequest = GetCloudForPublicUserRequest;
+module.exports.PickGatewayTransferRules = PickGatewayTransferRules;

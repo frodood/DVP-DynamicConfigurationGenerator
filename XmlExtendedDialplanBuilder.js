@@ -198,6 +198,102 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
     }
 };
 
+var CreatePbxFeaturesGateway = function(reqId, destNum, trunkNumber, trunkCode, companyId, tenantId, appId, context, digits)
+{
+    try
+    {
+
+        if (!destNum) {
+            destNum = "";
+        }
+
+        if (!companyId) {
+            companyId = -1;
+        }
+
+        if (!tenantId) {
+            tenantId = -1;
+        }
+
+        if (!appId) {
+            appId = -1;
+        }
+
+
+        var doc = xmlBuilder.create('document');
+
+        var cond = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', destNum)
+            .ele('condition').att('field', 'destination_number').att('expression', '^' + destNum + '$')
+
+
+        cond.ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=GATEWAY')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=ATT_XFER_GATEWAY')
+            .up()
+            .ele('action').att('application', 'att_xfer').att('data', '{origination_caller_id_number=' + trunkNumber + ',companyid=' + companyId + ',tenantid=' + tenantId + ',dvp_app_id=' + appId + '}sofia/gateway/' + trunkCode + '/' +digits)
+            .up()
+            .end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreatePbxFeatures] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+};
+
+var CreateAttendantTransferGW = function(reqId, destNum, context)
+{
+    try
+    {
+
+        if (!destNum) {
+            destNum = "";
+        }
+
+
+        var doc = xmlBuilder.create('document');
+
+        var cond = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', destNum)
+            .ele('condition').att('field', 'destination_number').att('expression', '^' + destNum + '$');
+
+
+        cond.ele('action').att('application', 'read').att('data', "9 15 'tone_stream://%(10000,0,350,440)' digits 30000 #")
+            .up()
+            .ele('action').att('application', 'set').att('data', 'origination_cancel_key=#')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'transfer_ringback=$${us-ring}')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=GATEWAY')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=ATT_XFER_GATEWAY')
+            .up()
+            .ele('action').att('application', 'execute_extension').att('data', 'gwtransfer XML PBXFeatures')
+            .up();
+
+
+            cond.end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreatePbxFeatures] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+};
+
 var CreateSendBusyMessageDialplan = function(reqId, destinationPattern, context, numLimitInfo, companyId, tenantId, appId, dvpCallDirection)
 {
     try
@@ -2235,3 +2331,5 @@ module.exports.CreateReceiveFaxDialplan = CreateReceiveFaxDialplan;
 module.exports.CreatePbxFeatures = CreatePbxFeatures;
 module.exports.createRejectResponse = createRejectResponse;
 module.exports.CreateAutoAttendantDialplan = CreateAutoAttendantDialplan;
+module.exports.CreateAttendantTransferGW = CreateAttendantTransferGW;
+module.exports.CreatePbxFeaturesGateway = CreatePbxFeaturesGateway;

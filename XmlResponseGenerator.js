@@ -268,7 +268,7 @@ var CreateGatewayProfile = function(gwList, reqId)
 
 }
 
-var createDirectoryProfile = function(extName, ext, domain, email, password, context, sendEmail, reqId)
+var createDirectoryProfile = function(extName, ext, domain, email, password, context, sendEmail, reqId, pin)
 {
     try {
 
@@ -293,6 +293,7 @@ var createDirectoryProfile = function(extName, ext, domain, email, password, con
 
 
 
+
         var doc = xmlBuilder.create('document');
 
         var tempDoc = doc.att('type', 'freeswitch/xml')
@@ -314,6 +315,12 @@ var createDirectoryProfile = function(extName, ext, domain, email, password, con
                 .ele('param').att('name', 'vm-mailto').att('value', email)
                 .up()
 
+        }
+
+        if(pin)
+        {
+            tempDoc.ele('param').att('name', 'vm-password').att('value', pin)
+                .up()
         }
 
         tempDoc.up()

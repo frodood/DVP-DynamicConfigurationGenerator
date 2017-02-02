@@ -198,6 +198,21 @@ var CreateGatewayProfile = function(gwList, reqId)
                 proxy = gw.Proxy;
             }
 
+            var username = '';
+
+            if(gw.Username)
+            {
+                username = gw.Username;
+            }
+
+            var password = '';
+
+            if(gw.Password)
+            {
+                password = gw.Password;
+            }
+
+
             section.ele('domain').att('name', gw.Domain)
                 .ele('params')
                     .ele('param').att('name', 'dial-string').att('value', '{presence_id=${dialed_user}${dialed_domain}}${sofia_contact(${dialed_user}${dialed_domain})}')
@@ -210,9 +225,9 @@ var CreateGatewayProfile = function(gwList, reqId)
                 .ele('user').att('id', '')
                     .ele('gateways')
                         .ele('gateway').att('name', gw.TrunkCode)
-                            .ele('param').att('name', 'username').att('value', '')
+                            .ele('param').att('name', 'username').att('value', username)
                             .up()
-                            .ele('param').att('name', 'auth-username').att('value', '')
+                            .ele('param').att('name', 'auth-username').att('value', username)
                             .up()
                             .ele('param').att('name', 'realm').att('value', gw.IpUrl)
                             .up()
@@ -224,9 +239,9 @@ var CreateGatewayProfile = function(gwList, reqId)
                             .up()
                             .ele('param').att('name', 'caller-id-in-from').att('value', 'true')
                             .up()
-                            .ele('param').att('name', 'password').att('value', '')
+                            .ele('param').att('name', 'password').att('value', password)
                             .up()
-                            .ele('param').att('name', 'from-user').att('value', '')
+                            .ele('param').att('name', 'from-user').att('value', username)
                             .up()
                             .ele('param').att('name', 'from-domain').att('value', gw.Domain)
                             .up()
@@ -741,7 +756,7 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
 
         cond.ele('action').att('application', 'set').att('data', bypassMed)
             .up()
-        ele('action').att('application', 'set').att('data', calling)
+            .ele('action').att('application', 'set').att('data', calling)
             .up()
 
         return cond.end({pretty: true});

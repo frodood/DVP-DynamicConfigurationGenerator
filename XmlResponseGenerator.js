@@ -205,19 +205,17 @@ var CreateGatewayProfile = function(gwList, reqId)
             }
 
             var username = '';
+            var password = '';
 
             if(gw.Username)
             {
                 username = gw.Username;
+
+                if(gw.Password)
+                {
+                    password = gw.Password;
+                }
             }
-
-            var password = '';
-
-            if(gw.Password)
-            {
-                password = gw.Password;
-            }
-
 
 
             var domainEle = {
@@ -360,6 +358,21 @@ var CreateGatewayProfile = function(gwList, reqId)
                     '@value': 'false'
                 });
 
+            }
+            else
+            {
+                domainEle.user.gateways.gateway.param.push({
+                    '@name': 'contact-params',
+                    '@value': username + '@' + gw.Domain
+                    },
+                    {
+                        '@name': 'extension',
+                        '@value': username
+                    },
+                    {
+                        '@name': 'extension-in-contact',
+                        '@value': 'true'
+                    });
             }
 
             obj.document.section.domain.push(domainEle);

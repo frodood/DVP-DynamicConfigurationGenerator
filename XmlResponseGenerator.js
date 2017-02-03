@@ -218,6 +218,11 @@ var CreateGatewayProfile = function(gwList, reqId)
                 password = gw.Password;
             }
 
+            if(gw.Username)
+            {
+                gw.Domain = gw.IpUrl;
+            }
+
 
 
             var domainEle = {

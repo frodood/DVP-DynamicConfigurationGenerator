@@ -301,10 +301,6 @@ var CreateGatewayProfile = function(gwList, reqId)
                     '@value': proxy
                 },
                 {
-                    '@name': 'caller-id-in-from',
-                    '@value': 'true'
-                },
-                {
                     '@name': 'password',
                     '@value': password
                 },
@@ -343,6 +339,10 @@ var CreateGatewayProfile = function(gwList, reqId)
                         '@value': 'provider'
                     },
                     {
+                        '@name': 'caller-id-in-from',
+                        '@value': 'true'
+                    },
+                    {
                         '@name': 'context',
                         '@value': 'public'
                     },
@@ -373,6 +373,10 @@ var CreateGatewayProfile = function(gwList, reqId)
                     {
                         '@name': 'extension-in-contact',
                         '@value': 'true'
+                    },
+                    {
+                        '@name': 'caller-id-in-from',
+                        '@value': 'false'
                     });
             }
 

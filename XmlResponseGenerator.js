@@ -248,7 +248,7 @@ var CreateGatewayProfile = function(gwList, reqId)
                 }
             };
 
-            domainEle.user.gateways.gateway.param.push({
+            /*domainEle.user.gateways.gateway.param.push({
                     '@name': 'realm',
                     '@value': 'sip.skype.com'
                 },
@@ -287,10 +287,10 @@ var CreateGatewayProfile = function(gwList, reqId)
                 {
                     '@name': 'retry-seconds',
                     '@value': '30'
-                });
+                });*/
 
 
-            /*domainEle.user.gateways.gateway.param.push({
+            domainEle.user.gateways.gateway.param.push({
                     '@name': 'username',
                     '@value': username
                 },
@@ -343,17 +343,24 @@ var CreateGatewayProfile = function(gwList, reqId)
                     '@value': 'public'
                 },
                 {
-                    '@name': 'register',
-                    '@value': 'false'
-                },
-                {
                     '@name': 'auth-calls',
                     '@value': 'false'
                 },
                 {
                     '@name': 'apply-register-acl',
                     '@value': 'provider'
-                });*/
+                });
+
+
+
+            if(!username)
+            {
+                domainEle.user.gateways.gateway.param.push({
+                    '@name': 'register',
+                    '@value': 'false'
+                });
+
+            }
 
             obj.document.section.domain.push(domainEle);
 

@@ -309,10 +309,6 @@ var CreateGatewayProfile = function(gwList, reqId)
                     '@value': gw.IpUrl
                 },
                 {
-                    '@name': 'register-transport',
-                    '@value': 'udp'
-                },
-                {
                     '@name': 'caller-id-in-from',
                     '@value': 'true'
                 },
@@ -335,19 +331,8 @@ var CreateGatewayProfile = function(gwList, reqId)
                 {
                     '@name': 'retry-seconds',
                     '@value': retrySec
-                },
-                {
-                    '@name': 'context',
-                    '@value': 'public'
-                },
-                {
-                    '@name': 'auth-calls',
-                    '@value': 'false'
-                },
-                {
-                    '@name': 'apply-register-acl',
-                    '@value': 'provider'
-                });
+                }
+                );
 
 
 
@@ -356,7 +341,23 @@ var CreateGatewayProfile = function(gwList, reqId)
                 domainEle.user.gateways.gateway.param.push({
                     '@name': 'register',
                     '@value': 'false'
-                });
+                },
+                    {
+                        '@name': 'register-transport',
+                        '@value': 'udp'
+                    },
+                    {
+                        '@name': 'apply-register-acl',
+                        '@value': 'provider'
+                    },
+                    {
+                        '@name': 'context',
+                        '@value': 'public'
+                    },
+                    {
+                        '@name': 'auth-calls',
+                        '@value': 'false'
+                    });
 
             }
             else

@@ -207,9 +207,12 @@ var CreateGatewayProfile = function(gwList, reqId)
             var username = '';
             var password = '';
 
+            var domain = gw.Domain;
+
             if(gw.Username)
             {
                 username = gw.Username;
+                domain = gw.IpUrl;
 
                 if(gw.Password)
                 {
@@ -219,7 +222,7 @@ var CreateGatewayProfile = function(gwList, reqId)
 
 
             var domainEle = {
-                '@name': 'sip.skype.com',
+                '@name': domain,
                 params: {
                     param: {
                         '@name': 'dial-string',
@@ -246,52 +249,14 @@ var CreateGatewayProfile = function(gwList, reqId)
                 }
             };
 
-            domainEle.user.gateways.gateway.param.push({
-                    '@name': 'realm',
-                    '@value': 'sip.skype.com'
-                },
-                {
-                    '@name': 'proxy',
-                    '@value': 'sip.skype.com'
-                },
-                {
-                    '@name': 'from-domain',
-                    '@value': 'sip.skype.com'
-                },
-                {
-                    '@name': 'username',
-                    '@value': '99051000278670'
-                },
-                {
-                    '@name': 'from-user',
-                    '@value': '99051000278670'
-                },
-                {
-                    '@name': 'password',
-                    '@value': 'TQwS2qr6FkC7kP'
-                },
-                {
-                    '@name': 'contact-params',
-                    '@value': '99051000278670@sip.skype.com'
-                },
-                {
-                    '@name': 'extension',
-                    '@value': '99051000278670'
-                },
-                {
-                    '@name': 'extension-in-contact',
-                    '@value': 'true'
-                },
-                {
-                    '@name': 'retry-seconds',
-                    '@value': '30'
-                });
 
 
 
-            /*if(!username)
+
+            if(!username)
             {
-                domainEle.user.gateways.gateway.param.push({
+                domainEle.user.gateways.gateway.param.push(
+                    {
                         '@name': 'username',
                         '@value': username
                     },
@@ -313,12 +278,12 @@ var CreateGatewayProfile = function(gwList, reqId)
                     },
                     {
                         '@name': 'from-domain',
-                        '@value': gw.Domain
+                        '@value': domain
                     },
                     {
-                    '@name': 'register',
-                    '@value': 'false'
-                },
+                        '@name': 'register',
+                        '@value': 'false'
+                    },
                     {
                         '@name': 'register-transport',
                         '@value': 'udp'
@@ -359,7 +324,8 @@ var CreateGatewayProfile = function(gwList, reqId)
             }
             else
             {
-                domainEle.user.gateways.gateway.param.push({
+                domainEle.user.gateways.gateway.param.push(
+                    {
                         '@name': 'realm',
                         '@value': gw.IpUrl
                     },
@@ -369,7 +335,7 @@ var CreateGatewayProfile = function(gwList, reqId)
                     },
                     {
                         '@name': 'from-domain',
-                        '@value': gw.Domain
+                        '@value': domain
                     },
                     {
                         '@name': 'username',
@@ -385,7 +351,7 @@ var CreateGatewayProfile = function(gwList, reqId)
                     },
                     {
                         '@name': 'contact-params',
-                        '@value': username + '@' + gw.Domain
+                        '@value': username + '@' + domain
                     },
                     {
                         '@name': 'extension',
@@ -400,7 +366,7 @@ var CreateGatewayProfile = function(gwList, reqId)
                         '@value': '30'
                     });
 
-            }*/
+            }
 
             obj.document.section.domain.push(domainEle);
 

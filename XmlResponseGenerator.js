@@ -305,10 +305,6 @@ var CreateGatewayProfile = function(gwList, reqId)
                     '@value': proxy
                 },
                 {
-                    '@name': 'register-proxy',
-                    '@value': gw.IpUrl
-                },
-                {
                     '@name': 'caller-id-in-from',
                     '@value': 'true'
                 },
@@ -357,6 +353,10 @@ var CreateGatewayProfile = function(gwList, reqId)
                     {
                         '@name': 'auth-calls',
                         '@value': 'false'
+                    },
+                    {
+                        '@name': 'register-proxy',
+                        '@value': gw.IpUrl
                     });
 
             }

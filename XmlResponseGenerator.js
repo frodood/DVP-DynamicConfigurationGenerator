@@ -311,15 +311,8 @@ var CreateGatewayProfile = function(gwList, reqId)
                 {
                     '@name': 'from-domain',
                     '@value': gw.Domain
-                },
-                {
-                    '@name': 'expire-seconds',
-                    '@value': expireSec
-                },
-                {
-                    '@name': 'retry-seconds',
-                    '@value': retrySec
                 }
+
                 );
 
 
@@ -345,6 +338,14 @@ var CreateGatewayProfile = function(gwList, reqId)
                     {
                         '@name': 'context',
                         '@value': 'public'
+                    },
+                    {
+                        '@name': 'expire-seconds',
+                        '@value': expireSec
+                    },
+                    {
+                        '@name': 'retry-seconds',
+                        '@value': retrySec
                     },
                     {
                         '@name': 'auth-calls',
@@ -377,6 +378,10 @@ var CreateGatewayProfile = function(gwList, reqId)
                     {
                         '@name': 'caller-id-in-from',
                         '@value': 'false'
+                    },
+                    {
+                        '@name': 'retry-seconds',
+                        '@value': '30'
                     });
             }
 

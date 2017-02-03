@@ -288,38 +288,34 @@ var CreateGatewayProfile = function(gwList, reqId)
                 });*/
 
 
-            domainEle.user.gateways.gateway.param.push({
-                    '@name': 'username',
-                    '@value': username
-                },
-                {
-                    '@name': 'realm',
-                    '@value': gw.IpUrl
-                },
-                {
-                    '@name': 'proxy',
-                    '@value': proxy
-                },
-                {
-                    '@name': 'password',
-                    '@value': password
-                },
-                {
-                    '@name': 'from-user',
-                    '@value': username
-                },
-                {
-                    '@name': 'from-domain',
-                    '@value': gw.Domain
-                }
-
-                );
-
-
 
             if(!username)
             {
                 domainEle.user.gateways.gateway.param.push({
+                        '@name': 'username',
+                        '@value': username
+                    },
+                    {
+                        '@name': 'realm',
+                        '@value': gw.IpUrl
+                    },
+                    {
+                        '@name': 'proxy',
+                        '@value': proxy
+                    },
+                    {
+                        '@name': 'password',
+                        '@value': password
+                    },
+                    {
+                        '@name': 'from-user',
+                        '@value': username
+                    },
+                    {
+                        '@name': 'from-domain',
+                        '@value': gw.Domain
+                    },
+                    {
                     '@name': 'register',
                     '@value': 'false'
                 },
@@ -364,8 +360,32 @@ var CreateGatewayProfile = function(gwList, reqId)
             else
             {
                 domainEle.user.gateways.gateway.param.push({
-                    '@name': 'contact-params',
-                    '@value': username + '@' + gw.Domain
+                        '@name': 'realm',
+                        '@value': gw.IpUrl
+                    },
+                    {
+                        '@name': 'proxy',
+                        '@value': proxy
+                    },
+                    {
+                        '@name': 'from-domain',
+                        '@value': gw.Domain
+                    },
+                    {
+                        '@name': 'username',
+                        '@value': username
+                    },
+                    {
+                        '@name': 'from-user',
+                        '@value': username
+                    },
+                    {
+                        '@name': 'password',
+                        '@value': password
+                    },
+                    {
+                        '@name': 'contact-params',
+                        '@value': username + '@' + gw.Domain
                     },
                     {
                         '@name': 'extension',
@@ -379,6 +399,7 @@ var CreateGatewayProfile = function(gwList, reqId)
                         '@name': 'retry-seconds',
                         '@value': '30'
                     });
+
             }
 
             obj.document.section.domain.push(domainEle);

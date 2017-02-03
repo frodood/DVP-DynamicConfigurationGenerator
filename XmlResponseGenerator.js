@@ -376,10 +376,6 @@ var CreateGatewayProfile = function(gwList, reqId)
                         '@value': 'true'
                     },
                     {
-                        '@name': 'caller-id-in-from',
-                        '@value': 'false'
-                    },
-                    {
                         '@name': 'retry-seconds',
                         '@value': '30'
                     });

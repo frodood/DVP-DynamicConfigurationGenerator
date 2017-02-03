@@ -246,7 +246,7 @@ var CreateGatewayProfile = function(gwList, reqId)
                 }
             };
 
-            /*domainEle.user.gateways.gateway.param.push({
+            domainEle.user.gateways.gateway.param.push({
                     '@name': 'realm',
                     '@value': 'sip.skype.com'
                 },
@@ -285,11 +285,11 @@ var CreateGatewayProfile = function(gwList, reqId)
                 {
                     '@name': 'retry-seconds',
                     '@value': '30'
-                });*/
+                });
 
 
 
-            if(!username)
+            /*if(!username)
             {
                 domainEle.user.gateways.gateway.param.push({
                         '@name': 'username',
@@ -400,7 +400,7 @@ var CreateGatewayProfile = function(gwList, reqId)
                         '@value': '30'
                     });
 
-            }
+            }*/
 
             obj.document.section.domain.push(domainEle);
 

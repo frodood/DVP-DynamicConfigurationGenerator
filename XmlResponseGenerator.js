@@ -254,6 +254,48 @@ var CreateGatewayProfile = function(gwList, reqId)
             };
 
             domainEle.user.gateways.gateway.param.push({
+                    '@name': 'realm',
+                    '@value': 'sip.skype.com'
+                },
+                {
+                    '@name': 'proxy',
+                    '@value': 'sip.skype.com'
+                },
+                {
+                    '@name': 'from-domain',
+                    '@value': 'sip.skype.com'
+                },
+                {
+                    '@name': 'username',
+                    '@value': '99051000278670'
+                },
+                {
+                    '@name': 'from-user',
+                    '@value': '99051000278670'
+                },
+                {
+                    '@name': 'password',
+                    '@value': 'TQwS2qr6FkC7kP'
+                },
+                {
+                    '@name': 'contact-params',
+                    '@value': '99051000278670@sip.skype.com'
+                },
+                {
+                    '@name': 'extension',
+                    '@value': '99051000278670'
+                },
+                {
+                    '@name': 'extension-in-contact',
+                    '@value': 'true'
+                },
+                {
+                    '@name': 'retry-seconds',
+                    '@value': '30'
+                });
+
+
+            /*domainEle.user.gateways.gateway.param.push({
                     '@name': 'username',
                     '@value': username
                 },
@@ -316,7 +358,7 @@ var CreateGatewayProfile = function(gwList, reqId)
                 {
                     '@name': 'apply-register-acl',
                     '@value': 'provider'
-                });
+                });*/
 
             obj.document.section.domain.push(domainEle);
 

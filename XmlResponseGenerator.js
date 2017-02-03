@@ -218,11 +218,6 @@ var CreateGatewayProfile = function(gwList, reqId)
                 password = gw.Password;
             }
 
-            if(gw.Username)
-            {
-                gw.Domain = gw.IpUrl;
-            }
-
 
 
             var domainEle = {
@@ -263,7 +258,7 @@ var CreateGatewayProfile = function(gwList, reqId)
                 },
                 {
                     '@name': 'from-domain',
-                    '@value': 'sip.skype.com'
+                    '@value': gw.Domain
                 },
                 {
                     '@name': 'username',
@@ -279,7 +274,7 @@ var CreateGatewayProfile = function(gwList, reqId)
                 },
                 {
                     '@name': 'contact-params',
-                    '@value': '99051000278670@sip.skype.com'
+                    '@value': '99051000278670@' + gw.Domain
                 },
                 {
                     '@name': 'extension',

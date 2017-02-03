@@ -293,10 +293,6 @@ var CreateGatewayProfile = function(gwList, reqId)
                     '@value': username
                 },
                 {
-                    '@name': 'auth-username',
-                    '@value': username
-                },
-                {
                     '@name': 'realm',
                     '@value': gw.IpUrl
                 },
@@ -357,6 +353,10 @@ var CreateGatewayProfile = function(gwList, reqId)
                     {
                         '@name': 'register-proxy',
                         '@value': gw.IpUrl
+                    },
+                    {
+                        '@name': 'auth-username',
+                        '@value': ''
                     });
 
             }

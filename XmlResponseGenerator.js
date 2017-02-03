@@ -177,14 +177,20 @@ var CreateGatewayProfile = function(gwList, reqId)
         var retrySec = 3600;
 
 
-        var doc = xmlBuilder.create('document').att('type', 'freeswitch/xml');
-        var section = doc.ele('section').att('name', 'directory');
+        /*var doc = xmlBuilder.create('document').att('type', 'freeswitch/xml');
+        var section = doc.ele('section').att('name', 'directory');*/
 
-        //var obj = {
-        //    'section': []
-        //    }
+        var obj = {
+            document: {
+                '@type': 'freeswitch/xml',
+                section: {
+                    '@name': 'directory',
+                    domain: []
+                }
 
-        //obj.section.push()
+
+            }
+        };
 
 
 
@@ -213,7 +219,104 @@ var CreateGatewayProfile = function(gwList, reqId)
             }
 
 
-            section.ele('domain').att('name', gw.Domain)
+
+            var domainEle = {
+                '@name': gw.Domain,
+                params: {
+                    param: {
+                        '@name': 'dial-string',
+                        '@value': '{presence_id=${dialed_user}${dialed_domain}}${sofia_contact(${dialed_user}${dialed_domain})}'
+                    }
+                },
+                variables: {
+                    variable: {}
+                },
+                user: {
+                    '@id': '',
+                    gateways: {
+                        gateway: {
+                            '@name': gw.TrunkCode,
+                            param: []
+                        }
+                    },
+                    params: {
+                        param: {
+                            '@name': 'password',
+                            '@value': ''
+                        }
+                    }
+                }
+            };
+
+            domainEle.user.gateways.gateway.param.push({
+                    '@name': 'username',
+                    '@value': username
+                },
+                {
+                    '@name': 'auth-username',
+                    '@value': username
+                },
+                {
+                    '@name': 'realm',
+                    '@value': gw.IpUrl
+                },
+                {
+                    '@name': 'proxy',
+                    '@value': proxy
+                },
+                {
+                    '@name': 'register-proxy',
+                    '@value': gw.IpUrl
+                },
+                {
+                    '@name': 'register-transport',
+                    '@value': 'udp'
+                },
+                {
+                    '@name': 'caller-id-in-from',
+                    '@value': 'true'
+                },
+                {
+                    '@name': 'password',
+                    '@value': password
+                },
+                {
+                    '@name': 'from-user',
+                    '@value': username
+                },
+                {
+                    '@name': 'from-domain',
+                    '@value': gw.Domain
+                },
+                {
+                    '@name': 'expire-seconds',
+                    '@value': expireSec
+                },
+                {
+                    '@name': 'retry-seconds',
+                    '@value': retrySec
+                },
+                {
+                    '@name': 'context',
+                    '@value': 'public'
+                },
+                {
+                    '@name': 'register',
+                    '@value': 'false'
+                },
+                {
+                    '@name': 'auth-calls',
+                    '@value': 'false'
+                },
+                {
+                    '@name': 'apply-register-acl',
+                    '@value': 'provider'
+                });
+
+            obj.document.section.domain.push(domainEle);
+
+
+            /*section.ele('domain').att('name', gw.Domain)
                 .ele('params')
                     .ele('param').att('name', 'dial-string').att('value', '{presence_id=${dialed_user}${dialed_domain}}${sofia_contact(${dialed_user}${dialed_domain})}')
                     .up()
@@ -264,14 +367,16 @@ var CreateGatewayProfile = function(gwList, reqId)
                         .up()
                     .up()
                 .up()
-            .up()
+            .up()*/
 
 
         });
 
+        var xml = xmlBuilder.create(obj);
+
         //var gwStr = section.end({pretty: true});
 
-        return section.end({pretty: true});
+        return xml.end({pretty: true});
     }
     catch(ex)
     {

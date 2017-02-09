@@ -122,6 +122,19 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
                 .up()
                 .end({pretty: true});
         }
+        else if(pbxType === 'ivr')
+        {
+            cond.ele('action').att('application', 'read').att('data', "3 6 'tone_stream://%(10000,0,350,440)' digits 30000 #")
+                .up()
+                .ele('action').att('application', 'set').att('data', 'origination_cancel_key=#')
+                .up()
+                .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=ATT_XFER_IVR')
+                .up()
+                .ele('action').att('application', 'transfer').att('data', '-bleg ${digits} XML PBXFeatures|' + tenantId + '|' + companyId)
+                .up()
+                .end({pretty: true});
+
+        }
         else
         {
             cond.ele('action').att('application', 'read').att('data', "3 6 'tone_stream://%(10000,0,350,440)' digits 30000 #")
@@ -159,6 +172,12 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
                         .up()
                 }
 
+                if(transferCodes.IVRTransfer != null && transferCodes.IVRTransfer != undefined)
+                {
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.IVRTransfer + ' b s execute_extension::att_xfer_ivr XML PBXFeatures')
+                        .up()
+                }
+
             }
 
 
@@ -167,6 +186,102 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
                 .up()
                 .end({pretty: true});
         }
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreatePbxFeatures] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+};
+
+var CreatePbxFeaturesGateway = function(reqId, destNum, trunkNumber, trunkCode, companyId, tenantId, appId, context, digits)
+{
+    try
+    {
+
+        if (!destNum) {
+            destNum = "";
+        }
+
+        if (!companyId) {
+            companyId = -1;
+        }
+
+        if (!tenantId) {
+            tenantId = -1;
+        }
+
+        if (!appId) {
+            appId = -1;
+        }
+
+
+        var doc = xmlBuilder.create('document');
+
+        var cond = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', destNum)
+            .ele('condition').att('field', 'destination_number').att('expression', '^' + destNum + '$')
+
+
+        cond.ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=GATEWAY')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=ATT_XFER_GATEWAY')
+            .up()
+            .ele('action').att('application', 'att_xfer').att('data', '{origination_caller_id_number=' + trunkNumber + ',companyid=' + companyId + ',tenantid=' + tenantId + ',dvp_app_id=' + appId + '}sofia/gateway/' + trunkCode + '/' +digits)
+            .up()
+            .end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreatePbxFeatures] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+};
+
+var CreateAttendantTransferGW = function(reqId, destNum, context)
+{
+    try
+    {
+
+        if (!destNum) {
+            destNum = "";
+        }
+
+
+        var doc = xmlBuilder.create('document');
+
+        var cond = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', destNum)
+            .ele('condition').att('field', 'destination_number').att('expression', '^' + destNum + '$');
+
+
+        cond.ele('action').att('application', 'read').att('data', "9 15 'tone_stream://%(10000,0,350,440)' digits 30000 #")
+            .up()
+            .ele('action').att('application', 'set').att('data', 'origination_cancel_key=#')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'transfer_ringback=$${us-ring}')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=GATEWAY')
+            .up()
+            .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=ATT_XFER_GATEWAY')
+            .up()
+            .ele('action').att('application', 'execute_extension').att('data', 'gwtransfer XML PBXFeatures')
+            .up();
+
+
+            cond.end({pretty: true});
 
 
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
@@ -646,6 +761,12 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
                     cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.ConferenceTransfer + ' ' + transferLegInfo.ConferenceLegs + ' s execute_extension::att_xfer_conference XML PBXFeatures')
                         .up()
                 }
+
+                if(transferLegInfo.IVRLegs && transferLegInfo.TransferCode.IVRTransfer)
+                {
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.IVRTransfer + ' ' + transferLegInfo.IVRLegs + ' s execute_extension::att_xfer_ivr XML PBXFeatures')
+                        .up()
+                }
             }
 
 
@@ -803,6 +924,8 @@ var CreateRouteFaxGatewayDialplan = function(reqId, ep, context, profile, destin
             .up()
             .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
             .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '9 ab s execute_extension::att_xfer_ivr XML PBXFeatures')
+            .up()
 
 
         var option = '';
@@ -827,7 +950,7 @@ var CreateRouteFaxGatewayDialplan = function(reqId, ep, context, profile, destin
 
         cond.ele('action').att('application', 'set').att('data', bypassMed)
             .up()
-        ele('action').att('application', 'set').att('data', calling)
+            .ele('action').att('application', 'set').att('data', calling)
             .up()
 
         return cond.end({pretty: true});
@@ -956,6 +1079,8 @@ var CreateRouteFaxUserDialplan = function(reqId, ep, context, profile, destinati
             .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
             .up()
             .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '9 ab s execute_extension::att_xfer_ivr XML PBXFeatures')
             .up()
 
         if(numLimitInfo && numLimitInfo.CheckLimit)
@@ -1663,6 +1788,12 @@ var CreateForwardingDialplan = function(reqId, endpoint, context, profile, desti
                 cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.ConferenceTransfer + ' ' + transferLegInfo.ConferenceLegs + ' s execute_extension::att_xfer_conference XML PBXFeatures')
                     .up()
             }
+
+            if(transferLegInfo.IVRLegs && transferLegInfo.TransferCode.IVRTransfer)
+            {
+                cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.IVRTransfer + ' ' + transferLegInfo.IVRLegs + ' s execute_extension::att_xfer_ivr XML PBXFeatures')
+                    .up()
+            }
         }
 
         if(numLimitInfo && numLimitInfo.CheckLimit)
@@ -1749,11 +1880,11 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
             .ele('action').att('application', 'set').att('data', 'continue_on_fail=true')
             .up()
 
-         if(dvpCallDirection === 'outbound')
-         {
-             cond.ele('action').att('application', 'set').att('data', 'my_uuid=${create_uuid()}').att('inline', 'true')
-             .up()
-         }
+        if(dvpCallDirection === 'outbound')
+        {
+            cond.ele('action').att('application', 'set').att('data', 'my_uuid=${create_uuid()}').att('inline', 'true')
+                .up()
+        }
 
         cond.ele('action').att('application', 'set').att('data', 'hangup_after_bridge=true')
             .up()
@@ -1812,6 +1943,12 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
 
 
 
+        }
+
+        if(ep.Operator)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'veeryoperator=' + ep.Operator)
+                .up()
         }
 
 
@@ -1904,6 +2041,12 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
                 cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.ConferenceTransfer + ' ' + transferLegInfo.ConferenceLegs + ' s execute_extension::att_xfer_conference XML PBXFeatures')
                     .up()
             }
+
+            if(transferLegInfo.IVRLegs && transferLegInfo.TransferCode.IVRTransfer)
+            {
+                cond.ele('action').att('application', 'bind_meta_app').att('data', transferLegInfo.TransferCode.IVRTransfer + ' ' + transferLegInfo.IVRLegs + ' s execute_extension::att_xfer_ivr XML PBXFeatures')
+                    .up()
+            }
         }
 
         if(ep.CheckLimit)
@@ -1970,7 +2113,7 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
     }
     catch(ex)
     {
-        logger.error('[DVP-DynamicConfigurationGenerator.CreateSendBusyMessageDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateRouteGatewayDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
         return createNotFoundResponse();
     }
 
@@ -2017,6 +2160,8 @@ var CreateFollowMeDialplan = function(reqId, fmEndpoints, context, profile, dest
             .ele('action').att('application', 'bind_meta_app').att('data', '6 ab s execute_extension::att_xfer_outbound XML PBXFeatures')
             .up()
             .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
+            .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '9 ab s execute_extension::att_xfer_ivr XML PBXFeatures')
             .up()
 
         cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=FOLLOW_ME')
@@ -2186,3 +2331,5 @@ module.exports.CreateReceiveFaxDialplan = CreateReceiveFaxDialplan;
 module.exports.CreatePbxFeatures = CreatePbxFeatures;
 module.exports.createRejectResponse = createRejectResponse;
 module.exports.CreateAutoAttendantDialplan = CreateAutoAttendantDialplan;
+module.exports.CreateAttendantTransferGW = CreateAttendantTransferGW;
+module.exports.CreatePbxFeaturesGateway = CreatePbxFeaturesGateway;

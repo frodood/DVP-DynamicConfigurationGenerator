@@ -31,9 +31,13 @@ module.exports = {
 
         "fileServiceHost": "SYS_FILESERVICE_HOST",
         "fileServicePort": "SYS_FILESERVICE_PORT",
-        "fileServiceVersion":"SYS_FILESERVICE_VERSION"
+        "fileServiceVersion":"SYS_FILESERVICE_VERSION",
+        "dccaclientHost": "SYS_DIAMETERCLIENT_HOST",
+        "dccaclientPort": "SYS_DIAMETERCLIENT_PORT",
+        "dccaclientVersion": "SYS_DIAMETERCLIENT_VERSION"
 
     },
 
-    "Token": "HOST_TOKEN"
+    "Token": "HOST_TOKEN",
+    "billingEnabled": "SYS_BILLING_ENABLED"
 };

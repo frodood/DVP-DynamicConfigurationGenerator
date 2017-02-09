@@ -481,8 +481,34 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
                     }
 
                 }
-                else if(extType === 'VOICE_PORTAL')
+                else if(extType === 'VOICE_PORTAL' || extType === 'AUTO_ATTENDANT')
                 {
+
+                    callback(null, extData);
+                }
+                else if(extType === 'IVR')
+                {
+                    if(data.Application)
+                    {
+                        var app = data.Application[extData.ExtraData];
+
+                        if(app)
+                        {
+                            extData.Application = app;
+
+                            if(app.MasterApplicationId)
+                            {
+                                var masterApp = data.Application[app.MasterApplicationId];
+
+                                if(masterApp)
+                                {
+                                    app.MasterApplication = masterApp
+                                }
+                            }
+
+
+                        }
+                    }
 
                     callback(null, extData);
                 }
@@ -504,6 +530,12 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
         callback(ex, false);
     }
 
+};
+
+var PickGatewayTransferRules = function(reqId, companyId, tenantId, data, callback)
+{
+    var emptyArr = [];
+    callback(new Error('Caching not implemented'), emptyArr);
 };
 
 //Only Used in Directory Profile - No Need To Cache
@@ -893,7 +925,9 @@ var GetGatewayListForCallServerProfile = function(profile, csId, reqId, data, ca
                                     IpUrl : trunk.IpUrl,
                                     Domain : result.InternalIp,
                                     TrunkCode: trunk.TrunkCode,
-                                    Proxy: undefined
+                                    Proxy: undefined,
+                                    Username: trunk.Username,
+                                    Password: trunk.Password
                                 };
                                 gatewayList.push(gw);
                             })
@@ -1634,3 +1668,4 @@ module.exports.GetGroupByExtension = GetGroupByExtension;
 module.exports.ValidateBlacklistNumber = ValidateBlacklistNumber;
 module.exports.GetCacheObject = GetCacheObject;
 module.exports.GetCloudForPublicUserRequest = GetCloudForPublicUserRequest;
+module.exports.PickGatewayTransferRules = PickGatewayTransferRules;

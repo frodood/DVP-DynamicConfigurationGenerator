@@ -2,8 +2,10 @@ var nodeUuid = require('node-uuid');
 var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var config = require('config');
+var Promise = require('bluebird');
 var extApi = require('./ExternalApiAccess.js');
 var xmlBuilder = require('./XmlExtendedDialplanBuilder.js');
+var xmlRespBuilder = require('./XmlResponseGenerator.js');
 var transHandler = require('dvp-ruleservice/TranslationHandler.js');
 var redisHandler = require('./RedisHandler.js');
 var conferenceHandler = require('./ConferenceOperations.js');
@@ -202,7 +204,8 @@ var AttendantTransferLegInfoHandler = function(reqId, fromUser, toUser)
             InternalLegs: '',
             ExternalLegs: '',
             GroupLegs: '',
-            ConferenceLegs: ''
+            ConferenceLegs: '',
+            IVRLegs: ''
         };
         if(fromUser)
         {
@@ -223,6 +226,10 @@ var AttendantTransferLegInfoHandler = function(reqId, fromUser, toUser)
             if(fromUser.TransConferenceEnable)
             {
                 AttTransLegInfo.ConferenceLegs = 'a';
+            }
+            if(fromUser.TransIVREnable)
+            {
+                AttTransLegInfo.IVRLegs = 'a';
             }
 
         }
@@ -246,6 +253,10 @@ var AttendantTransferLegInfoHandler = function(reqId, fromUser, toUser)
             if(toUser.TransConferenceEnable)
             {
                 AttTransLegInfo.ConferenceLegs = AttTransLegInfo.ConferenceLegs + 'b';
+            }
+            if(toUser.TransIVREnable)
+            {
+                AttTransLegInfo.IVRLegs = AttTransLegInfo.IVRLegs + 'b';
             }
         }
 
@@ -379,7 +390,8 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                         NumberType: rule.NumberType,
                                         CompanyId: rule.CompanyId,
                                         TenantId: rule.TenantId,
-                                        Action: 'FORWARDING'
+                                        Action: 'FORWARDING',
+                                        Operator: rule.Operator
                                     };
 
                                     if(dodNumber)
@@ -388,9 +400,27 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
                                         ep.OriginationCallerIdNumber = dodNumber;
                                     }
 
-                                    var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, null, null);
+                                    extApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                        .then(function(balanceRes)
+                                        {
+                                            if (balanceRes && balanceRes.IsSuccess)
+                                            {
+                                                var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, null, null, uuid);
 
-                                    callback(undefined, xml);
+                                                callback(undefined, xml);
+                                            }
+                                            else
+                                            {
+                                                callback(new Error('insufficient balance'), xmlBuilder.createRejectResponse());
+                                            }
+
+                                        })
+                                        .catch(function(err)
+                                        {
+                                            callback(err, xmlBuilder.createRejectResponse());
+                                        })
+
+
                                 }
                                 else
                                 {
@@ -524,6 +554,82 @@ var ProcessCallForwarding = function(reqId, aniNum, dnisNum, callerDomain, conte
     }
 };
 
+var handleIVRExt = function(reqId, companyId, tenantId, uuid, context, extDetails, isTransfer, ani)
+{
+
+    return new Promise(function(fulfill, reject)
+    {
+        if(extDetails.Application && extDetails.Application.Availability)
+        {
+            var app = extDetails.Application;
+
+            if(extDetails.Application.MasterApplication && extDetails.Application.MasterApplication.Availability && extDetails.Application.MasterApplication.Url)
+            {
+                var masterUrl = '';
+                var masterApp = extDetails.Application.MasterApplication;
+
+                if(masterApp.ObjType === "HTTAPI")
+                {
+                    logger.info('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Master App Type is HTTAPI for Extension IVR', reqId);
+                    //add to redis
+                    masterUrl = masterApp.Url;
+                    var sessionData =
+                    {
+                        path: app.Url,
+                        company: companyId,
+                        tenant: tenantId,
+                        app: app.AppName,
+                        appid: app.id
+                    };
+
+                    var jsonString = JSON.stringify(sessionData);
+
+                    logger.debug('DVP-DynamicConfigurationGenerator.ProcessExtendedDialplan] - [%s] - Session Data Object created for HTTAPI : %s', reqId, jsonString);
+
+                    redisHandler.SetObject(uuid + "_data", jsonString, function(err, result)
+                    {
+                        if(err)
+                        {
+                            reject(err);
+                        }
+                        else
+                        {
+                            redisHandler.ExpireKey(uuid + "_data", 86400);
+                            logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Session data added to redis successfully - Key : %s_data', reqId, uuid);
+
+                            var xml = '';
+
+                            if(isTransfer)
+                            {
+                                xml = xmlRespBuilder.CreateHttpApiDialplanTransfer('[^\\s]*', context, masterUrl, reqId, null, app.id, companyId, tenantId, 'outbound', ani);
+                            }
+                            else
+                            {
+                                xml = xmlRespBuilder.CreateHttpApiDialplan('[^\\s]*', context, masterUrl, reqId, null, app.id, companyId, tenantId, 'outbound', ani);
+                            }
+
+                            fulfill(xml);
+                        }
+
+                    });
+
+                }
+            }
+            else
+            {
+                reject(new Error('Master application not found for IVR extension'));
+            }
+        }
+        else
+        {
+            reject(new Error('Application not found for IVR extension'));
+        }
+    })
+
+
+
+};
+
 
 var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, extraData, fromUserData, companyId, tenantId, securityToken, numLimitInfo, dvpCallDirection, ctxt, cacheData, callback)
 {
@@ -569,6 +675,10 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
             if(opCat === 'AUTO_ATTENDANT')
             {
                 appType = 'AUTO_ATTENDANT';
+            }
+            else if(opCat === 'ATT_XFER_IVR' || extraData['IsIVRTransfer'])
+            {
+                appType = 'IVR_TRANSFER';
             }
 
             if(currentApp === 'voicemail')
@@ -921,20 +1031,37 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                         CompanyId: companyId,
                                                                         TenantId: tenantId,
                                                                         AppId: appId,
-                                                                        Action: 'CALL_DIVERT'
+                                                                        Action: 'CALL_DIVERT',
+                                                                        Operator: rule.Operator
                                                                     };
 
 
                                                                     ep.Origination = rule.ANI;
                                                                     ep.OriginationCallerIdNumber = rule.ANI;
 
-
-
                                                                     var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
 
-                                                                    var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo, dvpCallDirection);
+                                                                    extApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                                                        .then(function(balanceRes)
+                                                                        {
+                                                                            if (balanceRes && balanceRes.IsSuccess)
+                                                                            {
 
-                                                                    callback(undefined, xml);
+                                                                                var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo, dvpCallDirection);
+
+                                                                                callback(undefined, xml);
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                callback(new Error('insufficient balance'), xmlBuilder.createRejectResponse());
+                                                                            }
+
+                                                                        })
+                                                                        .catch(function(err)
+                                                                        {
+                                                                            callback(err, xmlBuilder.createRejectResponse());
+                                                                        })
+
                                                                 }
                                                                 else
                                                                 {
@@ -1243,6 +1370,21 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                 var xml = xmlBuilder.CreateAutoAttendantDialplan(reqId, ep, context, toContext, '[^\\s]*', false, dvpCallDirection);
 
                                 callback(undefined, xml);
+
+                            }
+                            else if(extDetails.ObjCategory === 'IVR')
+                            {
+
+                                handleIVRExt(reqId, companyId, tenantId, uuid, context, extDetails, false, callerIdNum)
+                                    .then(function(ivrResp)
+                                    {
+                                        callback(null, ivrResp);
+
+                                    })
+                                    .catch(function(err)
+                                    {
+                                        callback(err, xmlBuilder.createRejectResponse());
+                                    });
 
                             }
                             else
@@ -1700,7 +1842,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                             NumberType: rule.NumberType,
                                                                             CompanyId: rule.CompanyId,
                                                                             TenantId: rule.TenantId,
-                                                                            Action: 'CALL_DIVERT'
+                                                                            Action: 'CALL_DIVERT',
+                                                                            Operator: rule.Operator
                                                                         };
 
 
@@ -1717,9 +1860,28 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                                                         var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
 
-                                                                        var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo, dvpCallDirection);
+                                                                        extApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                                                            .then(function(balanceRes)
+                                                                            {
+                                                                                if (balanceRes && balanceRes.IsSuccess)
+                                                                                {
 
-                                                                        callback(undefined, xml);
+                                                                                    var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo, dvpCallDirection);
+
+                                                                                    callback(undefined, xml);
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    callback(new Error('insufficient balance'), xmlBuilder.createRejectResponse());
+                                                                                }
+
+                                                                            })
+                                                                            .catch(function(err)
+                                                                            {
+                                                                                callback(err, xmlBuilder.createRejectResponse());
+                                                                            });
+
+
                                                                     }
                                                                     else
                                                                     {
@@ -2045,6 +2207,21 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                     });
 
                                 }
+                                else if(extDetails.ObjCategory === 'IVR')
+                                {
+
+                                    handleIVRExt(reqId, companyId, tenantId, uuid, context, extDetails, false, null)
+                                        .then(function(ivrResp)
+                                        {
+                                            callback(null, ivrResp);
+
+                                        })
+                                        .catch(function(err)
+                                        {
+                                            callback(err, xmlBuilder.createRejectResponse());
+                                        });
+
+                                }
                                 else if(extDetails.ObjCategory === 'AUTO_ATTENDANT')
                                 {
 
@@ -2199,7 +2376,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                 TenantId: rule.TenantId,
                                                                 AppId: appId,
                                                                 Action: 'DEFAULT',
-                                                                RecordEnabled: recEnabled
+                                                                RecordEnabled: recEnabled,
+                                                                Operator: rule.Operator
                                                             };
 
                                                             if(dodActive && dodNumber)
@@ -2217,9 +2395,29 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                             else
                                                             {
                                                                 var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
-                                                                var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo, dvpCallDirection);
 
-                                                                callback(undefined, xml);
+                                                                extApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                                                    .then(function(balanceRes)
+                                                                    {
+                                                                        if (balanceRes && balanceRes.IsSuccess)
+                                                                        {
+
+                                                                            var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo, dvpCallDirection);
+
+                                                                            callback(undefined, xml);
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            callback(new Error('insufficient balance'), xmlBuilder.createRejectResponse());
+                                                                        }
+
+                                                                    })
+                                                                    .catch(function(err)
+                                                                    {
+                                                                        callback(err, xmlBuilder.createRejectResponse());
+                                                                    });
+
+
                                                             }
                                                         }
                                                         else
@@ -2443,7 +2641,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                         TenantId: rule.TenantId,
                                                         AppId: appId,
                                                         Action: 'DEFAULT',
-                                                        RecordEnabled: recEnabled
+                                                        RecordEnabled: recEnabled,
+                                                        Operator: rule.Operator
                                                     };
 
                                                     if(dodActive && dodNumber)
@@ -2461,9 +2660,29 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                     else
                                                     {
                                                         var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
-                                                        var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo, dvpCallDirection);
 
-                                                        callback(undefined, xml);
+                                                        extApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                                            .then(function(balanceRes)
+                                                            {
+                                                                if (balanceRes && balanceRes.IsSuccess)
+                                                                {
+
+                                                                    var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo, dvpCallDirection);
+
+                                                                    callback(undefined, xml);
+                                                                }
+                                                                else
+                                                                {
+                                                                    callback(new Error('insufficient balance'), xmlBuilder.createRejectResponse());
+                                                                }
+
+                                                            })
+                                                            .catch(function(err)
+                                                            {
+                                                                callback(err, xmlBuilder.createRejectResponse());
+                                                            });
+
+
                                                     }
 
                                                 }
@@ -2536,7 +2755,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             TenantId: rule.TenantId,
                                             AppId: appId,
                                             Action: 'DEFAULT',
-                                            RecordEnabled: recEnabled
+                                            RecordEnabled: recEnabled,
+                                            Operator: rule.Operator
                                         };
 
                                         if(dodActive && dodNumber)
@@ -2554,9 +2774,29 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         else
                                         {
                                             var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
-                                            var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo, dvpCallDirection);
 
-                                            callback(undefined, xml);
+                                            extApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                                .then(function(balanceRes)
+                                                {
+                                                    if (balanceRes && balanceRes.IsSuccess)
+                                                    {
+
+                                                        var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo, dvpCallDirection);
+
+                                                        callback(undefined, xml);
+                                                    }
+                                                    else
+                                                    {
+                                                        callback(new Error('insufficient balance'), xmlBuilder.createRejectResponse());
+                                                    }
+
+                                                })
+                                                .catch(function(err)
+                                                {
+                                                    callback(err, xmlBuilder.createRejectResponse());
+                                                });
+
+
                                         }
 
                                     }
@@ -2573,7 +2813,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
             }
             else
             {
-                if(appType && (appType === 'HTTAPI' || appType === 'AUTO_ATTENDANT' || appType === 'VOICEMAIL'))
+                if(appType && (appType === 'HTTAPI' || appType === 'AUTO_ATTENDANT' || appType === 'VOICEMAIL' || appType === 'IVR_TRANSFER'))
                 {
 
                     var fromUserUuid = '';
@@ -2928,7 +3168,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                                                 CompanyId: rule.CompanyId,
                                                                                 TenantId: rule.TenantId,
                                                                                 Action: 'CALL_DIVERT',
-                                                                                AppId: appId
+                                                                                AppId: appId,
+                                                                                Operator: rule.Operator
                                                                             };
 
 
@@ -2945,9 +3186,28 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
 
                                                                             var attTransInfo = AttendantTransferLegInfoHandler(reqId, null, null);
 
-                                                                            var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo, dvpCallDirection);
+                                                                            extApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                                                                .then(function(balanceRes)
+                                                                                {
+                                                                                    if (balanceRes && balanceRes.IsSuccess)
+                                                                                    {
 
-                                                                            callback(undefined, xml);
+                                                                                        var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo, dvpCallDirection);
+
+                                                                                        callback(undefined, xml);
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        callback(new Error('insufficient balance'), xmlBuilder.createRejectResponse());
+                                                                                    }
+
+                                                                                })
+                                                                                .catch(function(err)
+                                                                                {
+                                                                                    callback(err, xmlBuilder.createRejectResponse());
+                                                                                });
+
+
                                                                         }
                                                                         else
                                                                         {
@@ -3273,6 +3533,21 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         callback(undefined, xml);
 
                                     }
+                                    else if(extDetails.ObjCategory === 'IVR')
+                                    {
+
+                                        handleIVRExt(reqId, companyId, tenantId, uuid, context, extDetails, true, null)
+                                            .then(function(ivrResp)
+                                            {
+                                                callback(null, ivrResp);
+
+                                            })
+                                            .catch(function(err)
+                                            {
+                                                callback(err, xmlBuilder.createRejectResponse());
+                                            });
+
+                                    }
                                     else
                                     {
                                         callback(new Error('Unsupported extension category'), xmlBuilder.createRejectResponse());
@@ -3345,7 +3620,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                             TenantId: rule.TenantId,
                                             Action: 'DEFAULT',
                                             AppId: appId,
-                                            RecordEnable: recEnabled
+                                            RecordEnable: recEnabled,
+                                            Operator: rule.Operator
                                         };
 
                                         if(dodActive && dodNumber)
@@ -3363,9 +3639,28 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         else
                                         {
                                             var attTransInfo = AttendantTransferLegInfoHandler(reqId, fromUserData, null);
-                                            var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo, dvpCallDirection);
 
-                                            callback(undefined, xml);
+                                            extApi.CheckBalance(reqId, uuid, ep.Origination, ep.Destination, 'minute', ep.Operator, ep.CompanyId, ep.TenantId)
+                                                .then(function(balanceRes)
+                                                {
+                                                    if (balanceRes && balanceRes.IsSuccess)
+                                                    {
+
+                                                        var xml = xmlBuilder.CreateRouteGatewayDialplan(reqId, ep, context, profile, '[^\\s]*', false, attTransInfo, dvpCallDirection);
+
+                                                        callback(undefined, xml);
+                                                    }
+                                                    else
+                                                    {
+                                                        callback(new Error('insufficient balance'), xmlBuilder.createRejectResponse());
+                                                    }
+
+                                                })
+                                                .catch(function(err)
+                                                {
+                                                    callback(err, xmlBuilder.createRejectResponse());
+                                                });
+
                                         }
 
                                     }

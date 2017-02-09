@@ -177,14 +177,20 @@ var CreateGatewayProfile = function(gwList, reqId)
         var retrySec = 3600;
 
 
-        var doc = xmlBuilder.create('document').att('type', 'freeswitch/xml');
-        var section = doc.ele('section').att('name', 'directory');
+        /*var doc = xmlBuilder.create('document').att('type', 'freeswitch/xml');
+        var section = doc.ele('section').att('name', 'directory');*/
 
-        //var obj = {
-        //    'section': []
-        //    }
+        var obj = {
+            document: {
+                '@type': 'freeswitch/xml',
+                section: {
+                    '@name': 'directory',
+                    domain: []
+                }
 
-        //obj.section.push()
+
+            }
+        };
 
 
 
@@ -198,7 +204,174 @@ var CreateGatewayProfile = function(gwList, reqId)
                 proxy = gw.Proxy;
             }
 
-            section.ele('domain').att('name', gw.Domain)
+            var username = '';
+            var password = '';
+
+            var domain = gw.Domain;
+
+            if(gw.Username)
+            {
+                username = gw.Username;
+                domain = gw.IpUrl;
+
+                if(gw.Password)
+                {
+                    password = gw.Password;
+                }
+            }
+
+
+            var domainEle = {
+                '@name': domain,
+                params: {
+                    param: {
+                        '@name': 'dial-string',
+                        '@value': '{presence_id=${dialed_user}${dialed_domain}}${sofia_contact(${dialed_user}${dialed_domain})}'
+                    }
+                },
+                variables: {
+                    variable: {}
+                },
+                user: {
+                    '@id': '',
+                    gateways: {
+                        gateway: {
+                            '@name': gw.TrunkCode,
+                            param: []
+                        }
+                    },
+                    params: {
+                        param: {
+                            '@name': 'password',
+                            '@value': ''
+                        }
+                    }
+                }
+            };
+
+
+
+
+
+            if(!username)
+            {
+                domainEle.user.gateways.gateway.param.push(
+                    {
+                        '@name': 'username',
+                        '@value': username
+                    },
+                    {
+                        '@name': 'realm',
+                        '@value': gw.IpUrl
+                    },
+                    {
+                        '@name': 'proxy',
+                        '@value': proxy
+                    },
+                    {
+                        '@name': 'password',
+                        '@value': password
+                    },
+                    {
+                        '@name': 'from-user',
+                        '@value': username
+                    },
+                    {
+                        '@name': 'from-domain',
+                        '@value': domain
+                    },
+                    {
+                        '@name': 'register',
+                        '@value': 'false'
+                    },
+                    {
+                        '@name': 'register-transport',
+                        '@value': 'udp'
+                    },
+                    {
+                        '@name': 'apply-register-acl',
+                        '@value': 'provider'
+                    },
+                    {
+                        '@name': 'caller-id-in-from',
+                        '@value': 'true'
+                    },
+                    {
+                        '@name': 'context',
+                        '@value': 'public'
+                    },
+                    {
+                        '@name': 'expire-seconds',
+                        '@value': expireSec
+                    },
+                    {
+                        '@name': 'retry-seconds',
+                        '@value': retrySec
+                    },
+                    {
+                        '@name': 'auth-calls',
+                        '@value': 'false'
+                    },
+                    {
+                        '@name': 'register-proxy',
+                        '@value': gw.IpUrl
+                    },
+                    {
+                        '@name': 'auth-username',
+                        '@value': ''
+                    });
+
+            }
+            else
+            {
+                domainEle.user.gateways.gateway.param.push(
+                    {
+                        '@name': 'realm',
+                        '@value': gw.IpUrl
+                    },
+                    {
+                        '@name': 'proxy',
+                        '@value': proxy
+                    },
+                    {
+                        '@name': 'from-domain',
+                        '@value': domain
+                    },
+                    {
+                        '@name': 'username',
+                        '@value': username
+                    },
+                    {
+                        '@name': 'from-user',
+                        '@value': username
+                    },
+                    {
+                        '@name': 'password',
+                        '@value': password
+                    },
+                    {
+                        '@name': 'contact-params',
+                        '@value': username + '@' + domain
+                    },
+                    {
+                        '@name': 'extension',
+                        '@value': username
+                    },
+                    {
+                        '@name': 'extension-in-contact',
+                        '@value': 'true'
+                    },
+                    {
+                        '@name': 'retry-seconds',
+                        '@value': '30'
+                    });
+
+            }
+
+            obj.document.section.domain.push(domainEle);
+
+
+            /*section.ele('domain').att('name', gw.Domain)
                 .ele('params')
                     .ele('param').att('name', 'dial-string').att('value', '{presence_id=${dialed_user}${dialed_domain}}${sofia_contact(${dialed_user}${dialed_domain})}')
                     .up()
@@ -210,9 +383,9 @@ var CreateGatewayProfile = function(gwList, reqId)
                 .ele('user').att('id', '')
                     .ele('gateways')
                         .ele('gateway').att('name', gw.TrunkCode)
-                            .ele('param').att('name', 'username').att('value', '')
+                            .ele('param').att('name', 'username').att('value', username)
                             .up()
-                            .ele('param').att('name', 'auth-username').att('value', '')
+                            .ele('param').att('name', 'auth-username').att('value', username)
                             .up()
                             .ele('param').att('name', 'realm').att('value', gw.IpUrl)
                             .up()
@@ -224,9 +397,9 @@ var CreateGatewayProfile = function(gwList, reqId)
                             .up()
                             .ele('param').att('name', 'caller-id-in-from').att('value', 'true')
                             .up()
-                            .ele('param').att('name', 'password').att('value', '')
+                            .ele('param').att('name', 'password').att('value', password)
                             .up()
-                            .ele('param').att('name', 'from-user').att('value', '')
+                            .ele('param').att('name', 'from-user').att('value', username)
                             .up()
                             .ele('param').att('name', 'from-domain').att('value', gw.Domain)
                             .up()
@@ -249,14 +422,16 @@ var CreateGatewayProfile = function(gwList, reqId)
                         .up()
                     .up()
                 .up()
-            .up()
+            .up()*/
 
 
         });
 
+        var xml = xmlBuilder.create(obj);
+
         //var gwStr = section.end({pretty: true});
 
-        return section.end({pretty: true});
+        return xml.end({pretty: true});
     }
     catch(ex)
     {
@@ -268,7 +443,7 @@ var CreateGatewayProfile = function(gwList, reqId)
 
 }
 
-var createDirectoryProfile = function(extName, ext, domain, email, password, context, sendEmail, reqId)
+var createDirectoryProfile = function(extName, ext, domain, email, password, context, sendEmail, reqId, pin)
 {
     try {
 
@@ -293,6 +468,7 @@ var createDirectoryProfile = function(extName, ext, domain, email, password, con
 
 
 
+
         var doc = xmlBuilder.create('document');
 
         var tempDoc = doc.att('type', 'freeswitch/xml')
@@ -314,6 +490,12 @@ var createDirectoryProfile = function(extName, ext, domain, email, password, con
                 .ele('param').att('name', 'vm-mailto').att('value', email)
                 .up()
 
+        }
+
+        if(pin)
+        {
+            tempDoc.ele('param').att('name', 'vm-password').att('value', pin)
+                .up()
         }
 
         tempDoc.up()
@@ -370,7 +552,7 @@ var createDirectoryProfile = function(extName, ext, domain, email, password, con
 
 };
 
-var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, reqId, numLimitInfo, appId, companyId, tenantId, dvpCallDirection)
+var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, reqId, numLimitInfo, appId, companyId, tenantId, dvpCallDirection, ani)
 {
     try
     {
@@ -442,13 +624,120 @@ var CreateHttpApiDialplan = function(destinationPattern, context, httApiUrl, req
                 .up()
         }
 
+        if(ani)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'effective_caller_id_number=' + ani)
+                .up()
+        }
+
+        cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=HTTAPI')
+            .up()
+            .ele('action').att('application', 'export').att('data', 'dvp_app_type=HTTAPI')
+            .up()
+            .ele('action').att('application', 'answer')
+            .up()
+            .ele('action').att('application', 'httapi').att('data', httpApiUrl)
+            .up();
+
+
+        cond.end({pretty: true});
+
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-DynamicConfigurationGenerator.CreateHttpApiDialplan] - [%s] - Exception occurred creating xml', reqId, ex);
+        return createNotFoundResponse();
+    }
+
+};
+
+var CreateHttpApiDialplanTransfer = function(destinationPattern, context, httApiUrl, reqId, numLimitInfo, appId, companyId, tenantId, dvpCallDirection, ani)
+{
+    try
+    {
+        if (!destinationPattern) {
+            destinationPattern = "";
+        }
+
+        if (!context) {
+            context = "";
+        }
+
+        //var httpUrl = Config.Services.HttApiUrl;
+
+        var httpApiUrl = "{url=" + httApiUrl + "}";
+
+        var doc = xmlBuilder.create('document');
+
+        var cond = doc.att('type', 'freeswitch/xml')
+            .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
+            .ele('context').att('name', context)
+            .ele('extension').att('name', 'test')
+            .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
+
+        if(numLimitInfo && numLimitInfo.CheckLimit)
+        {
+            if(numLimitInfo.NumType === 'INBOUND')
+            {
+                var limitStr = util.format('hash %d_%d_inbound %s %d !USER_BUSY', numLimitInfo.TenantId, numLimitInfo.CompanyId, numLimitInfo.TrunkNumber, numLimitInfo.InboundLimit);
+                cond.ele('action').att('application', 'limit').att('data', limitStr)
+                    .up()
+            }
+            else if(numLimitInfo.NumType === 'BOTH')
+            {
+                if(numLimitInfo.InboundLimit)
+                {
+                    var limitStr = util.format('hash %d_%d_inbound %s %d !USER_BUSY', numLimitInfo.TenantId, numLimitInfo.CompanyId, numLimitInfo.TrunkNumber, numLimitInfo.InboundLimit);
+                    cond.ele('action').att('application', 'limit').att('data', limitStr)
+                        .up()
+                }
+
+                if(numLimitInfo.BothLimit)
+                {
+                    var limitStr = util.format('hash %d_%d_both %s %d !USER_BUSY', numLimitInfo.TenantId, numLimitInfo.CompanyId, numLimitInfo.TrunkNumber, numLimitInfo.BothLimit);
+                    cond.ele('action').att('application', 'limit').att('data', limitStr)
+                        .up()
+                }
+            }
+
+        }
+
+        if(companyId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
+                .up()
+        }
+        if(tenantId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
+                .up()
+        }
+        if(appId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'dvp_app_id=' + appId)
+                .up()
+        }
+        if(dvpCallDirection)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'DVP_CALL_DIRECTION=' + dvpCallDirection)
+                .up()
+        }
+
+        if(ani)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'effective_caller_id_number=' + ani)
+                .up()
+        }
+
         cond.ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=HTTAPI')
             .up();
 
 
         cond.ele('action').att('application', 'export').att('data', 'dvp_app_type=HTTAPI')
-            .up()
-            .ele('action').att('application', 'answer')
             .up()
             .ele('action').att('application', 'httapi').att('data', httpApiUrl)
             .up();
@@ -601,6 +890,8 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
             .up()
             .ele('action').att('application', 'bind_meta_app').att('data', '5 ab s execute_extension::att_xfer_conference XML PBXFeatures')
             .up()
+            .ele('action').att('application', 'bind_meta_app').att('data', '9 ab s execute_extension::att_xfer_ivr XML PBXFeatures')
+            .up()
 
 
         var option = '';
@@ -625,7 +916,7 @@ var CreateRouteGatewayDialplan = function(reqId, ep, context, profile, destinati
 
         cond.ele('action').att('application', 'set').att('data', bypassMed)
             .up()
-        ele('action').att('application', 'set').att('data', calling)
+            .ele('action').att('application', 'set').att('data', calling)
             .up()
 
         return cond.end({pretty: true});
@@ -648,3 +939,4 @@ module.exports.CreateUserGroupDirectoryProfile = CreateUserGroupDirectoryProfile
 module.exports.CreateSocketApiDialplan = CreateSocketApiDialplan;
 module.exports.CreateRouteGatewayDialplan = CreateRouteGatewayDialplan;
 module.exports.createRejectResponse = createRejectResponse;
+module.exports.CreateHttpApiDialplanTransfer = CreateHttpApiDialplanTransfer;

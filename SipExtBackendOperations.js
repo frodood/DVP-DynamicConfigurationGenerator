@@ -730,7 +730,9 @@ var GetGatewayListForCallServerProfile = function(profile, csId, reqId, data, ca
                                         IpUrl : trunk.IpUrl,
                                         Domain : result.InternalIp,
                                         TrunkCode: trunk.TrunkCode,
-                                        Proxy: undefined
+                                        Proxy: undefined,
+                                        Username: trunk.Username,
+                                        Password: trunk.Password
                                     };
                                     gatewayList.push(gw);
                                 })

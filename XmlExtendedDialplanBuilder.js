@@ -150,25 +150,25 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
             {
                 if(transferCodes.InternalTransfer != null && transferCodes.InternalTransfer != undefined)
                 {
-                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.InternalTransfer + ' b s execute_extension::att_xfer XML PBXFeatures')
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.InternalTransfer + ' b s execute_extension::att_xfer XML ' + context)
                         .up()
                 }
 
                 if(transferCodes.ExternalTransfer != null && transferCodes.ExternalTransfer != undefined)
                 {
-                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.ExternalTransfer + ' b s execute_extension::att_xfer_outbound XML PBXFeatures')
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.ExternalTransfer + ' b s execute_extension::att_xfer_outbound XML ' + context)
                         .up()
                 }
 
                 if(transferCodes.GroupTransfer != null && transferCodes.GroupTransfer != undefined)
                 {
-                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.GroupTransfer + ' b s execute_extension::att_xfer_group XML PBXFeatures')
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.GroupTransfer + ' b s execute_extension::att_xfer_group XML PBXFeatures ' + context)
                         .up()
                 }
 
                 if(transferCodes.ConferenceTransfer != null && transferCodes.ConferenceTransfer != undefined)
                 {
-                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.ConferenceTransfer + ' b s execute_extension::att_xfer_conference XML PBXFeatures')
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.ConferenceTransfer + ' b s execute_extension::att_xfer_conference XML PBXFeatures ' + context)
                         .up()
                 }
 

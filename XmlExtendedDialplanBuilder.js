@@ -137,6 +137,7 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
         }
         else
         {
+            context = 'PBXFeatures';
             cond.ele('action').att('application', 'read').att('data', "3 6 'tone_stream://%(10000,0,350,440)' digits 30000 #")
                 .up()
                 .ele('action').att('application', 'set').att('data', 'origination_cancel_key=#')

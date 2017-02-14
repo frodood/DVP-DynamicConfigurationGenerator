@@ -101,7 +101,7 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
 
         var cond = doc.att('type', 'freeswitch/xml')
             .ele('section').att('name', 'dialplan').att('description', 'RE Dial Plan For FreeSwitch')
-            .ele('context').att('name', context)
+            .ele('context').att('name', 'PBXFeatures')
             .ele('extension').att('name', destNum)
             .ele('condition').att('field', 'destination_number').att('expression', '^' + destNum + '$')
 

@@ -162,13 +162,13 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
 
                 if(transferCodes.GroupTransfer != null && transferCodes.GroupTransfer != undefined)
                 {
-                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.GroupTransfer + ' b s execute_extension::att_xfer_group XML PBXFeatures ' + context)
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.GroupTransfer + ' b s execute_extension::att_xfer_group XML ' + context)
                         .up()
                 }
 
                 if(transferCodes.ConferenceTransfer != null && transferCodes.ConferenceTransfer != undefined)
                 {
-                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.ConferenceTransfer + ' b s execute_extension::att_xfer_conference XML PBXFeatures ' + context)
+                    cond.ele('action').att('application', 'bind_meta_app').att('data', transferCodes.ConferenceTransfer + ' b s execute_extension::att_xfer_conference XML ' + context)
                         .up()
                 }
 

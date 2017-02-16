@@ -219,11 +219,6 @@ var CreatePbxFeaturesGateway = function(reqId, destNum, trunkNumber, trunkCode, 
             appId = -1;
         }
 
-        if(!operator)
-        {
-            operator = '';
-        }
-
 
         var doc = xmlBuilder.create('document');
 
@@ -233,6 +228,23 @@ var CreatePbxFeaturesGateway = function(reqId, destNum, trunkNumber, trunkCode, 
             .ele('extension').att('name', destNum)
             .ele('condition').att('field', 'destination_number').att('expression', '^' + destNum + '$')
 
+        if(companyId)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'companyid=' + companyId)
+                .up()
+        }
+        if(tenantId)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'tenantid=' + tenantId)
+                .up()
+        }
+
+        if(operator)
+        {
+            cond.ele('action').att('application', 'set').att('data', 'veeryoperator=' + operator)
+                .up()
+        }
+
 
         cond.ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=GATEWAY')
             .up()
@@ -240,7 +252,7 @@ var CreatePbxFeaturesGateway = function(reqId, destNum, trunkNumber, trunkCode, 
             .up()
             .ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=outbound')
             .up()
-            .ele('action').att('application', 'att_xfer').att('data', '{origination_caller_id_number=' + trunkNumber + ',veeryoperator=' + operator + ',DVP_CALL_DIRECTION=outbound' + ',companyid=' + companyId + ',tenantid=' + tenantId + ',dvp_app_id=' + appId + '}sofia/gateway/' + trunkCode + '/' +digits)
+            .ele('action').att('application', 'att_xfer').att('data', '{origination_caller_id_number=' + trunkNumber + ',dvp_app_id=' + appId + '}sofia/gateway/' + trunkCode + '/' +digits)
             .up()
             .end({pretty: true});
 

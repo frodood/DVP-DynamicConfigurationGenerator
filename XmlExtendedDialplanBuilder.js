@@ -230,27 +230,27 @@ var CreatePbxFeaturesGateway = function(reqId, destNum, trunkNumber, trunkCode, 
 
         if(companyId)
         {
-            cond.ele('action').att('application', 'set').att('data', 'companyid=' + companyId)
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
                 .up()
         }
         if(tenantId)
         {
-            cond.ele('action').att('application', 'set').att('data', 'tenantid=' + tenantId)
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
                 .up()
         }
 
         if(operator)
         {
-            cond.ele('action').att('application', 'set').att('data', 'veeryoperator=' + operator)
+            cond.ele('action').att('application', 'export').att('data', 'veeryoperator=' + operator)
                 .up()
         }
 
 
         cond.ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=GATEWAY')
             .up()
-            .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=ATT_XFER_GATEWAY')
+            .ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=ATT_XFER_GATEWAY')
             .up()
-            .ele('action').att('application', 'set').att('data', 'DVP_CALL_DIRECTION=outbound')
+            .ele('action').att('application', 'export').att('data', 'DVP_CALL_DIRECTION=outbound')
             .up()
             .ele('action').att('application', 'att_xfer').att('data', '{origination_caller_id_number=' + trunkNumber + ',dvp_app_id=' + appId + '}sofia/gateway/' + trunkCode + '/' +digits)
             .up()
@@ -293,8 +293,6 @@ var CreateAttendantTransferGW = function(reqId, destNum, context)
             .ele('action').att('application', 'set').att('data', 'transfer_ringback=$${us-ring}')
             .up()
             .ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=GATEWAY')
-            .up()
-            .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=ATT_XFER_GATEWAY')
             .up()
             .ele('action').att('application', 'execute_extension').att('data', 'gwtransfer XML PBXFeatures')
             .up();

@@ -587,7 +587,7 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
         var option = '';
 
 
-        if(dvpCallDirection === 'outbound')
+        if(dvpCallDirection === 'outbound' && ep.Type !== 'GROUP')
         {
             if (ep.LegStartDelay > 0)
                 option = util.format('[leg_delay_start=%d, origination_uuid=${my_uuid}, leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
@@ -640,7 +640,7 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
             .ele('extension').att('name', 'test')
             .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
 
-        if(dvpCallDirection === 'outbound')
+        if(dvpCallDirection === 'outbound' && ep.Type !== 'GROUP')
         {
             cond.ele('action').att('application', 'set').att('data', 'my_uuid=${create_uuid()}').att('inline', 'true')
                 .up()

@@ -562,7 +562,7 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
         }
 
         var ignoreEarlyM = "ignore_early_media=false";
-        if (ignoreEarlyMedia)
+        if (ignoreEarlyMedia && ep.Type != 'GROUP')
         {
             ignoreEarlyM = "ignore_early_media=true";
         }
@@ -806,6 +806,11 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
             //var greetingPath = 'sounds/' + ep.PersonalGreeting;
             //.ele('action').att('application', 'playback').att('data', greetingPath)
             //    .up()
+        }
+
+        if(ep.Type === 'GROUP')
+        {
+            calling = calling + '+A';
         }
 
         cond.ele('action').att('application', 'bridge').att('data', calling)

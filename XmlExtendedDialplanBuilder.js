@@ -657,6 +657,13 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
             .ele('action').att('application', 'set').att('data', bypassMedia)
             .up()
 
+        if(ep.Type === 'GROUP')
+        {
+            cond.ele('action').att('application', 'set').att('data', 'originate_continue_on_timeout=true')
+                .up();
+
+        }
+
         if(ep.Action)
         {
             cond.ele('action').att('application', 'export').att('data', 'DVP_ACTION_CAT=' + ep.Action)

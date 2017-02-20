@@ -69,7 +69,7 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
         //var element = new xmlBuilder.create('users');
 
 
-        var users = [];
+        var users = {'user': []};
 
 
 
@@ -77,9 +77,6 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
         {
             grp.SipUACEndpoint.forEach(function(sipUsr)
             {
-
-                var tempParamsArr = [];
-                var tempVarArr = [];
 
                 var sipUsername = sipUsr.SipUsername ? sipUsr.SipUsername : "";
                 var sipExt = sipUsr.SipExtension ? sipUsr.SipExtension : "";
@@ -98,23 +95,20 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
                 }
 
                 var userObj = {
-                    'user':
-                    {
                         '@id': sipUsername, '@cacheable': 'false', '@number-alias': sipExt,
-                        'params': tempParamsArr,
-                        'variables': tempVarArr
-                    }
+                        'params': {'param':[]},
+                        'variables': {'variable':[]}
                 };
 
-                tempParamsArr.push({'param': {'@name' : 'dial-string', '@value' : '{sip_invite_domain=${domain_name},presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}'}});
-                tempParamsArr.push({'param': {'@name' : 'password', '@value' : sipPassword}});
+                userObj.params.param.push({'@name' : 'dial-string', '@value' : '{sip_invite_domain=${domain_name},presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}'});
+                userObj.params.param.push({'param': {'@name' : 'password', '@value' : sipPassword}});
 
-                tempVarArr.push({'variable': {'@name' : 'domain', '@value' : sipUsrDomain}});
-                tempVarArr.push({'variable': {'@name' : 'user_context', '@value' : sipUserContext}});
-                tempVarArr.push({'variable': {'@name' : 'user_id', '@value' : sipUsername}});
+                userObj.variables.variable.push({'@name' : 'domain', '@value' : sipUsrDomain});
+                userObj.variables.variable.push({'@name' : 'user_context', '@value' : sipUserContext});
+                userObj.variables.variable.push({'@name' : 'user_id', '@value' : sipUsername});
 
 
-                users.push(userObj);
+                users.user.push(userObj);
 
 
 

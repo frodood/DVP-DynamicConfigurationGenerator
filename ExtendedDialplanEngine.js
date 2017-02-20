@@ -1290,6 +1290,24 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                             {
                                 if(extDetails.Extension.UserGroup)
                                 {
+                                    var recEnabled = false;
+
+                                    if(ctxtRecordingEnabled)
+                                    {
+                                        recEnabled = true;
+                                    }
+                                    else
+                                    {
+                                        if(extDetails.Extension.RecordingEnabled)
+                                        {
+                                            recEnabled = true;
+                                        }
+                                        else
+                                        {
+                                            recEnabled = false;
+                                        }
+                                    }
+
                                     var ep =
                                     {
                                         Profile: profile,
@@ -1305,7 +1323,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         CompanyId: companyId,
                                         TenantId: tenantId,
                                         AppId: appId,
-                                        Action: 'DEFAULT'
+                                        Action: 'DEFAULT',
+                                        RecordEnabled: recEnabled
                                     };
 
                                     var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -2122,6 +2141,24 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                     }
                                     else
                                     {
+                                        var recEnabled = false;
+
+                                        if(ctxtRecordingEnabled)
+                                        {
+                                            recEnabled = true;
+                                        }
+                                        else
+                                        {
+                                            if(extDetails.Extension.RecordingEnabled)
+                                            {
+                                                recEnabled = true;
+                                            }
+                                            else
+                                            {
+                                                recEnabled = false;
+                                            }
+                                        }
+
                                         if(extDetails.UserGroup)
                                         {
                                             var ep =
@@ -2139,7 +2176,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 CompanyId: companyId,
                                                 TenantId: tenantId,
                                                 AppId: appId,
-                                                Action: 'DEFAULT'
+                                                Action: 'DEFAULT',
+                                                RecordEnabled: recEnabled
                                             };
 
                                             var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';

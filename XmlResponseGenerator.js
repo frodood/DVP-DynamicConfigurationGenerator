@@ -67,9 +67,9 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
     {
         var grpDomain = grp.Domain ? grp.Domain : "";
         //var element = new xmlBuilder.create('users');
-        var obj = {
-            'users': []
-        };
+
+
+        var users = [];
 
 
 
@@ -114,7 +114,7 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
                 tempVarArr.push({'variable': {'@name' : 'user_id', '@value' : sipUsername}});
 
 
-                obj.users.push(userObj);
+                users.push(userObj);
 
 
 
@@ -129,10 +129,10 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
         }
 
         var obj2 = {
-            'groups': {
                 group : {'@name' : grpExt, 'users' : []}
-            }
+
         };
+
 
 
         if(grp.SipUACEndpoint)
@@ -142,12 +142,35 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
             {
                 var sipExt = sipUsr.SipExtension ? sipUsr.SipExtension : "";
                 var usrPointerObj = {user: {'@id': sipExt, '@type': 'pointer'}};
-                obj2.groups.group.users.push(usrPointerObj);
+                obj2.group.users.push(usrPointerObj);
 
             });
         }
 
-        var doc = xmlBuilder.create('document').att('type', 'freeswitch/xml')
+        var obj = {
+            document: {
+                '@type': 'freeswitch/xml',
+                section: {
+                    '@name': 'directory',
+                    domain: {
+                        '@name': grpDomain,
+                        'users': users,
+                        'groups': obj2
+                    }
+                }
+
+
+            }
+        };
+
+        var xml = xmlBuilder.create(obj);
+        xml.end({pretty: true});
+
+        //var gwStr = section.end({pretty: true});
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + xml.toString({pretty: true});
+
+        /*var doc = xmlBuilder.create('document').att('type', 'freeswitch/xml')
             doc.ele('section').att('name', 'directory')
                 .ele('domain').att('name', grpDomain)
                     .ele(obj)
@@ -156,7 +179,7 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
 
         doc.end({pretty: true});
 
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});*/
 
     }
     catch(ex)

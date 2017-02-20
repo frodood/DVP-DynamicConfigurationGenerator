@@ -101,7 +101,7 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
                 };
 
                 userObj.params.param.push({'@name' : 'dial-string', '@value' : '{sip_invite_domain=${domain_name},presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}'});
-                userObj.params.param.push({'param': {'@name' : 'password', '@value' : sipPassword}});
+                userObj.params.param.push({'@name' : 'password', '@value' : sipPassword});
 
                 userObj.variables.variable.push({'@name' : 'domain', '@value' : sipUsrDomain});
                 userObj.variables.variable.push({'@name' : 'user_context', '@value' : sipUserContext});

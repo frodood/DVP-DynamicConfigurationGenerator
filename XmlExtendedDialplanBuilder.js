@@ -825,10 +825,13 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
             //    .up()
         }
 
+        if(ep.Type === 'GROUP')
+        {
+            calling = calling + '+A';
+        }
+
         cond.ele('action').att('application', 'bridge').att('data', calling)
             .up()
-
-
 
         if(ep.IsVoicemailEnabled)
         {

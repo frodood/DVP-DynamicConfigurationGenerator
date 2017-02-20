@@ -579,7 +579,7 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
         }
 
         var ignoreEarlyM = "ignore_early_media=false";
-        if (ignoreEarlyMedia)
+        if (ignoreEarlyMedia && ep.Type != 'GROUP')
         {
             ignoreEarlyM = "ignore_early_media=true";
         }

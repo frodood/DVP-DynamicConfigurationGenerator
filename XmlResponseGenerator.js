@@ -129,7 +129,7 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
         }
 
         var obj2 = {
-                group : {'@name' : grpExt, 'users' : []}
+                group : {'@name' : grpExt, 'users' : {'user': []}}
 
         };
 
@@ -141,8 +141,8 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
             grp.SipUACEndpoint.forEach(function (sipUsr)
             {
                 var sipExt = sipUsr.SipExtension ? sipUsr.SipExtension : "";
-                var usrPointerObj = {user: {'@id': sipExt, '@type': 'pointer'}};
-                obj2.group.users.push(usrPointerObj);
+                var usrPointerObj = {'@id': sipExt, '@type': 'pointer'};
+                obj2.group.users.user.push(usrPointerObj);
 
             });
         }

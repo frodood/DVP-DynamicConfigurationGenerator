@@ -676,6 +676,10 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
             {
                 appType = 'AUTO_ATTENDANT';
             }
+            else if(opCat == 'DIALER')
+            {
+                appType = 'DIALER';
+            }
             else if(opCat === 'ATT_XFER_IVR' || extraData['IsIVRTransfer'])
             {
                 appType = 'IVR_TRANSFER';
@@ -1290,6 +1294,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                             {
                                 if(extDetails.Extension.UserGroup)
                                 {
+
                                     var ep =
                                     {
                                         Profile: profile,
@@ -1305,7 +1310,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         CompanyId: companyId,
                                         TenantId: tenantId,
                                         AppId: appId,
-                                        Action: 'DEFAULT'
+                                        Action: 'DEFAULT',
+                                        RecordEnabled: extDetails.RecordingEnabled
                                     };
 
                                     var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -2124,6 +2130,24 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                     {
                                         if(extDetails.UserGroup)
                                         {
+                                            var recEnabled = false;
+
+                                            if(ctxtRecordingEnabled)
+                                            {
+                                                recEnabled = true;
+                                            }
+                                            else
+                                            {
+                                                if(fromUserData.Extension.RecordingEnabled)
+                                                {
+                                                    recEnabled = true;
+                                                }
+                                                else
+                                                {
+                                                    recEnabled = false;
+                                                }
+                                            }
+
                                             var ep =
                                             {
                                                 Profile: profile,
@@ -2139,7 +2163,8 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                                 CompanyId: companyId,
                                                 TenantId: tenantId,
                                                 AppId: appId,
-                                                Action: 'DEFAULT'
+                                                Action: 'DEFAULT',
+                                                RecordEnabled: recEnabled
                                             };
 
                                             var customStr = tenantId + '_' + extDetails.Extension + '_PBXUSERCALL';
@@ -2813,7 +2838,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
             }
             else
             {
-                if(appType && (appType === 'HTTAPI' || appType === 'AUTO_ATTENDANT' || appType === 'VOICEMAIL' || appType === 'IVR_TRANSFER'))
+                if(appType && (appType === 'HTTAPI' || appType === 'AUTO_ATTENDANT' || appType === 'VOICEMAIL' || appType === 'DIALER' || appType === 'IVR_TRANSFER'))
                 {
 
                     var fromUserUuid = '';

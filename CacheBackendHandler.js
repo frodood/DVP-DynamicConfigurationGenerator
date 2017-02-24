@@ -276,7 +276,7 @@ var AppendConferenceUser = function(confUser, companyId, tenantId, data, callbac
                 if(data.CloudEndUser && usr.CloudEndUserId && data.CloudEndUser[usr.CloudEndUserId])
                 {
                     usr.CloudEndUser = data.CloudEndUser[usr.CloudEndUserId];
-                };
+                }
 
                 confUser.SipUACEndpoint = usr;
             }

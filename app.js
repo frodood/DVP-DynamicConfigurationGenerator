@@ -108,7 +108,7 @@ var RedisOperations = function(callUuid, companyId, tenantId, appId, appType, is
     }
     catch(ex)
     {
-
+        //Do nothing
     }
 
 

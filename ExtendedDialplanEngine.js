@@ -3558,7 +3558,7 @@ var ProcessExtendedDialplan = function(reqId, ani, dnis, context, direction, ext
                                         callback(undefined, xml);
 
                                     }
-                                    else if(extDetails.ObjCategory === 'IVR')
+                                    else if(extDetails.ObjCategory === 'IVR' || extDetails.ObjCategory === 'CAMPAIGN')
                                     {
 
                                         handleIVRExt(reqId, companyId, tenantId, uuid, context, extDetails, true, null)

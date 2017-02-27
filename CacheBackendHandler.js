@@ -486,7 +486,7 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
 
                     callback(null, extData);
                 }
-                else if(extType === 'IVR')
+                else if(extType === 'IVR' || extType === 'CAMPAIGN')
                 {
                     if(data.Application)
                     {
@@ -517,6 +517,10 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
                     logger.error('[DVP-DynamicConfigurationGenerator.GetAllDataForExt] - [%s] - Unsupported extension type', reqId);
                     callback(new Error('Unsupported extension type'), null);
                 }
+            }
+            else
+            {
+                callback(null, null);
             }
 
         });

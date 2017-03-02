@@ -67,9 +67,9 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
     {
         var grpDomain = grp.Domain ? grp.Domain : "";
         //var element = new xmlBuilder.create('users');
-        var obj = {
-            'users': []
-        };
+
+
+        var users = {'user': []};
 
 
 
@@ -77,9 +77,6 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
         {
             grp.SipUACEndpoint.forEach(function(sipUsr)
             {
-
-                var tempParamsArr = [];
-                var tempVarArr = [];
 
                 var sipUsername = sipUsr.SipUsername ? sipUsr.SipUsername : "";
                 var sipExt = sipUsr.SipExtension ? sipUsr.SipExtension : "";
@@ -98,23 +95,20 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
                 }
 
                 var userObj = {
-                    'user':
-                    {
                         '@id': sipUsername, '@cacheable': 'false', '@number-alias': sipExt,
-                        'params': tempParamsArr,
-                        'variables': tempVarArr
-                    }
+                        'params': {'param':[]},
+                        'variables': {'variable':[]}
                 };
 
-                tempParamsArr.push({'param': {'@name' : 'dial-string', '@value' : '{sip_invite_domain=${domain_name},presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}'}});
-                tempParamsArr.push({'param': {'@name' : 'password', '@value' : sipPassword}});
+                userObj.params.param.push({'@name' : 'dial-string', '@value' : '{sip_invite_domain=${domain_name},presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}'});
+                userObj.params.param.push({'@name' : 'password', '@value' : sipPassword});
 
-                tempVarArr.push({'variable': {'@name' : 'domain', '@value' : sipUsrDomain}});
-                tempVarArr.push({'variable': {'@name' : 'user_context', '@value' : sipUserContext}});
-                tempVarArr.push({'variable': {'@name' : 'user_id', '@value' : sipUsername}});
+                userObj.variables.variable.push({'@name' : 'domain', '@value' : sipUsrDomain});
+                userObj.variables.variable.push({'@name' : 'user_context', '@value' : sipUserContext});
+                userObj.variables.variable.push({'@name' : 'user_id', '@value' : sipUsername});
 
 
-                obj.users.push(userObj);
+                users.user.push(userObj);
 
 
 
@@ -129,10 +123,10 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
         }
 
         var obj2 = {
-            'groups': {
-                group : {'@name' : grpExt, 'users' : []}
-            }
+                group : {'@name' : grpExt, 'users' : {'user': []}}
+
         };
+
 
 
         if(grp.SipUACEndpoint)
@@ -141,13 +135,36 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
             grp.SipUACEndpoint.forEach(function (sipUsr)
             {
                 var sipExt = sipUsr.SipExtension ? sipUsr.SipExtension : "";
-                var usrPointerObj = {user: {'@id': sipExt, '@type': 'pointer'}};
-                obj2.groups.group.users.push(usrPointerObj);
+                var usrPointerObj = {'@id': sipExt, '@type': 'pointer'};
+                obj2.group.users.user.push(usrPointerObj);
 
             });
         }
 
-        var doc = xmlBuilder.create('document').att('type', 'freeswitch/xml')
+        var obj = {
+            document: {
+                '@type': 'freeswitch/xml',
+                section: {
+                    '@name': 'directory',
+                    domain: {
+                        '@name': grpDomain,
+                        'users': users,
+                        'groups': obj2
+                    }
+                }
+
+
+            }
+        };
+
+        var xml = xmlBuilder.create(obj);
+        xml.end({pretty: true});
+
+        //var gwStr = section.end({pretty: true});
+
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + xml.toString({pretty: true});
+
+        /*var doc = xmlBuilder.create('document').att('type', 'freeswitch/xml')
             doc.ele('section').att('name', 'directory')
                 .ele('domain').att('name', grpDomain)
                     .ele(obj)
@@ -156,7 +173,7 @@ var CreateUserGroupDirectoryProfile = function(grp, reqId)
 
         doc.end({pretty: true});
 
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + doc.toString({pretty: true});*/
 
     }
     catch(ex)

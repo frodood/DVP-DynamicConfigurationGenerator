@@ -15,6 +15,7 @@ var smsCdrOp = require('./SMSCDROp.js');
 var backendFactory = require('./BackendFactory.js');
 var translationHandler = require('dvp-ruleservice/TranslationHandler.js');
 var underscore = require('underscore');
+var extApi = require('./ExternalApiAccess.js');
 
 
 /*var backendHandler;
@@ -107,7 +108,7 @@ var RedisOperations = function(callUuid, companyId, tenantId, appId, appType, is
     }
     catch(ex)
     {
-
+        //Do nothing
     }
 
 
@@ -911,11 +912,42 @@ server.post('/DVP/API/:version/DynamicConfigGenerator/CallApp', function(req,res
                                 {
                                     if(outRule)
                                     {
-                                        var xml = xmlBuilder.CreatePbxFeaturesGateway(reqId, huntDestNum, outRule.TrunkNumber, outRule.GatewayCode, ctxt.CompanyId, ctxt.TenantId, null, huntContext, outRule.DNIS);
+                                        extApi.CheckBalance(reqId, varUuid, outRule.ANI, outRule.DNIS, 'minute', outRule.Operator, ctxt.CompanyId, ctxt.TenantId)
+                                            .then(function(balanceRes)
+                                            {
+                                                if (balanceRes && balanceRes.IsSuccess)
+                                                {
 
-                                        logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+                                                    var xml = xmlBuilder.CreatePbxFeaturesGateway(reqId, huntDestNum, outRule.TrunkNumber, outRule.GatewayCode, ctxt.CompanyId, ctxt.TenantId, null, huntContext, outRule.DNIS, outRule.Operator);
 
-                                        res.end(xml);
+                                                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                                                    res.end(xml);
+                                                }
+                                                else
+                                                {
+                                                    logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Insufficient balance', reqId);
+
+                                                    var xml = xmlGen.createRejectResponse(huntContext);
+
+                                                    logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                                                    res.end(xml);
+                                                }
+
+                                            })
+                                            .catch(function(err)
+                                            {
+                                                logger.error('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - Insufficient balance', reqId, err);
+
+                                                var xml = xmlGen.createRejectResponse(huntContext);
+
+                                                logger.debug('DVP-DynamicConfigurationGenerator.CallApp] - [%s] - API RESPONSE : %s', reqId, xml);
+
+                                                res.end(xml);
+                                            });
+
+
                                     }
                                     else
                                     {

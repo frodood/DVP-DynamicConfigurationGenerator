@@ -74,6 +74,7 @@ var CheckBalance = function(reqId, uuid, from, to, type, provider, companyId, te
     {
         try
         {
+            console.log('billing enabled : ' + billingEnabled);
             if(billingEnabled)
             {
                 logger.debug('[DVP-DynamicConfigurationGenerator.CheckBalance] - [%s] -  check balance', reqId);

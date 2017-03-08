@@ -389,7 +389,7 @@ var GetAllDataForExt = function(reqId, extension, companyId, tenantId, extType, 
                     callback(err, undefined);
                 });
         }
-        else if(extType === 'IVR')
+        else if(extType === 'IVR' || extType === 'CAMPAIGN')
         {
             dbModel.Extension.find({where: [{Extension: extension},{CompanyId: companyId},{TenantId: tenantId},{ObjCategory: extType}]})
                 .then(function (extData)

@@ -198,7 +198,7 @@ var CreatePbxFeatures = function(reqId, destNum, pbxType, domain, trunkNumber, t
     }
 };
 
-var CreatePbxFeaturesGateway = function(reqId, destNum, trunkNumber, trunkCode, companyId, tenantId, appId, context, digits)
+var CreatePbxFeaturesGateway = function(reqId, destNum, trunkNumber, trunkCode, companyId, tenantId, appId, context, digits, operator)
 {
     try
     {
@@ -228,12 +228,31 @@ var CreatePbxFeaturesGateway = function(reqId, destNum, trunkNumber, trunkCode, 
             .ele('extension').att('name', destNum)
             .ele('condition').att('field', 'destination_number').att('expression', '^' + destNum + '$')
 
+        if(companyId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'companyid=' + companyId)
+                .up()
+        }
+        if(tenantId)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'tenantid=' + tenantId)
+                .up()
+        }
+
+        if(operator)
+        {
+            cond.ele('action').att('application', 'export').att('data', 'veeryoperator=' + operator)
+                .up()
+        }
+
 
         cond.ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=GATEWAY')
             .up()
-            .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=ATT_XFER_GATEWAY')
+            .ele('action').att('application', 'export').att('data', 'DVP_OPERATION_CAT=ATT_XFER_GATEWAY')
             .up()
-            .ele('action').att('application', 'att_xfer').att('data', '{origination_caller_id_number=' + trunkNumber + ',companyid=' + companyId + ',tenantid=' + tenantId + ',dvp_app_id=' + appId + '}sofia/gateway/' + trunkCode + '/' +digits)
+            .ele('action').att('application', 'export').att('data', 'DVP_CALL_DIRECTION=outbound')
+            .up()
+            .ele('action').att('application', 'att_xfer').att('data', '{origination_caller_id_number=' + trunkNumber + ',dvp_app_id=' + appId + '}sofia/gateway/' + trunkCode + '/' +digits)
             .up()
             .end({pretty: true});
 
@@ -274,8 +293,6 @@ var CreateAttendantTransferGW = function(reqId, destNum, context)
             .ele('action').att('application', 'set').att('data', 'transfer_ringback=$${us-ring}')
             .up()
             .ele('action').att('application', 'set').att('data', 'sip_h_DVP-DESTINATION-TYPE=GATEWAY')
-            .up()
-            .ele('action').att('application', 'set').att('data', 'DVP_OPERATION_CAT=ATT_XFER_GATEWAY')
             .up()
             .ele('action').att('application', 'execute_extension').att('data', 'gwtransfer XML PBXFeatures')
             .up();
@@ -562,7 +579,7 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
         }
 
         var ignoreEarlyM = "ignore_early_media=false";
-        if (ignoreEarlyMedia)
+        if (ignoreEarlyMedia && ep.Type != 'GROUP')
         {
             ignoreEarlyM = "ignore_early_media=true";
         }
@@ -570,7 +587,7 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
         var option = '';
 
 
-        if(dvpCallDirection === 'outbound')
+        if(dvpCallDirection === 'outbound' && ep.Type !== 'GROUP')
         {
             if (ep.LegStartDelay > 0)
                 option = util.format('[leg_delay_start=%d, origination_uuid=${my_uuid}, leg_timeout=%d,origination_caller_id_name=%s,origination_caller_id_number=%s]', ep.LegStartDelay, ep.LegTimeout, ep.Origination, ep.OriginationCallerIdNumber);
@@ -623,7 +640,7 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
             .ele('extension').att('name', 'test')
             .ele('condition').att('field', 'destination_number').att('expression', destinationPattern)
 
-        if(dvpCallDirection === 'outbound')
+        if(dvpCallDirection === 'outbound' && ep.Type !== 'GROUP')
         {
             cond.ele('action').att('application', 'set').att('data', 'my_uuid=${create_uuid()}').att('inline', 'true')
                 .up()
@@ -639,6 +656,13 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
             .up()
             .ele('action').att('application', 'set').att('data', bypassMedia)
             .up()
+
+        if(ep.Type === 'GROUP')
+        {
+            cond.ele('action').att('application', 'set').att('data', 'originate_continue_on_timeout=true')
+                .up();
+
+        }
 
         if(ep.Action)
         {
@@ -808,10 +832,13 @@ var CreateRouteUserDialplan = function(reqId, ep, context, profile, destinationP
             //    .up()
         }
 
+        if(ep.Type === 'GROUP')
+        {
+            calling = calling + '+A';
+        }
+
         cond.ele('action').att('application', 'bridge').att('data', calling)
             .up()
-
-
 
         if(ep.IsVoicemailEnabled)
         {
